@@ -1,0 +1,7 @@
+set,prices,contracts
+"Low-bid prices, train (before cutoff)",10296.0,599
+"Low-bid prices, test period",4563.0,242
+Test prices after exclusions,4507.0,238
+  of which flagged price outliers,58.0,45
+Test contracts with an engineer's estimate and item lines,,201
+Headline contracts (90%+ lines with item-level history),,178

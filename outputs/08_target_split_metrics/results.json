@@ -1,0 +1,40 @@
+{
+  "cutoff": "2024-01-01",
+  "test_end": "2026-11-03",
+  "item_level": {
+    "all prices": {
+      "n": 4507,
+      "coverage": 1.0,
+      "mdape": 0.5294117647058824,
+      "within_15": 0.1593077435100954
+    },
+    "without outliers": {
+      "n": 4449,
+      "coverage": 1.0,
+      "mdape": 0.5238095238095238,
+      "within_15": 0.16138458080467522
+    }
+  },
+  "contract_level": {
+    "headline": {
+      "contracts": 178,
+      "bidlens_closer_share": 0.4101123595505618,
+      "bidlens_median_abs_error": 0.27488894222397503,
+      "ee_median_abs_error": 0.21238682952515903,
+      "bidlens_median_error": 0.18487084414775645,
+      "ee_median_error": 0.19891149897610552,
+      "bidlens_within_15": 0.25842696629213485,
+      "ee_within_15": 0.3539325842696629
+    },
+    "all_test_contracts": {
+      "contracts": 201,
+      "bidlens_closer_share": 0.39303482587064675,
+      "bidlens_median_abs_error": 0.2749351927419355,
+      "ee_median_abs_error": 0.20434988709677415,
+      "bidlens_median_error": 0.15971610772595055,
+      "ee_median_error": 0.1720889883703285,
+      "bidlens_within_15": 0.25870646766169153,
+      "ee_within_15": 0.38308457711442784
+    }
+  }
+}

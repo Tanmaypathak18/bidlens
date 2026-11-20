@@ -11,5 +11,6 @@ Every stage of BidLens writes its results to a numbered folder here, so anyone c
 | 05 | [`05_data_quality/`](05_data_quality/README.md) | Missing values and data quality checks on the combined database. |
 | 06 | [`06_item_master/`](06_item_master/README.md) | The official Caltrans item list, item families, and how bid items map to it. |
 | 07 | [`07_data_overview/`](07_data_overview/README.md) | The results of `notebooks/01_data_overview.ipynb`: a plain-language tour of the data |
+| 08 | [`08_target_split_metrics/`](08_target_split_metrics/README.md) | How BidLens will be tested, and how well two simple yardsticks do on that test (step 2.1). |
 
-Regenerate stages 01 to 06 with `uv run python -m bidlens.outputs`. Last generated 2026-11-19.
+Regenerate stages 01 to 06 with `uv run python -m bidlens.outputs`. Last generated 2026-11-20.

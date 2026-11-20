@@ -1,0 +1,11 @@
+contracts,tier,description,lines,share_of_lines,share_of_bidlens_dollars
+all test contracts,1,Top-100 item: trailing 12-month median,3911,0.2634,0.6840
+all test contracts,2,Other standard item: median of earlier bids,9349,0.6296,0.1880
+all test contracts,3,Special item: median of earlier bids with the same description,666,0.0449,0.1027
+all test contracts,4,Fallback: median for the same item family or unit,918,0.0618,0.0253
+all test contracts,5,Unpriced: no earlier bid with the same unit,4,0.0003,0.0000
+headline contracts,1,Top-100 item: trailing 12-month median,3439,0.2763,0.7065
+headline contracts,2,Other standard item: median of earlier bids,7925,0.6368,0.1867
+headline contracts,3,Special item: median of earlier bids with the same description,547,0.0440,0.0908
+headline contracts,4,Fallback: median for the same item family or unit,530,0.0426,0.0159
+headline contracts,5,Unpriced: no earlier bid with the same unit,4,0.0003,0.0000
