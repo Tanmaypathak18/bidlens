@@ -1,0 +1,90 @@
+fact_id,topic,fact,value,pages
+S1,scope,"Work: trash capture devices, maintenance vehicle pullouts (MVPs), Midwest guardrail system (MGS), erosion control and modified lighting",,sp p13
+S2,scope,"Construction on state highway in Alameda and Contra Costa counties at various locations, District 4, Routes 4, 13, 24, 80, 84 and others",,sp p1; sp p13
+S3,scope,Engineer's estimated cost of the project,"$22,900,000",sp p13
+S4,scope,"Addendum 2 changes the bid item list: items 119 (clearing and grubbing, LS) and 120 (mobilization) added, items 26 and 118 deleted",,ad2 p1; ad2 p3
+S5,scope,Stormwater BMP (trash capture) installation at many listed locations needing lane closures and mobile barriers where workers are on foot,,sp p56
+T1,time_damages,Complete the work within 600 working days,600 working days,sp p13
+T2,time_damages,Start job site activities within 55 days after notice of contract approval (delayed start),55 days,sp p41; sp p42
+T3,time_damages,"Job site activities may not start until the CPM baseline schedule, WPCP or SWPPP, DRA/DRB nominee notice and SQCM resume are authorized or accepted",,sp p41
+T4,time_damages,Submit a notice 72 hours before starting job site activities (separate notice for each location),72 hours,sp p42
+T5,time_damages,"Late reopening of a lane or ramp closure: liquidated damages for each 10-minute interval past the pickup time, capped at 5% of the total bid per occurrence",5% of bid per occurrence,sp p58
+T6,time_damages,"Closure late-pickup damages vary by route and duration, e.g. ALA-92 westbound $4,000, $5,900 then $7,900 per 10 minutes; ALA-13 northbound $1,000 per 10 minutes",per 10 minutes,sp p59
+T7,time_damages,Tier 4 interim or final engines required for off-road diesel equipment; $2,000 penalty per noncompliant engine per day,"$2,000 per engine per day",sp p29; sp p37; sp p28; sp p3
+T8,time_damages,"Time-related overhead is bid per working day (600 WDAY) and paid by the working days on the weekly statement",600 WDAY,sp p15; sp p42
+T9,time_damages,Weekly statement of working days; dispute it with an RFI within 5 business days,5 business days,sp p42
+T10,time_damages,"Environmental product declarations for HMA and concrete: submit within 30 days of placement; $6,000 withhold per missing declaration","$6,000 per declaration",sp p36; sp p3; sp p35
+R1,traffic,"Complete ramp and connector closures only during the hours in the closure charts (I and J charts), with detours per the detour plans",,sp p76-p100
+R2,traffic,"Maximum work area length inside a closure is 1.5 miles (except one-way reversing closures)",1.5 miles,sp p101
+R3,traffic,"No more than 2 stationary closures per direction at a time, spaced at least 2 miles apart",2 closures; 2 miles,sp p101
+R4,traffic,Moving closures only for striping and pavement marker placement with bituminous adhesive; not for grinding recessed striping,,sp p101
+R5,traffic,"One-way reversing control: stop traffic no more than 15 minutes; closure up to 2 miles between flaggers; pilot car max 25 mph",15 minutes; 2 miles; 25 mph,sp p101
+R6,traffic,"Stationary impact attenuator vehicle required for work in the travel way or shoulder with traffic control devices, one per work area at least 500 feet apart",500 feet,sp p101; sp p57
+R7,traffic,"Construction work zone speed limit reduction (10 mph) required for lane closures with workers present, not for closures of 1 hour or less or 1/2 mile or less; radar speed feedback signs",10 mph,sp p101; sp p102
+R8,traffic,Mobile barrier system at each work area where workers are on foot (listed BMP locations); place and move it within a stationary lane closure,,sp p56; sp p57
+R9,traffic,"Keep the full traveled way open on holidays and special days (third Monday in January) and when no active work is in or within 6 feet of it",,sp p57; sp p58
+R10,traffic,Portable changeable message signs ahead of each closure; start the message 30 minutes before closing,30 minutes,sp p57
+R11,traffic,"Closure interlocks between ramps, e.g. Marine St on-ramp (locations 54, 55) must stay open when Canal Blvd off-ramp (location 53) is closed; J38 not with J42",,sp p98; sp p99; sp p100
+R12,traffic,Submit a contingency plan for work in the travel way and shoulders,,sp p57
+R13,traffic,"Lane requirement charts: keep at least 2 or 3 adjacent through freeway lanes open, depending on the location",,sp p62-p74
+E1,environmental,"Project is in or near habitat for nesting owls and raptors, roosting bats, and nesting native and nongame birds",,sp p104
+E2,environmental,"Stop work within 50 feet of a discovery; 300 feet for nesting owls and raptors, 200 feet for roosting bats",50/300/200 feet,sp p104
+E3,environmental,"Species protection area SPA-1 covers the entire project; attend an environmental (PLACs) preconstruction conference with the Department biologist",,sp p104
+E4,environmental,All construction personnel must complete 1-hour biologist training before working; request it 15 days before starting,1 hour; 15 days,sp p104
+E5,environmental,"Notify 30 days before job site activities for a preconstruction clearance survey; survey valid 72 hours; allow 15 days for a resurvey",30 days; 72 hours,sp p104
+E6,environmental,"During bird-nesting season no ground disturbance, vegetation removal, pruning, saw cutting or grinding without authorization; request a bird survey 10 days before starting and 5 days before resuming; valid 72 hours",10 days; 5 days; 72 hours,sp p104
+E7,environmental,Do not use plastic monofilament netting,,sp p104
+E8,environmental,"Cover holes and trenches deeper than 1 foot at the end of each day or provide an escape ramp; inspect for wildlife",1 foot,sp p105
+E9,environmental,"Using property outside the job site: obtain permits (PLACs) and submit them at least 30 days before work there",30 days,sp p105
+H1,hazardous,"Regulated material containing aerially deposited lead (ADL) is present in the project limits; the DTSC ADL Agreement applies",,sp p105
+H2,hazardous,"Type Z-2 material (1,000 mg/kg or more total lead, or 5.0 mg/L soluble) is California hazardous waste for a Class I disposal facility; locations listed with depths of about 0 to 1.5 feet",,sp p106
+H3,hazardous,"Type Z-2 excavation quantities: roadway excavation (Type Z-2) 340 CY and structure excavation (Type Z-2) 88 CY",340 CY; 88 CY,sp p16
+H4,hazardous,"Do not stockpile Type Z-2 material; load it directly into trucks; transport with a hazardous waste manifest and a DTSC-registered transporter",,sp p107
+H5,hazardous,Submit disposal documentation within 5 business days of transporting Type Z-2 material,5 business days,sp p107
+H6,hazardous,"Excavation and transportation plan for regulated material within 15 days of contract approval (3 copies, 15-day review), including the Class I facility and a spill contingency plan",15 days,sp p106; sp p107
+H7,hazardous,The Department does not pay for extra sampling required by disposal facilities; the contractor pays for spillage during transport,,sp p107
+H8,hazardous,"Unregulated earth material containing lead is present to a depth of 4.5 feet (3.1 to 68 mg/kg, average 15.33 mg/kg)",4.5 feet,sp p37; sp p39
+H9,hazardous,"Disposing of unregulated material: property-owner agreement form at least 15 days before, or a Class II or III landfill at the contractor's cost, including extra testing",15 days,sp p41
+H10,hazardous,"Minimal-disturbance ADL areas (15 to 370 mg/kg, average 92.65) for signs, MGS, vegetation control, end anchors and terminals: no visible dust, surplus stays in place",,sp p108
+H11,hazardous,Lead compliance plan required (bid item 1),,sp p15; sp p37; sp p108
+H12,hazardous,"Local material from noncommercial sources: local material plan 60 days before placing; must test at or below 80 mg/kg total lead, below 5 mg/L soluble lead, pH above 5.0",60 days; 80 mg/kg,sp p31; sp p33
+H13,hazardous,"Noncompliant local material goes to a Class I, II or III facility; the contractor is the generator",,sp p33
+H14,hazardous,"Information handout includes soil lead and pH lab results (e.g. STLC lead up to 14 mg/L in samples)",,IH p27; IH p380-p393; IH p151
+G1,geotechnical,"If rock or stiff soil is met at guardrail terminal posts, auger and backfill the holes (manufacturer manuals in the handout)",,IH p429; IH p629; IH p560; IH p507; IH p610
+G2,geotechnical,"Ordered changes in excavation, embankment or borrow: surplus disposal and borrow supply are change order work; option of $0.50 per cubic yard",$0.50/CY,sp p109
+G3,geotechnical,"At listed lead-impacted locations, excavate to full depth and do not excavate in lifts",,sp p38; sp p40; sp p41
+U1,utilities,"Other contracts may be working at or near the job site (list of coincident and adjacent contracts); coordinate lane closures with the Engineer and those contractors",,sp p25-p28
+U2,utilities,A railroad is within the project limits but there is no railroad work; do not trespass on railroad property,,sp p28
+U3,utilities,"Notify the Engineer and the Department's electrical maintenance superintendent at least 3 business days before working on the existing electrical system",3 business days,sp p122
+B1,bid_requirements,"Mandatory virtual prebid meeting (Webex): bids from bidders who did not attend are rejected; attendee must be an officer, superintendent or estimator; register at least 1 hour before",,sp p22; sp p21
+B2,bid_requirements,"Addendum 1 moves the mandatory prebid meeting to September 2, 2026 at 10:00 a.m. (was September 10)","September 2, 2026",ad1 p1; sp p13
+B3,bid_requirements,"Bids open Thursday September 17, 2026; electronic bids via Bid Express until 2:00 p.m.","September 17, 2026",sp p13; sp p1; ad1 p1
+B4,bid_requirements,Bidder's security of at least 10% of the bid,10%,sp p13
+B5,bid_requirements,Contractor must hold a Class A license or a Class C-42 license,,sp p13
+B6,bid_requirements,"Prevailing wages required; federal minimum wage rates also apply (pay the higher); Addendum 3 revises the federal minimum wages (modification 7, 09/03/2026)",,sp p13; sp p14; ad3 p1
+B7,bid_requirements,"Federal-aid project ST-000C(576); bids on a unit price basis; 5 trainees or apprentices for the federal training program",5 trainees,sp p13
+B8,bid_requirements,The successful bidder must report each small business hired as a result of the prebid meeting,,sp p22
+B9,bid_requirements,"Supplemental information in the handout: traffic management system elements list, soil investigation report, terminal installation manuals, mobile barrier rental quote and terms",,sp p22
+B10,bid_requirements,Addendum 2 deletes special provisions section 3-1.04,,ad2 p1
+SU1,submittals,"Safety representative resume and Cal/OSHA 30-hour (or OSHA 510) certificate; site-specific safety program at least 15 days before work and 48 hours before after revisions",15 days; 48 hours,sp p24
+SU2,submittals,"Temporary crash cushions: at least 10 days before installation submit certificate of compliance, manuals, drawings and manufacturer training records",10 days,sp p52
+SU3,submittals,"Temporary barrier systems: certificate of compliance, installation instructions, precast QC results and production log, bolt test reports",,sp p43; sp p44
+SU4,submittals,"Terminal systems: certificate of compliance per model; installation and maintenance manuals at least 10 days before installation",10 days,sp p118
+SU5,submittals,"Mobile barrier systems: FHWA acceptance letter and certificates 5 business days before use; proof of rental or ownership within 30 days of contract approval; inspection report and transport permit 15 days before",5 business days; 30 days; 15 days,sp p55
+SU6,submittals,Tier 4 equipment inventory list at least 15 days before using off-road diesel vehicles,15 days,sp p29
+SU7,submittals,"Local material analytical test results at least 15 days before placing; revised local material plan within 7 days of comments",15 days,sp p31
+SU8,submittals,Certified payroll records submitted electronically with LCPtracker Pro,,sp p3
+SU9,submittals,Mix design (with strength results) for minor concrete vegetation control; crumb rubber certificate if used,,sp p116
+SU10,submittals,"Prompt payment information each month between the 15th and 20th through the Department's monitoring system",,sp p23
+SU11,submittals,Loop detector test results within 1 business day after testing,1 business day,sp p122
+SU12,submittals,Request authorization for storage areas 10 days before storing materials,10 days,sp p105
+P1,payment,"Mobile barrier trailer rental quoted by the supplier at $375,000 for the total days specified, excluding sales tax, firm for orders by October 1, 2026","$375,000",sp p56
+P2,payment,"Mobile barrier trailers paid by the month; mobile barrier systems paid by the day (each working day used)",,sp p57
+P3,payment,"Pay subcontractors within 7 days and suppliers within 30 days of each progress payment",7 days; 30 days,sp p23
+P4,payment,"Dispute resolution: $250/hour off-site tasks, virtual meetings capped at $1,000, $2,500 per day on-site (up to $7,500 per DRB on-site meeting); no unit price adjustment for quantity changes","$250/hour; $2,500/day",sp p30
+P5,payment,"Material-on-hand payment requests need material cost above $50,000 ($25,000 for DVBE or certified small business)","$50,000; $25,000",sp p42
+P6,payment,Speed-limit-reduction signs and devices are paid under construction area signs and the listed sign items; for lane-closure-only reductions they are included in traffic control system,,sp p103
+P7,payment,"Withholds: 2% per month penalty on improperly withheld amounts; failure to submit Buy America forms can trigger a withhold",2% per month,sp p24; sp p30
+P8,payment,"Move-in/move-out (erosion control) payments for hydroseed and bonded fiber matrix",,sp p112
+P9,payment,"A lateral move of temporary crash cushions or barrier ordered but not shown is change order work",,sp p54; sp p51
+P10,payment,Temporary barrier is paid by length measured along the top of the barrier,,sp p52
