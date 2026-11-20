@@ -17,6 +17,7 @@ the model. Quantities come from the parsed bid item list, not from the model.
 from __future__ import annotations
 
 import argparse
+import contextlib
 import json
 import math
 import os
@@ -31,6 +32,8 @@ import pandas as pd
 ROOT = Path(".")
 CACHE = ROOT / "data" / "interim" / "docs"
 TOP_K = 25
+NUM_CTX = 32768  # D-054
+RETRIES, RETRY_WAIT = 6, 30
 MAX_QUOTE = 400
 
 HOSTED_MODEL = os.environ.get("BIDLENS_HOSTED_MODEL", "claude-opus-5-5")
@@ -273,22 +276,33 @@ class LocalBackend:
         )
 
     def complete(self, system: str, user: str, schema: dict) -> dict:
-        r = self.http.post(
-            "/api/chat",
-            json={
-                "model": self.model,
-                "stream": False,
-                "format": schema,
-                "think": False,  # D-054: qwen3's reasoning mode off, same as llama3.1
-                "options": {"temperature": 0, "num_ctx": 32768},
-                "messages": [
-                    {"role": "system", "content": system},
-                    {"role": "user", "content": user},
-                ],
-            },
-        )
-        r.raise_for_status()
+        import httpx
+
+        payload = {
+            "model": self.model,
+            "stream": False,
+            "format": schema,
+            "think": False,  # D-054: qwen3's reasoning mode off, same as llama3.1
+            "options": {"temperature": 0, "num_ctx": NUM_CTX},
+            "messages": [
+                {"role": "system", "content": system},
+                {"role": "user", "content": user},
+            ],
+        }
+        # The Ollama desktop app can restart itself (e.g. to apply an update); wait for it.
+        for attempt in range(RETRIES + 1):
+            try:
+                r = self.http.post("/api/chat", json=payload)
+                r.raise_for_status()
+                break
+            except (httpx.TransportError, httpx.HTTPStatusError) as e:
+                if attempt == RETRIES:
+                    raise
+                print(f"Ollama call failed ({e!r}); retrying in {RETRY_WAIT} s", flush=True)
+                time.sleep(RETRY_WAIT)
         body = r.json()
+        if (body.get("prompt_eval_count") or 0) >= NUM_CTX - 1024:
+            raise RuntimeError("prompt filled the context window; Ollama may have cut it")
         self.last_usage = {
             "input_tokens": body.get("prompt_eval_count"),
             "output_tokens": body.get("eval_count"),
@@ -298,7 +312,11 @@ class LocalBackend:
 
     def close(self) -> None:
         """Unload the model so only one is in memory at a time (D-054)."""
-        self.http.post("/api/generate", json={"model": self.model, "keep_alive": 0})
+        import httpx
+
+        # If the server is already gone, nothing is loaded.
+        with contextlib.suppress(httpx.TransportError):
+            self.http.post("/api/generate", json={"model": self.model, "keep_alive": 0})
 
 
 def slug(model: str) -> str:
@@ -384,33 +402,41 @@ def quantities(contract: str) -> list[dict]:
     return out
 
 
-def run(contract: str, backend, categories=CATEGORIES) -> dict:
+def run(contract: str, backend, categories=CATEGORIES, partial: Path | None = None) -> dict:
+    """Extract every category. With `partial`, finished categories are saved after each
+    call and skipped on a rerun, so an interrupted run resumes where it stopped."""
     chunks = pd.read_parquet(CACHE / contract / "chunks.parquet")
-    items, rejected, calls = quantities(contract), [], []
+    done = json.loads(partial.read_text()) if partial and partial.exists() else {}
     for cat in categories:
+        if cat.key in done:
+            continue
         ctx = retrieve(chunks, cat)
         t0 = time.perf_counter()
         raw = backend.complete(SYSTEM, prompt(cat, ctx), SCHEMA).get("items", [])
         kept, rej = cite(raw, ctx, cat)
-        items += kept
-        rejected += rej
-        calls.append(
-            {
+        done[cat.key] = {
+            "items": kept,
+            "rejected": rej,
+            "call": {
                 "category": cat.key,
                 "chunks": len(ctx),
                 "returned": len(raw),
                 "kept": len(kept),
                 "seconds": round(time.perf_counter() - t0, 1),
                 **getattr(backend, "last_usage", {}),
-            }
-        )
+            },
+        }
+        print(f"{cat.key}: {len(kept)} kept of {len(raw)}", flush=True)
+        if partial:
+            partial.write_text(json.dumps(done), encoding="utf-8")
+    keys = [c.key for c in categories]
     return {
         "contract": contract,
         "mode": backend.name,
         "model": getattr(backend, "model", ""),
-        "items": items,
-        "rejected": rejected,
-        "calls": calls,
+        "items": quantities(contract) + [i for k in keys for i in done[k]["items"]],
+        "rejected": [i for k in keys for i in done[k]["rejected"]],
+        "calls": [done[k]["call"] for k in keys],
     }
 
 
@@ -430,12 +456,14 @@ def main(argv: list[str] | None = None) -> int:
         backend = HostedBackend(args.model or HOSTED_MODEL)
     else:
         backend = LocalBackend(args.model or LOCAL_MODEL)
+    partial = CACHE / args.contract / f"extraction_{backend.name}.partial.json"
     try:
-        result = run(args.contract, backend)
+        result = run(args.contract, backend, partial=partial)
     finally:
         if hasattr(backend, "close"):
             backend.close()
     path = save(result)
+    partial.unlink(missing_ok=True)
     from bidlens.documents.report import write_extraction_report
 
     write_extraction_report(args.contract)

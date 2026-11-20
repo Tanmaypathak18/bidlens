@@ -120,3 +120,32 @@ def test_norm_ignores_whitespace_and_case():
 def test_slug_names_one_results_file_per_local_model():
     assert slug("qwen3:8b") == "qwen3-8b"
     assert slug("llama3.1:8b") == "llama3.1-8b"
+
+
+def test_run_resumes_from_partial_file_after_a_crash(tmp_path, monkeypatch):
+    import pytest
+
+    from bidlens.documents import extract
+
+    (tmp_path / "c1").mkdir()
+    _chunks().to_parquet(tmp_path / "c1" / "chunks.parquet")
+    monkeypatch.setattr(extract, "CACHE", tmp_path)
+    monkeypatch.setattr(extract, "quantities", lambda contract: [])
+    cats = [_cat("time_damages"), _cat("traffic")]
+
+    class Flaky:
+        name, calls = "local_fake", []
+
+        def complete(self, system, user, schema):
+            self.calls.append(user[-40:])
+            if len(self.calls) == 2:
+                raise RuntimeError("server went away")
+            return {"items": []}
+
+    partial = tmp_path / "c1" / "partial.json"
+    be = Flaky()
+    with pytest.raises(RuntimeError):
+        extract.run("c1", be, cats, partial=partial)
+    res = extract.run("c1", be, cats, partial=partial)
+    assert len(be.calls) == 3  # the finished topic was not asked again
+    assert [c["category"] for c in res["calls"]] == ["time_damages", "traffic"]
