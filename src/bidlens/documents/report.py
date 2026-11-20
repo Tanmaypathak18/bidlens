@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import json
+import re
 from datetime import date
 from pathlib import Path
 
@@ -11,6 +12,22 @@ import pandas as pd
 ROOT = Path(".")
 CACHE = ROOT / "data" / "interim" / "docs"
 OUT = ROOT / "outputs" / "18_extraction"
+
+
+CONTACT = re.compile(
+    r"[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[a-z]{2,}|\(?\b[0-9]{3}\)?[ .-]?[0-9]{3}-[0-9]{4}\b"
+)
+
+
+def mask(df: pd.DataFrame) -> pd.DataFrame:
+    """Outputs hold no phone numbers or email addresses, even agency ones (D-031)."""
+    return df.apply(
+        lambda col: (
+            col.str.replace(CONTACT, "[contact removed]", regex=True)
+            if pd.api.types.is_string_dtype(col)
+            else col
+        )
+    )
 
 
 def label(mode: str, model: str) -> str:
@@ -29,9 +46,9 @@ def write_extraction_report(contract: str) -> None:
     OUT.mkdir(parents=True, exist_ok=True)
     sections = []
     for mode, res in runs.items():
-        items = pd.DataFrame(res["items"])
+        items = mask(pd.DataFrame(res["items"]))
         items.to_csv(OUT / f"extracted_{mode}.csv", index=False)
-        pd.DataFrame(res["rejected"]).to_csv(OUT / f"rejected_{mode}.csv", index=False)
+        mask(pd.DataFrame(res["rejected"])).to_csv(OUT / f"rejected_{mode}.csv", index=False)
         cited = items["page"].notna().all() and items["file"].notna().all()
         calls = pd.DataFrame(res["calls"])
         model = res.get("model") or (calls["model"].dropna().iloc[0] if "model" in calls else "")
