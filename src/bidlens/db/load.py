@@ -132,7 +132,8 @@ def build(interim: Path, db_path: Path) -> dict:
             "SELECT count(*) FROM contract WHERE in_contract_list"
         ).fetchone()[0],
         "contracts_from_bids_only": con.execute(
-            "SELECT count(*) FROM contract WHERE NOT in_contract_list AND n_bidders_sv08 IS NOT NULL"
+            "SELECT count(*) FROM contract"
+            " WHERE NOT in_contract_list AND n_bidders_sv08 IS NOT NULL"
         ).fetchone()[0],
         "contracts_with_bid_summary": con.execute(
             "SELECT count(*) FROM contract WHERE has_bid_summary"
