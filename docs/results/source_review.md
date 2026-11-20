@@ -10,9 +10,11 @@ Reviewed 2026-11-19. This review covers where BidLens gets its Caltrans bid hist
 | County, route and type of work per contract | Contract Cost Data, `details.php` | Available |
 | Bidder count | Derived: the highest bid rank seen for a contract | Available, with a caveat (see below) |
 | Item code list and descriptions | Contract Cost Data, `codes.php` | Available |
-| Engineer's estimate (contract and item level) | HQ bid summaries (`ppmoe.dot.ca.gov`) only | **Not available for automated collection** |
-| Working days | HQ bid summaries only | **Not available for automated collection** |
-| Low bid total | HQ bid summaries; or summed from all items of bid rank 1 | Open: summing needs every item of a contract, not only in-scope items |
+| Engineer's estimate, contract total | Bid Summary PDFs, downloaded by hand (D-014) | Available |
+| Engineer's estimate, item level | Not found in any public source | **Not available.** Affects the step 2.1 benchmark |
+| Working days | Bid Summary PDFs | Available |
+| Every bid total, low bid and bidder count | Bid Summary PDFs (cross-checked against sv08data bid ranks) | Available |
+| Contract list for the slice | sv08data, four near-universal items (D-015) | 827 bid openings, 815 contract numbers |
 
 ## Source 1: Contract Cost Data (sv08data.dot.ca.gov)
 
@@ -90,13 +92,63 @@ The highest bid rank seen for a contract gives its number of regular bidders. In
 - **Automated access is not allowed.** `https://ppmoe.dot.ca.gov/robots.txt` says `User-agent: *` / `Disallow: /`. One request was made to the landing page during this review, before the `robots.txt` was checked. BidLens makes no further automated requests to this host (D-013).
 - **Open data:** a search of data.ca.gov found no dataset of Caltrans bid results, engineer's estimates or working days.
 
-**The source for the engineer's estimate and working days is an open question for the maintainer.** These fields feed:
-- step 1.5 (contract data)
-- the engineer's-estimate benchmark in step 2.1
-- the spread model in step 2.7
+The maintainer downloads Bid Summary PDFs from this site by hand (D-014). The list to download is in `the download list`.
+
+## Source 3: Bid Summary PDFs (manual download)
+
+Pilot: 10 contracts from 2025 (5 in District 4, 5 in District 5), saved as `data/raw/bid_summaries/<contract>.pdf`. They aren't committed: they contain bidder names, addresses and phone numbers, and BidLens works at market level. The parser fixtures for step 1.5 will be redacted text extracts.
+
+**Layout.** Each file is a text PDF (not a scan) produced by Caltrans' report tool. Pages are in this order:
+
+1. **Header (page 1):** contract number, bid opening date, project ID, location (`04-Son-101-22.8/32.8`), number of items, type of work, federal aid number, proposals issued, **total number of working days**, **number of bidders**, **engineer's estimate**, % over/under the estimate, and overrun/underrun.
+2. **Bid list:** one entry per bidder, with bid rank, bid amount, bidder ID, name and address, and the preference claimed (small business and so on).
+   - **A+B contracts** (cost plus time) show `Cost`, `Time: N Days x $rate` and `Total` for each bidder. The ranking uses `Total`.
+3. **Contract Proposal of Low Bidder:** every item, with item number, an optional `F` flag (final pay item), item code, description, unit, estimated quantity, unit price and amount.
+4. **Summary of Remaining Bidders:** for every other bidder, each item's unit price and amount, four bidders per page block.
+5. **List of Subcontractors:** not used.
+
+**Fields found in all 10 pilot files:**
+
+| Field | Found | Notes |
+| --- | --- | --- |
+| Engineer's estimate (contract total) | 10 of 10 | `Engineers Est: $…`. % over/under matches the low bid |
+| Working days | 10 of 10 | `Total Number of Working Days` |
+| Bid totals for every bidder | 10 of 10 | Bid list on pages 1 and 2 |
+| Item-level prices, low bidder | 10 of 10 | Item rows match `Number of Items` once the `F` flag is allowed for |
+| Item-level prices, other bidders | 10 of 10 | Summary of Remaining Bidders |
+| Item-level engineer's estimate | 0 of 10 | Not in the bid summary |
+
+**Quirks:**
+- **Unranked bidders.** 04-1Q7004 lists 8 bidders but ranks only 7. The eighth has no rank and is most likely an irregular bid. sv08data, which excludes irregular bidders, also shows 7. Use the ranked count as the bidder count, and keep `Number of Bidders` as published.
+- **A+B bids.** The low bid is chosen on `Total` (cost plus time), not `Cost`.
+- **Header-only pages.** 05-1N3804 page 5 and 05-1R7504 page 4 have only the header. They are harmless.
+- **One bidder.** 05-1R7504 had a single bid, 10% over the estimate. Bidder counts in the pilot range from 1 to 12.
+- Single-bidder and two-bidder contracts have no separate bid-list page.
+
+## Contract list (D-015)
+
+Searches on sv08data need at least 3 contiguous letters or digits, so no single search lists every contract. The site also returned HTTP 500 for the code pattern `390___`. The contract list is built from the union of awarded-only (`ob=1`) searches, one per district covering all years, for four items nearly every contract has:
+
+- 999990 mobilization
+- 120090 construction area signs
+- 120100 traffic control system
+- 130100 job site management
+
+Mobilization alone missed 2 of the 10 pilot contracts. The union found all 10.
+
+Result for D-007:
+
+| District | 2018 | 2019 | 2020 | 2021 | 2022 | 2023 | 2024 | 2025 | 2026 (to Nov 3) |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| 04 | 80 | 64 | 43 | 64 | 68 | 72 | 68 | 64 | 28 |
+| 05 | 40 | 29 | 27 | 40 | 42 | 30 | 25 | 24 | 19 |
+
+That's 827 bid openings under 815 contract numbers. Twelve openings re-use a contract number, meaning the contract was re-advertised.
+
+With `ob=1`, the Bid column holds the awarded bidder's rank, not the bid-open quarter that the help page describes. Fixture: `tests/fixtures/caltrans/results_awarded_contract_list.html`.
 
 ## Collection plan for the D-007 slice
 
-- **Queries:** about 100 items × 2 districts × 9 years = up to 1,800 `results.php` calls, plus one `details.php` call per contract (estimated at under 1,700). That is about 3,500 requests, roughly 2 hours at D-013's rate.
-- **Picking the top 100 items:** this needs item totals first. Step 1.2 decides how, either a one-off wildcard query per district and year (heavy) or a candidate list from the code search.
+- **Queries:** about 100 items × 2 districts × 9 years = up to 1,800 `results.php` calls, plus one `details.php` call per contract (827). That is about 2,600 requests, roughly 1.5 hours at the D-013 rate.
+- **Picking the top 100 items:** from bid summary dollar totals (D-016). The list is provisional until Tier 1 of the checklist is downloaded.
 - **Cache:** raw HTML keyed by URL (format chosen in step 1.2).
