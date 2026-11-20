@@ -32,13 +32,18 @@ CREATE TABLE contract (
     CHECK (working_days IS NULL OR working_days > 0)
 );
 
--- Current Caltrans item list (filled in step 1.4).
+-- Caltrans item list (step 1.4; D-027 to D-030). Retired codes seen in the data are
+-- kept with is_current = FALSE.
 CREATE TABLE item_master (
     item_code           VARCHAR PRIMARY KEY,      -- 6 digits
     description         VARCHAR NOT NULL,
-    unit                VARCHAR,                  -- normalized unit (step 1.4)
-    item_family         VARCHAR,                  -- step 1.4
+    unit                VARCHAR,                  -- normalized pay unit
+    item_family         VARCHAR,                  -- D-030
     is_one_time_use     BOOLEAN NOT NULL DEFAULT FALSE,
+    spec_section        INTEGER,                  -- 2026 Standard Specifications section
+    final_pay           BOOLEAN NOT NULL DEFAULT FALSE,
+    is_current          BOOLEAN NOT NULL,         -- on the 2026 list
+    replaced_by         VARCHAR[],                -- successors of a retired code
     CHECK (length(item_code) = 6)
 );
 

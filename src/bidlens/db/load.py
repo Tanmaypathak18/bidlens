@@ -18,12 +18,13 @@ from pathlib import Path
 
 import duckdb
 
+from bidlens.db.item_master import DEFAULT_ITEM_LIST, build_item_master
 from bidlens.ingest.check_bid_summaries import _CONTRACT_SCHEMA
 
 SCHEMA = files("bidlens.db").joinpath("schema.sql").read_text()
 
 
-def build(interim: Path, db_path: Path) -> dict:
+def build(interim: Path, db_path: Path, item_list: Path | None = None) -> dict:
     """Create a fresh database and load it. Returns row counts and reconciliation."""
     bids = interim / "sv08_bids.parquet"
     contracts = interim / "sv08_contracts.parquet"
@@ -115,6 +116,10 @@ def build(interim: Path, db_path: Path) -> dict:
         FROM stg_bid
     """)
 
+    item_stats = None
+    if item_list is not None and Path(item_list).exists():
+        item_stats = build_item_master(con, Path(item_list))
+
     counts = {
         t: con.execute(f"SELECT count(*) FROM {t}").fetchone()[0]
         for t in ("contract", "bid_item", "bid", "item_master", "cost_index")
@@ -141,15 +146,16 @@ def build(interim: Path, db_path: Path) -> dict:
     }
     con.close()
     tmp.replace(db_path)
-    return {"counts": counts, "reconciliation": recon}
+    return {"counts": counts, "reconciliation": recon, "item_master": item_stats}
 
 
 def main(argv: list[str] | None = None) -> int:
     ap = argparse.ArgumentParser(description=__doc__)
     ap.add_argument("--interim", type=Path, default=Path("data/interim"))
     ap.add_argument("--db", type=Path, default=Path("data/bidlens.duckdb"))
+    ap.add_argument("--item-list", type=Path, default=DEFAULT_ITEM_LIST)
     args = ap.parse_args(argv)
-    result = build(args.interim, args.db)
+    result = build(args.interim, args.db, args.item_list)
     print(json.dumps(result, indent=2))
     (args.interim / "load_log.json").write_text(json.dumps(result, indent=2))
     return 0 if result["reconciliation"]["bids_reconcile"] else 1
