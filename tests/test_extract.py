@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import pandas as pd
 
-from bidlens.documents.extract import BM25, CATEGORIES, cite, norm, retrieve, slug
+from bidlens.documents.extract import BM25, CATEGORIES, cite, found, norm, retrieve, salvage, slug
 
 
 def _chunks():
@@ -149,3 +149,19 @@ def test_run_resumes_from_partial_file_after_a_crash(tmp_path, monkeypatch):
     res = extract.run("c1", be, cats, partial=partial)
     assert len(be.calls) == 3  # the finished topic was not asked again
     assert [c["category"] for c in res["calls"]] == ["time_damages", "traffic"]
+
+
+def test_found_ignores_punctuation_and_line_breaks_but_not_words():
+    text = "AT VARIOUS LOCATIONS\nUC Bridge No. 33-\n0285 in Oakland"
+    assert found("at various locations.", text)
+    assert found("Bridge No. 33-0285", text)
+    assert not found("Bridge No. 33-0286", text)
+    assert not found("various Oakland", text)
+    assert not found("...", text)
+
+
+def test_salvage_keeps_complete_items_from_a_cut_off_reply():
+    cut = '{"items": [{"statement": "a"}, {"statement": "b"}, {"statem'
+    assert salvage(cut) == {"items": [{"statement": "a"}, {"statement": "b"}]}
+    assert salvage('{"items": [{"statem') == {"items": []}
+    assert salvage('{"items": []}') == {"items": []}

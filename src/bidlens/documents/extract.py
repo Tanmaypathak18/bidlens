@@ -33,6 +33,7 @@ ROOT = Path(".")
 CACHE = ROOT / "data" / "interim" / "docs"
 TOP_K = 25
 NUM_CTX = 32768  # D-054
+NUM_PREDICT = 4096  # D-056: stop a looping model
 RETRIES, RETRY_WAIT = 6, 30
 MAX_QUOTE = 400
 
@@ -283,7 +284,7 @@ class LocalBackend:
             "stream": False,
             "format": schema,
             "think": False,  # D-054: qwen3's reasoning mode off, same as llama3.1
-            "options": {"temperature": 0, "num_ctx": NUM_CTX},
+            "options": {"temperature": 0, "num_ctx": NUM_CTX, "num_predict": NUM_PREDICT},
             "messages": [
                 {"role": "system", "content": system},
                 {"role": "user", "content": user},
@@ -307,8 +308,9 @@ class LocalBackend:
             "input_tokens": body.get("prompt_eval_count"),
             "output_tokens": body.get("eval_count"),
             "model": self.model,
+            "truncated": body.get("done_reason") == "length",
         }
-        return json.loads(body["message"]["content"])
+        return salvage(body["message"]["content"])
 
     def close(self) -> None:
         """Unload the model so only one is in memory at a time (D-054)."""
@@ -317,6 +319,21 @@ class LocalBackend:
         # If the server is already gone, nothing is loaded.
         with contextlib.suppress(httpx.TransportError):
             self.http.post("/api/generate", json={"model": self.model, "keep_alive": 0})
+
+
+def salvage(text: str) -> dict:
+    """Parse the model's JSON; if it was cut off (D-056), keep the complete items."""
+    try:
+        return json.loads(text)
+    except json.JSONDecodeError:
+        pass
+    cut = text.rfind("}")
+    while cut > 0:
+        try:
+            return json.loads(text[: cut + 1] + "]}")
+        except json.JSONDecodeError:
+            cut = text.rfind("}", 0, cut)
+    return {"items": []}
 
 
 def slug(model: str) -> str:
@@ -331,6 +348,17 @@ def norm(text: str) -> str:
     return re.sub(r"\s+", " ", text).strip().lower()
 
 
+def words(text: str) -> str:
+    """Letters and digits only, space separated, with spaces at both ends (D-056)."""
+    return " " + " ".join(re.findall(r"[a-z0-9]+", text.lower())) + " "
+
+
+def found(quote: str, text: str) -> bool:
+    """The quote's words appear as one unbroken run in the text's words."""
+    q = words(quote)
+    return q.strip() != "" and q in words(text)
+
+
 def cite(items: list[dict], ctx: pd.DataFrame, cat: Category) -> tuple[list[dict], list[dict]]:
     """Keep items whose quote is found in their chunk; attach the chunk's citation."""
     by_id = ctx.set_index("chunk_id")
@@ -340,11 +368,11 @@ def cite(items: list[dict], ctx: pd.DataFrame, cat: Category) -> tuple[list[dict
         ok = (
             cid in by_id.index
             and 0 < len(quote) <= MAX_QUOTE
-            and norm(quote) in norm(by_id.at[cid, "text"])
+            and found(quote, by_id.at[cid, "text"])
         )
         if not ok:
             # The quote may be from another provided chunk than the one named.
-            hits = [c for c in by_id.index if quote and norm(quote) in norm(by_id.at[c, "text"])]
+            hits = [c for c in by_id.index if found(quote, by_id.at[c, "text"])]
             if len(quote) <= MAX_QUOTE and len(hits) == 1:
                 cid, ok = hits[0], True
         if not ok:
