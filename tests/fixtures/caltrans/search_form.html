@@ -1,0 +1,313 @@
+    <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd" >
+
+    <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en" >
+    <head>
+    <title>California Department Of Transportation: Contract Cost Data</title>
+
+    <meta http-equiv="content-type" content="text/html; charset=iso-8859-1" />
+    <meta http-equiv="Content-Style-Type" content="text/css" />
+
+    <meta name="Author" content="State of California: Jonathan den Hartog, District 8" />
+    <meta name="Description" content="Contract Cost Data" />
+    <meta name="Keywords" content="estimate, estimating, bid, bidder, costs, unit prices" />
+
+    <script type="text/javascript" src="/ruxitagentjs_ICANVfqrux_10349261020121938.js" data-dtconfig="rid=RID_2144409172|rpid=-1866872912|domain=ca.gov|reportUrl=/rb_bf84802mhz|app=ea7c4b59f27d43eb|srtbv=4|owasp=1|featureHash=ICANVfqrux|rdnt=1|uxrgce=1|cuc=lxc2r0ou|mel=100000|expw=1|dpvc=1|lastModification=1794201565198|tp=500,50,0|srbbv=3|agentUri=/ruxitagentjs_ICANVfqrux_10349261020121938.js"></script><link rel="icon" type="image/x-icon" href="./favicon.ico" />
+
+    <script type="text/javascript" src="javascript/navigation.js"></script>
+    <script type="text/javascript" src="javascript/input.js?v=1"></script>
+
+    <style type="text/css">
+    <!--
+    @import url("css/ca_master.css?v=1");
+    @import url("css/ca_department.css");
+    @import url("css/navigation_2_level.css");
+
+    @import url("css/content_2_column.css");
+
+    @import url("css/color_scheme_02_ca.css");
+
+    @import url("css/cost_data.css");
+
+    -->
+    </style>
+
+    <!-- <link href="styles/help.css" rel="stylesheet" type="text/css" /> -->
+    <!-- **************************************************************** -->
+        <!-- Begin JavaScript Variable to Set Active Tab -->
+        <!-- Change the "defaultMainList" value to match the name of the  -->
+        <!-- page as listed in the navigation include unordered list -->
+        <script type="text/javascript">
+        <!--
+
+        var defaultMainList = "Home";
+
+        // -->
+        </script>
+        <!-- End JavaScript Variable to Set Active Tab -->
+    <!-- **************************************************************** -->
+
+    </head><body>
+<div id="heading">
+    <a href="http://dot.ca.gov"><img src="https://dot.ca.gov/-/media/dot-media/images/logos/caltrans/caltranslogo.png" alt="Caltrans Logo"></a>
+    <div id="site_title">Contract Cost Data</div>
+</div>
+<div id="navigation">
+    <div id="background_top"></div>
+    <div id="nav_list" style="visibility:hidden"><!-- needed to avoid a JS error --></div>
+</div>
+<div id="main_content_1">
+    <div id="main_content_2">
+        <div id="left_column">
+            <div class="left_column_top">
+                <ul class="list_decorative_blue">
+                    <li><a href="index.php">Contract Cost Data Home</a></li>
+<li><a href="codes.php">Code Search</a></li>
+<li><a href="resources.php">Other Resources</a></li>
+<li><a href="searchtips.php">Search Tips</a></li>
+<li><a href="help.php">Help</a></li>
+                </ul>
+            </div>
+            <div class="column_inner">
+                <div class="column_inner">
+                    <h3>DATABASE STATS</h3>
+                    <ul class="list_decorative_dark">
+                        <li>3,476,161 records in database</li>
+                        <li>Latest bid-open-date imported: 11-03-2026</li>
+                    </ul>
+                    <p style="text-align:center;"><img src="images/ct_logo_trans.gif" alt="Caltrans logo" width="75" height="62" /></p>
+                </div>
+            </div>
+        </div>
+        <div id="middle_column">
+            <div class="breadcrumbs">
+                <strong>Cost Data Home</strong>
+            </div>
+            <div class="column_inner">
+                <div class="cleaner">&nbsp;</div>
+                <p>Welcome to the Contract Cost Database Search Page. This site
+                    allows you to search historic bid data for Caltrans construction cost data.
+                    Use of this site constitutes acceptance of the
+                    <a href="https://www.dot.ca.gov/conditions-of-use">conditions of use</a>.
+                    For more help on using this site <a href="help.php">use this help page</a>. For the most recent bid data, go to the
+                    <a href="https://ppmoe.dot.ca.gov/cc?id=cc_bid_summary&archived=false">Headquarters bid summary results page</a>.</p>
+
+                <h2>Search Parameters</h2>
+                <div id="ccdata_search_entry">
+                    <form method="get" action="results.php" id="frm" onsubmit="return verify()">
+                        <p>
+                            <label for="item">
+                                <span class="fldlabel">Item Code or Description</span><span style="color:#df0000">*</span>
+                            </label>
+                            <input type="text" id="item" name="item" size="38" />
+                            <a href="javascript:graphIt();"><img src="images/graph.gif" alt="graph trend" title="Graph cost trend"/></a>
+                        </p>
+                        <div id="searchTip">
+                            Note that description and/or wildcard searches are slower than searching by an item code.
+                            It is recommended to find the appropriate code for your item from the
+                            <a href="codes.php">Code Search</a> page and search by the code directly for faster,
+                            more precise searches.
+                        </div>
+                        <p>
+                            <label for="ob">Include data from</label>
+                            <select name="ob" id="ob">
+                                <option value="0" selected='selected'>all</option>
+                                <option value="1" >awarded</option>
+                                <option value="2" >top 2</option>
+                                <option value="3" >top 3</option>
+                                <option value="4" >top 4</option>
+                                <option value="5" >top 5</option>
+                            </select>
+                            bidder(s). (Note: Does not include irregular bidders).
+                        </p><p>
+                            To make multiple selections from the boxes below, hold the control key down as
+                            you make selections. Leave the boxes unselected or blank to query for all
+                            the values.
+                        </p>
+                        <table>
+                            <tr>
+                                <td style="width:15%">
+                                    <div id="loclabel">
+                                        <label for="DISTRICT"><span class="fldlabel">District(s)</span></label>
+                                    </div>
+                                    <select name="DISTRICT[]" id="DISTRICT" size="12" multiple="multiple"><option value="01">District 01</option>
+<option value="02">District 02</option>
+<option value="03">District 03</option>
+<option value="04">District 04</option>
+<option value="05">District 05</option>
+<option value="06">District 06</option>
+<option value="07">District 07</option>
+<option value="08">District 08</option>
+<option value="09">District 09</option>
+<option value="10">District 10</option>
+<option value="11">District 11</option>
+<option value="12">District 12</option>
+                                    </select><br/>
+                                    <a href="javascript:clearSel(0);" style="font-size:smaller" aria-label="clear district">clear selection</a>
+                                </td><td style="width:15%">
+                                    <label for="Year"><span class="fldlabel">Year(s)</span></label><br/>
+                                    <select name="Year[]" id="Year" size="12" multiple="multiple"><option value="y2026">2026</option>
+<option value="y2025">2025</option>
+<option value="y2024">2024</option>
+<option value="y2023">2023</option>
+<option value="y2022">2022</option>
+<option value="y2021">2021</option>
+<option value="y2020">2020</option>
+<option value="y2019">2019</option>
+<option value="y2018">2018</option>
+<option value="y2017">2017</option>
+<option value="y2016">2016</option>
+<option value="y2015">2015</option>
+<option value="y2014">2014</option>
+<option value="y2013">2013</option>
+<option value="y2012">2012</option>
+<option value="y2011">2011</option>
+<option value="y2010">2010</option>
+<option value="y2009">2009</option>
+<option value="y2008">2008</option>
+<option value="y2007">2007</option>
+<option value="y2006">2006</option>
+<option value="y2005">2005</option>
+<option value="y2004">2004</option>
+<option value="y2003">2003</option>
+<option value="y2002">2002</option>
+<option value="y2001">2001</option>
+<option value="y2000">2000</option>
+<option value="y1999">1999</option>
+<option value="y1998">1998</option>
+<option value="y1997">1997</option>
+<option value="y1996">1996</option>
+<option value="y1995">1995</option>
+<option value="y1994">1994</option>
+<option value="y1993">1993</option>
+                                    </select>
+                                    <br/>
+                                    <a href="" onclick="clearSel(1);return false;" style="font-size:smaller" aria-label="clear year">clear selection</a>
+                                </td><td style="vertical-align: top;">
+                                    <span class="fldlabel">Optional Parameters:</span><br/>
+                                    <span style="font-size:smaller">(Fill in as many as you need, or leave them blank to search all)</span>
+                                    <p>
+                                        <span class="fldlabel">Total Price (for item)</span>
+                                    </p>
+                                    <table>
+                                        <tr>
+                                            <td class="fldcell"><label for="min">Min $</label></td>
+                                            <td><input type="text" name="min" id="min" size="10" /></td>
+                                        </tr><tr>
+                                            <td class="fldcell"><label for="max">Max $</label></td>
+                                            <td><input type="text" name="max" id="max" size="10" /></td>
+                                        </tr>
+                                    </table>
+                                    <p>
+                                        <span class="fldlabel">Quantity</span>
+                                    </p>
+                                    <table>
+                                        <tr>
+                                            <td class="fldcell"><label for="minU">Min</label></td>
+                                            <td><input name="minU" type="text" id="minU" size="10" /></td>
+                                        </tr><tr>
+                                            <td class="fldcell"><label for="maxU">Max</label></td>
+                                            <td><input name="maxU" type="text" id="maxU" size="10" /></td>
+                                        </tr>
+                                    </table>
+                                    <p>
+                                        <label for="unit"><span class="fldlabel">Unit</span></label>
+                                        <select name="unit" id="unit" onchange="setCheck()">
+                                            <option value="none">-any-</option>
+                                            <option value="ACRE">ACRE</option>
+                                            <option value="CDAY">CDAY</option>
+                                            <option value="CF">CF</option>
+                                            <option value="CY">CY</option>
+                                            <option value="DAY">DAY</option>
+                                            <option value="EA">EA</option>
+                                            <option value="GAL">GAL</option>
+                                            <option value="HA">HA</option>
+                                            <option value="HR">HR</option>
+                                            <option value="KG">KG</option>
+                                            <option value="KM">KM</option>
+                                            <option value="L">L</option>
+                                            <option value="LB">LB</option>
+                                            <option value="LF">LF</option>
+                                            <option value="LNKM">LNKM</option>
+                                            <option value="LNMI">LNMI</option>
+                                            <option value="LS">LS</option>
+                                            <option value="M">M</option>
+                                            <option value="M2">M2</option>
+                                            <option value="M3">M3</option>
+                                            <option value="MFBM">MFBM</option>
+                                            <option value="MI">MI</option>
+                                            <option value="SQFT">SQFT</option>
+                                            <option value="SQYD">SQYD</option>
+                                            <option value="STA">STA</option>
+                                            <option value="STA(E)">STA(E)</option>
+                                            <option value="STA(M)">STA(M)</option>
+                                            <option value="TAB">TAB</option>
+                                            <option value="TF">TF</option>
+                                            <option value="TON">TON</option>
+                                            <option value="TONN">TONN</option>
+                                            <option value="WDAY">WDAY</option>
+                                        </select>
+                                        <input type="checkbox" value="1" name="convert" id="convert" />
+                                        <label for="convert">
+                                            <span style="font-size:smaller">convert to this unit whenever possible</span>
+                                        </label>
+                                    </p>
+                                </td>
+                            </tr>
+                        </table>
+                        <div>
+                            <div id="loclink">
+                                <a href="#" onclick="changeLoc();return false;">show counties</a> |
+                                <a href="map.php">show map</a>
+                            </div>
+                            <input type="reset" value="Reset" name="clear" />
+                            &nbsp;&nbsp;
+                            <input type="submit" value="Search" name="start" />
+                        </div>
+                        <div style="text-align:right">
+                            <span style="color:#df0000">*</span>
+                            <span style="font-size:0.8em">indicates required field</span>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <div class="cleaner">&nbsp;</div>
+    </div>
+</div>
+
+<div class="cleaner">&nbsp;</div>
+<script type="text/javascript">
+    <!--
+    var counties = new Array('ALA','ALP','AMA','BUT','CAL','CC','COL','DN','ED','FRE','GLE','HUM','IMP','INY','KER','KIN','LA','LAK','LAS','MAD','MEN','MER','MNO','MOD','MON','MPA','MRN','NAP','NEV','ORA','PLA','PLU','RIV','SAC','SB','SBD','SBT','SCL','SCR','SD','SF','SHA','SIE','SIS','SJ','SLO','SM','SOL','SON','STA','SUT','TEH','TRI','TUL','TUO','VEN','YOL','YUB');
+    // -->
+</script>
+<!-- *********************************** -->
+<!-- State of California master template -->
+<!--             Version 1.10            -->
+<!--    Last Updated January 4, 2007     -->
+<!-- *********************************** -->
+
+<!-- **************************************************************** -->
+    <!-- Begin Footer -->
+    <script>
+        (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+        (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+        m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+        })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+        ga('create', 'UA-64727386-2', 'auto');
+        ga('send', 'pageview');
+    </script>
+    <div id="footer">
+      <div>
+            <a href="mailto:email-removed@example.org">Contact Us</a>
+            <span></span>
+      </div>
+      <p>
+          <span class="hidden"> | </span><a href="http://www.dot.ca.gov/use.html">Conditions of Use</a> | <a href="https://dot.ca.gov/privacy-policy">Privacy Policy</a><br />
+        Copyright &copy; 2026 State of California</p>
+    </div>
+    <!-- End Footer -->
+<!-- **************************************************************** --></body>
+</html>
