@@ -30,7 +30,7 @@ _HEADER_FIELDS = {
 _REQUIRED = ("contract_number", "bid_open_date", "engineers_estimate", "n_bidders_reported")
 
 # "1 $6,368,565.50 VC..." or "1 Cost: $7,965,469.13 VC..." (rank missing on irregular bids)
-_BID_RE = re.compile(r"^(\d{1,2})?\s*(?:Cost:\s*|A\)\s*)?\$([\d,]+\.\d{2})\s+VC\w*", re.M)
+_BID_RE = re.compile(r"^(?:(\d{1,2})\s+)?(?:Cost:\s*|A\)\s*)?\$([\d,]+\.\d{2})\s+VC\w*", re.M)
 _TIME_RE = re.compile(r"^(?:Time:|B\))\s*([\d,]+)\s*Days\s*[x*]\s*\$?([\d,]+(?:\.\d{2})?)", re.M)
 _TOTAL_RE = re.compile(r"^(?:Total:|A\+B\))\s*\$([\d,]+\.\d{2})", re.M)
 _ITEM_RE = re.compile(
@@ -290,7 +290,7 @@ _LEGACY_HEADER = {
     "engineers_estimate": r"ENGINEERS EST\s+([\d,]+\.\d{2})",
 }
 _LEGACY_PCT = re.compile(r"PERCENT (OVER|UNDER) EST\s+([\d.]+)")
-_LEGACY_BID = re.compile(r"^(\d{1,2})?\s*(?:A\)\s*)?([\d,]+\.\d{2})\s+\d{1,3}\s+\S")
+_LEGACY_BID = re.compile(r"^(?:(\d{1,2})\s+)?(?:A\)\s*)?([\d,]+\.\d{2})\s+\d{1,3}\s+\S")
 _LEGACY_TIME = re.compile(r"^B\)\s*([\d,]+)\s*DAYS\s*X\s*([\d,.]+)")
 _LEGACY_TOTAL = re.compile(r"^A\+B\)\s*([\d,]+\.\d{2})")
 _LEGACY_ITEM_START = re.compile(r"^\d{1,4}\s+(?:\(?F\)?\s+)?\d{6}\s")

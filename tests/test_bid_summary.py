@@ -133,3 +133,75 @@ def test_rejects_non_bid_summary() -> None:
         parse_text(["Some other document"])
     with pytest.raises(BidSummaryError):
         parse_text(["Bid Summary\nContract Number: 04-0X0000\n"])  # header fields missing
+
+
+LEGACY_P1 = """STATE OF CALIFORNIA B I D S U M M A R Y DEPARTMENT OF TRANSPORTATION BID211(cid:13)
+PAGE 1(cid:13)
+BID OPENING DATE 06/14/22 IN SONOMA COUNTY NEAR SOMEWHERE 06/22/22(cid:13)
+CONTRACT NUMBER 04-0Z0000 0.3 TO 0.7 MILES NORTH CONTRACT CODE 'A '(cid:13)
+LOCATION 04-SON-1-26.7/27.1 GRADE ROAD 3 CONTRACT ITEMS(cid:13)
+PROPOSALS ISSUED 12 FUND TOTAL 0 TOTAL NUMBER OF WORKING DAYS 625(cid:13)
+NUMBER OF BIDDERS 3 ENGINEERS EST 1,000.00 AMOUNT UNDER 100.00 PERCENT UNDER EST 10.00(cid:13)
+BID RANK BID TOTAL BIDDER ID BIDDER INFORMATION (NAME/ADDRESS/LOCATION)(cid:13)
+1 A) 900.00 3 EXAMPLE PAVING ONE 000 000-0000(cid:13)
+B) 10 DAYS X 50(cid:13)
+A+B) 1,400.00 SOMEWHERE CA 00000(cid:13)
+2 A) 950.00 4 EXAMPLE PAVING TWO 000 000-0000(cid:13)
+B) 10 DAYS X 50(cid:13)
+A+B) 1,450.00 SOMEWHERE CA 00000(cid:13)
+1,100.00 2 EXAMPLE PAVING THREE(cid:13)
+"""
+
+LEGACY_P2 = """04-0Z0000 BID211
+04-SON-1-26 C O N T R A C T P R O P O S A L O F L O W B I D D E R PAGE 2
+06/14/22 06/22/22
+------------------------------------------------------------
+ITEM ITEM UNIT OF ESTIMATED
+NO. CODE ITEM DESCRIPTION MEASURE QUANTITY BID AMOUNT
+------------------------------------------------------------
+1 120090 CONSTRUCTION AREA SIGNS LS LUMP SUM 100.00 100.00
+2 120204 PORTABLE RADAR SPEED FEEDBACK SIGN EA 2 200.00 400.00
+SYSTEM DAY
+3 390132 HOT MIX ASPHALT (TYPE A) TON 4 100.00 400.00
+TOTAL 900.00
+"""
+
+
+def test_legacy_layout() -> None:
+    s = parse_text([LEGACY_P1, LEGACY_P2])
+    assert s.contract_number == "04-0Z0000"
+    assert s.bid_open_date == date(2022, 6, 14)
+    assert (s.district, s.county) == ("04", "SON")
+    assert s.working_days == 625 and s.engineers_estimate == 1000.0
+    assert s.pct_over_under == -10.0
+    assert s.is_a_plus_b
+    assert [b.rank for b in s.bids] == [1, 2, None]
+    assert (s.low_bid.cost, s.low_bid.time_days, s.low_bid.total) == (900.0, 10, 1400.0)
+    assert [i.item_code for i in s.low_items] == ["120090", "120204", "390132"]
+    assert s.low_items[1].description == "PORTABLE RADAR SPEED FEEDBACK SIGN SYSTEM DAY"
+    assert s.low_items[1].unit == "EA" and s.low_items[1].quantity == 2
+    assert s.checks() == []
+
+
+def test_2023_a_plus_b_variant_and_no_dollar_sign() -> None:
+    p1 = (
+        PAGE1_A_PLUS_B.replace("Engineers Est: $1,000.00", "Engineers Est: 1,000.00")
+        .replace("1 Cost: $900.00", "1 A) $900.00")
+        .replace("Time: 10 Days x $50.00", "B) 10 Days * 50")
+        .replace("Total: $1,400.00", "A+B) $1,400.00")
+    )
+    s = parse_text([p1, PAGE2_A_PLUS_B])
+    assert s.engineers_estimate == 1000.0
+    assert (s.low_bid.cost, s.low_bid.time_days, s.low_bid.time_rate, s.low_bid.total) == (
+        900.0,
+        10,
+        50.0,
+        1400.0,
+    )
+
+
+def test_repeated_item_row_dropped() -> None:
+    dup = PAGE2_ITEMS + "0003 999990 MOBILIZATION LS LUMP SUM 3,000.00 3,000.00\n"
+    s = parse_text([PAGE1_PLAIN, dup])
+    assert s.duplicate_item_lines == 1
+    assert s.checks() == []
