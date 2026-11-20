@@ -1,82 +1,42 @@
 # Bid summary coverage
 
-Status of the bid summary PDFs for the D-007 slice, checked 2026-11-19 by `bidlens.ingest.check_bid_summaries` (decision D-022). The list holds contract numbers and dates only. The PDFs themselves stay git-ignored.
+Status of the bid summary PDFs for the D-007 slice, checked 2026-11-19 by `bidlens.ingest.check_bid_summaries` (decision D-026, which supersedes D-022). The list holds contract numbers and dates only. The PDFs themselves stay git-ignored.
 
 ## Summary
 
 | | Bid openings |
 | --- | --- |
 | In the download checklist (D-015) | 827 |
-| Usable bid summary on file | 624 |
+| Usable bid summary | **665** |
 | Not on the Caltrans site | 151 |
-| Still needed: no usable file (listed below) | 52 |
+| No usable summary exists (Caltrans errors, listed below) | 11 |
 
-Seven more files are usable but hold a different bid opening of an in-scope contract, one that the cost database does not list. They are kept as extra contract records, which gives **631 usable bid summaries** in all, covering bids opened 2019-01-08 to 2026-11-03. The Caltrans archive has no 2018 bid summaries.
+Seven more files hold earlier openings of in-scope contracts. These are real bid summaries and are kept as their own contract records, which gives **672 usable bid summaries** in all, covering bids opened 2019-01-08 to 2026-11-03. The Caltrans archive has no 2018 bid summaries.
 
-Every usable file passed these checks:
-- the contract number and date match the file name
-- the item rows match the stated number of items
-- the low bidder's items sum exactly to the low bid
-- every listed bid was read
+**How usable files were checked:**
+- **631 files with a text layer.** The item rows match the stated number of items, and the low bidder's items sum exactly to the low bid.
+- **41 files read by OCR (D-025).** Caltrans serves these with broken fonts (confirmed by the maintainer: the site has no other copy). 37 pass the same exact-sum check. In the other 4, a few item lines were misread, so their item lines are left out. Their contract-level fields are still confirmed by the header check below.
+- **Header check, all 672 files:** the engineer's estimate × (1 + printed % over/under) reproduces the low bid, within rounding.
 
-In 43 contracts, one or more listed bids carry no rank. These are most likely irregular bids. The ranked count is used as the bidder count.
+In 43 contracts, one or more listed bids carry no rank. These are most likely irregular bids. The ranked count is used as the bidder count. In 16 OCR files, the printed bidder count was not readable, so the count of listed bids is used.
 
-## Still needed (52)
+## No usable summary exists (11)
+
+The maintainer re-downloaded all of these on 2026-11-19. The site serves the same files byte for byte.
 
 | Contract | Bid opened | Problem |
 | --- | --- | --- |
-| 04-1A6614 | 2020-08-26 | File `04-1A6614.pdf` holds a different contract (03-2F5704, postponed); re-download |
-| 04-0P1104 | 2021-05-20 | File `04-0P1104_2021-05-20.pdf` holds the earlier opening (2019-05-01); this opening is still needed |
-| 04-4J9704 | 2022-04-21 | File `04-4J9704_2022-04-21.pdf` holds the earlier opening (2021-10-14); this opening is still needed |
-| 04-4J8504 | 2023-03-16 | File `04-4J8504.pdf` has scrambled text (likely made with Print to PDF); re-save from the site |
-| 05-0T9914 | 2023-03-29 | File `05-0T9914_2023-03-29.pdf` holds the earlier opening (2022-07-27); this opening is still needed |
-| 05-1N9404 | 2023-03-30 | File `05-1N9404.pdf` has scrambled text (likely made with Print to PDF); re-save from the site |
-| 04-0Y2404 | 2023-04-04 | File `04-0Y2404.pdf` has scrambled text (likely made with Print to PDF); re-save from the site |
-| 04-0Y1804 | 2023-04-11 | File `04-0Y1804.pdf` has scrambled text (likely made with Print to PDF); re-save from the site |
-| 04-1W1204 | 2023-04-18 | File `04-1W1204.pdf` has scrambled text (likely made with Print to PDF); re-save from the site |
-| 04-3Q5104 | 2023-05-02 | File `04-3Q5104.pdf` has scrambled text (likely made with Print to PDF); re-save from the site |
-| 04-0Y3404 | 2023-05-09 | File `04-0Y3404.pdf` has scrambled text (likely made with Print to PDF); re-save from the site |
-| 04-2W6804 | 2023-05-11 | File `04-2W6804.pdf` has scrambled text (likely made with Print to PDF); re-save from the site |
-| 04-0Y1704 | 2023-05-16 | File `04-0Y1704.pdf` has scrambled text (likely made with Print to PDF); re-save from the site |
-| 04-3Q6104 | 2023-05-24 | File `04-3Q6104.pdf` has scrambled text (likely made with Print to PDF); re-save from the site |
-| 04-0Y1904 | 2023-05-25 | File `04-0Y1904.pdf` has scrambled text (likely made with Print to PDF); re-save from the site |
-| 04-2W5104 | 2023-05-25 | File `04-2W5104.pdf` holds a different opening (2022-11-03); this opening is still needed |
-| 04-0Y2004 | 2023-05-31 | File `04-0Y2004.pdf` has scrambled text (likely made with Print to PDF); re-save from the site |
-| 04-0K6304 | 2023-06-01 | File `04-0K6304.pdf` has scrambled text (likely made with Print to PDF); re-save from the site |
-| 04-0Y2104 | 2023-06-01 | File `04-0Y2104.pdf` has scrambled text (likely made with Print to PDF); re-save from the site |
-| 04-3Q5304 | 2023-06-01 | File `04-3Q5304.pdf` has scrambled text (likely made with Print to PDF); re-save from the site |
-| 04-3Q6004 | 2023-06-01 | File `04-3Q6004.pdf` has scrambled text (likely made with Print to PDF); re-save from the site |
-| 04-4Q2504 | 2023-06-01 | File `04-4Q2504.pdf` has scrambled text (likely made with Print to PDF); re-save from the site |
-| 05-1M7604 | 2023-06-01 | File `05-1M7604.pdf` has scrambled text (likely made with Print to PDF); re-save from the site |
-| 05-1K4604 | 2023-06-13 | File `05-1K4604.pdf` has scrambled text (likely made with Print to PDF); re-save from the site |
-| 05-1P5374 | 2023-07-11 | File `05-1P5374.pdf` holds a different opening (2022-11-30); this opening is still needed |
-| 05-1M7304 | 2023-07-19 | File `05-1M7304.pdf` has scrambled text (likely made with Print to PDF); re-save from the site |
-| 05-1P5354 | 2023-08-17 | File `05-1P5354.pdf` holds a different opening (2023-03-15); this opening is still needed |
-| 04-1Q5204 | 2023-09-13 | File `04-1Q5204.pdf` has scrambled text (likely made with Print to PDF); re-save from the site |
-| 04-1J5674 | 2023-09-19 | File `04-1J5674.pdf` has scrambled text (likely made with Print to PDF); re-save from the site |
-| 05-1Q4604 | 2024-02-06 | File `05-1Q4604.pdf` has scrambled text (likely made with Print to PDF); re-save from the site |
-| 05-1Q4804 | 2024-02-29 | File `05-1Q4804.pdf` has scrambled text (likely made with Print to PDF); re-save from the site |
-| 05-1P2804 | 2024-03-07 | File `05-1P2804.pdf` has scrambled text (likely made with Print to PDF); re-save from the site |
-| 04-1Q4604 | 2024-03-14 | File `04-1Q4604.pdf` has scrambled text (likely made with Print to PDF); re-save from the site |
-| 04-2W4504 | 2024-04-16 | File `04-2W4504.pdf` has scrambled text (likely made with Print to PDF); re-save from the site |
-| 05-1P7304 | 2024-04-25 | File `05-1P7304.pdf` has scrambled text (likely made with Print to PDF); re-save from the site |
-| 04-0Q8204 | 2024-05-02 | File `04-0Q8204.pdf` has scrambled text (likely made with Print to PDF); re-save from the site |
-| 04-0Y3904 | 2024-05-14 | File `04-0Y3904.pdf` has scrambled text (likely made with Print to PDF); re-save from the site |
-| 04-2Y5504 | 2024-05-14 | File `04-2Y5504.pdf` has scrambled text (likely made with Print to PDF); re-save from the site |
-| 04-2Y5004 | 2024-05-16 | File `04-2Y5004.pdf` has scrambled text (likely made with Print to PDF); re-save from the site |
-| 04-0Q8304 | 2024-05-22 | File `04-0Q8304.pdf` has scrambled text (likely made with Print to PDF); re-save from the site |
-| 04-0Y7904 | 2024-05-30 | File `04-0Y7904.pdf` has scrambled text (likely made with Print to PDF); re-save from the site |
-| 04-2Y4704 | 2024-05-30 | File `04-2Y4704.pdf` has scrambled text (likely made with Print to PDF); re-save from the site |
-| 04-2Y4904 | 2024-05-30 | File `04-2Y4904.pdf` has scrambled text (likely made with Print to PDF); re-save from the site |
-| 05-1P5364 | 2024-07-09 | File `05-1P5364.pdf` holds a different opening (2023-01-24); this opening is still needed |
-| 04-0Q2104 | 2024-07-25 | File `04-0Q2104.pdf` holds a different opening (2024-01-11); this opening is still needed |
-| 04-3W5604 | 2024-08-07 | File `04-3W5604.pdf` holds a different opening (2023-11-08); this opening is still needed |
-| 05-1Q4704 | 2024-08-28 | File `05-1Q4704.pdf` holds a different opening (2024-03-14); this opening is still needed |
-| 04-1Y3404 | 2025-04-23 | File `04-1Y3404.pdf` has scrambled text (likely made with Print to PDF); re-save from the site |
-| 04-0X7604 | 2025-05-28 | File `04-0X7604.pdf` has scrambled text (likely made with Print to PDF); re-save from the site |
-| 05-1R7704 | 2026-05-07 | File `05-1R7704.pdf` has scrambled text (likely made with Print to PDF); re-save from the site |
-| 04-0W0604 | 2026-09-01 | File `04-0W0604.pdf` has scrambled text (likely made with Print to PDF); re-save from the site |
-| 04-2W6604 | 2026-09-23 | File `04-2W6604.pdf` has scrambled text (likely made with Print to PDF); re-save from the site |
+| 04-1A6614 | 2020-08-26 | Caltrans attached the wrong PDF (postponed contract 03-2F5704) to this record |
+| 04-0P1104 | 2021-05-20 | Caltrans attached the summary of an earlier opening (2019-05-01); no summary exists for this one |
+| 04-4J9704 | 2022-04-21 | Caltrans attached the summary of an earlier opening (2021-10-14); no summary exists for this one |
+| 05-0T9914 | 2023-03-29 | Caltrans attached the summary of an earlier opening (2022-07-27); no summary exists for this one |
+| 04-2W5104 | 2023-05-25 | Caltrans attached the summary of an earlier opening (2022-11-03); no summary exists for this one |
+| 05-1P5374 | 2023-07-11 | Caltrans attached the summary of an earlier opening (2022-11-30); no summary exists for this one |
+| 05-1P5354 | 2023-08-17 | Caltrans attached the summary of an earlier opening (2023-03-15); no summary exists for this one |
+| 05-1P5364 | 2024-07-09 | Caltrans attached the summary of an earlier opening (2023-01-24); no summary exists for this one |
+| 04-0Q2104 | 2024-07-25 | Caltrans attached the summary of an earlier opening (2024-01-11); no summary exists for this one |
+| 04-3W5604 | 2024-08-07 | Caltrans attached the summary of an earlier opening (2023-11-08); no summary exists for this one |
+| 05-1Q4704 | 2024-08-28 | Caltrans attached the summary of an earlier opening (2024-03-14); no summary exists for this one |
 
 ## Not on the Caltrans site (151)
 
