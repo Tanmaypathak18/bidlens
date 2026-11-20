@@ -22,7 +22,7 @@ Bridge deck rehabilitation.
 Federal Aid #1: NONE
 Proposals Issued: 23 Total Number of Working Days: 160 Overrun/Underrun: -$3,000.00
 Number of Bidders: 3 Engineers Est: $10,000.00 % Over/Under Est: -30.00%
-Bid Rank Bid Amount Bidder Id Bidder Information (Name / Address / License Number / Phone / Fax) Preference
+Bid Rank Bid Amount Bidder Id Bidder Information Preference
 1 $7,000.00 VC0000000001 EXAMPLE BUILDERS ONE CSLB# 00000001
 1 MAIN ST Phone (000) 000-0000
 2 $8,500.00 VC0000000002 EXAMPLE BUILDERS TWO CSLB# 00000002
@@ -60,7 +60,7 @@ Replace bridge railing.
 NO GOAL Federal Aid #1: NONE
 Proposals Issued: 11 Total Number of Working Days: 200 Overrun/Underrun: -$100.00
 Number of Bidders: 3 Engineers Est: $1,000.00 % Over/Under Est: -10.00%
-Bid Rank Bid Amount Bidder Id Bidder Information (Name / Address / License Number / Phone / Fax) Preference
+Bid Rank Bid Amount Bidder Id Bidder Information Preference
 1 Cost: $900.00 VC0000000004 EXAMPLE CIVIL ONE CSLB# 00000004 CC PREF CLAIMED
 Time: 10 Days x $50.00 4 MAIN ST
 Total: $1,400.00 SOMEWHERE CA 00000
