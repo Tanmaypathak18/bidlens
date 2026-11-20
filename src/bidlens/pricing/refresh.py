@@ -39,7 +39,7 @@ def _predictor(model: str):
         from bidlens.pricing.kumo import KumoPricer
 
         pricer = KumoPricer()
-        return pricer.predict
+        return lambda Xf, yf, Xq: pricer.predict(Xf, yf, Xq, with_range=True)
 
     from bidlens.pricing import baseline as BL
 
@@ -54,6 +54,15 @@ def _predictor(model: str):
         return BL.predict_saved(fits, X_query)
 
     return predict
+
+
+def _cols(p: np.ndarray, sl: slice = slice(None)) -> dict:
+    """Prediction columns: the median, plus the 10th and 90th percentiles when present."""
+    p = p.reshape(len(p), -1)[sl]
+    out = {"log_ref_pred": p[:, 0]}
+    if p.shape[1] == 3:
+        out |= {"log_ref_q10": p[:, 1], "log_ref_q90": p[:, 2]}
+    return out
 
 
 def run(model: str) -> pd.DataFrame:
@@ -77,7 +86,7 @@ def run(model: str) -> pd.DataFrame:
                 "kind": "validation",
                 "key": rows.loc[val, "bid_item_id"],
                 "bid_open_date": d[val],
-                "log_ref_pred": p,
+                **_cols(p),
             }
         )
     )
@@ -102,7 +111,7 @@ def run(model: str) -> pd.DataFrame:
                     "kind": "test",
                     "key": rows.loc[ti, "bid_item_id"].to_numpy(),
                     "bid_open_date": test.loc[ti, "bid_open_date"].to_numpy(),
-                    "log_ref_pred": p[: len(ti)],
+                    **_cols(p, slice(None, len(ti))),
                 }
             )
         )
@@ -117,12 +126,15 @@ def run(model: str) -> pd.DataFrame:
                     + "|"
                     + keys["item_no"].astype(str),
                     "bid_open_date": keys["bid_open_date"].to_numpy(),
-                    "log_ref_pred": p[len(ti) :],
+                    **_cols(p, slice(len(ti), None)),
                 }
             )
         )
     res = pd.concat(out, ignore_index=True)
     res["pred_unit_price"] = F.from_ref(np.exp(res["log_ref_pred"]), res["bid_open_date"])
+    for q in ("q10", "q90"):
+        if f"log_ref_{q}" in res:
+            res[f"pred_{q}"] = F.from_ref(np.exp(res[f"log_ref_{q}"]), res["bid_open_date"])
     res.attrs["seconds_per_quarter"] = float(np.mean(timing))
     path = Path(str(OUT).format(model=model))
     path.parent.mkdir(parents=True, exist_ok=True)

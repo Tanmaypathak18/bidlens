@@ -52,8 +52,11 @@ class KumoPricer:
             out[c] = out[c].astype(object).where(out[c].notna(), "<missing>").astype(str)
         return out
 
-    def predict(self, X_ctx: pd.DataFrame, y_ctx, X_query: pd.DataFrame) -> np.ndarray:
-        """Median predicted log price for each query row."""
+    def predict(
+        self, X_ctx: pd.DataFrame, y_ctx, X_query: pd.DataFrame, with_range: bool = False
+    ) -> np.ndarray:
+        """Median predicted log price for each query row. With `with_range`, an array of
+        three columns: the median, 10th and 90th percentile (D-047)."""
         df = pd.concat(
             [
                 self._frame(X_ctx).assign(target=np.asarray(y_ctx, dtype=float)),
@@ -74,7 +77,9 @@ class KumoPricer:
                 x_query=tab[n:].drop_columns("target"),
                 generator=torch.Generator(device=self.device).manual_seed(SEED),
             )
-        return out["q500"].numerical.squeeze(-1).cpu().numpy()
+        cols = ["q500", "q100", "q900"] if with_range else ["q500"]
+        res = np.column_stack([out[q].numerical.squeeze(-1).cpu().numpy() for q in cols])
+        return res if with_range else res[:, 0]
 
 
 def run(con) -> dict:

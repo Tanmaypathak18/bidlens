@@ -263,7 +263,7 @@ bidder's unit price differs from the low bidder's by a median of **{_pct(floor["
 across items differently ("unbalanced" bids), so a single item's low-bid price carries a
 lot of noise even when the total is competitive. That sets a floor: no method should be
 expected to match single low-bid prices much better than a second real bidder does. The
-best model is about {100 * (check['kumo']['mdape'] - floor['mdape']):.0f} points above that floor.
+best model is about {100 * (check["kumo"]["mdape"] - floor["mdape"]):.0f} points above that floor.
 
 **Lump sums and odd quantities are the hardest.**
 

@@ -14,7 +14,7 @@ data:
 	uv run python -m bidlens.pricing.escalate
 	uv run python -m bidlens.outputs
 
-# Pricing models and reports (steps 2.1 to 2.5), after `make data`. Each model library runs
+# Pricing models and reports (steps 2.1 to 2.6), after `make data`. Each model library runs
 # in its own process (PyTorch and XGBoost/LightGBM clash on macOS). About 12 minutes.
 pricing:
 	uv run python -m bidlens.pricing.compare
@@ -25,6 +25,7 @@ pricing:
 	uv run python -m bidlens.pricing.refresh --model lightgbm
 	uv run python -m bidlens.pricing.refresh --model kumo
 	uv run python -m bidlens.pricing.select
+	uv run python -m bidlens.pricing.ranges
 
 test:
 	uv run pytest

@@ -1,0 +1,29 @@
+{
+  "native": {
+    "prices": 4507,
+    "coverage": 0.8269358775238518,
+    "median_width": 6.040499245177733,
+    "below": 0.06367872198801863,
+    "above": 0.10938540048812957
+  },
+  "calibrated": {
+    "prices": 4507,
+    "coverage": 0.7901042822276458,
+    "median_width": 5.290070833395701,
+    "below": 0.07632571555358332,
+    "above": 0.1335700022187708
+  },
+  "validation_native": {
+    "prices": 1811,
+    "coverage": 0.8475980121479846,
+    "median_width": 5.751746945834066,
+    "below": 0.07399226946438432,
+    "above": 0.07840971838763114
+  },
+  "comparables": {
+    "test_prices_with_comparables": 4507,
+    "share_with_10": 0.9915686709562902,
+    "comparable_median_mdape": 0.43241773601335953,
+    "inside_comparable_span": 0.8138451297980919
+  }
+}

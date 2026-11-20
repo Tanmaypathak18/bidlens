@@ -475,10 +475,10 @@ estimate on {_pct(h["production"]["bidlens_closer_share"])} of contracts.** Over
 {a["contracts"]} test contracts: {_pct(a["bidlens_closer_share"])}.
 
 The engineer's estimate sits above the low bid on most contracts (median
-{100 * ee['ee_median_error']:+.1f}%): the low bid is the most aggressive of several bids,
+{100 * ee["ee_median_error"]:+.1f}%): the low bid is the most aggressive of several bids,
 and in 2024 to 2026 low bids in Districts 4 and 5 came in well under Caltrans' estimates.
 The BidLens total is centred much closer to the low bid (median
-{100 * h['production']['bidlens_median_error']:+.1f}%), because it is built from earlier
+{100 * h["production"]["bidlens_median_error"]:+.1f}%), because it is built from earlier
 low bids rather than from an engineer's cost build-up.
 
 ## Speed and licence
