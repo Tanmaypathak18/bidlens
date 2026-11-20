@@ -10,109 +10,107 @@ min_interval_s: 2.0
 # Items nearly every contract has. Their union lists the contracts in scope (D-015).
 contract_list_items: ['999990', '120090', '120100', '130100']
 
-# Top 100 items by total low-bid dollars (D-016).
-# PROVISIONAL: built from the 10 pilot bid summaries (2025). Regenerate once
-# Tier 1 of the download list is downloaded.
-# One-time-use codes (starting 01-04) are excluded.
-items_source: provisional_pilot_10
+# Top 100 items by total low-bid dollars (D-016), from the 631 usable bid summaries
+# (D-022), bids opened 2019-2026. One-time-use codes (starting 01-04) are excluded.
+items_source: bid_summaries_631
 items:
-  - {code: '999990', unit: 'LS', description: "MOBILIZATION"}
-  - {code: '390137', unit: 'TON', description: "RUBBERIZED HOT MIX ASPHALT (GAP GRADED)"}
-  - {code: '120100', unit: 'LS', description: "TRAFFIC CONTROL SYSTEM"}
-  - {code: '390132', unit: 'TON', description: "HOT MIX ASPHALT (TYPE A)"}
-  - {code: '090100', unit: 'WDAY', description: "TIME-RELATED OVERHEAD (WDAY)"}
-  - {code: '390095', unit: 'CY', description: "REPLACE ASPHALT CONCRETE SURFACING"}
-  - {code: '120320', unit: 'LF', description: "TEMPORARY BARRIER SYSTEM"}
-  - {code: '480600', unit: 'LS', description: "TEMPORARY SHORING"}
-  - {code: '600041', unit: 'CF', description: "FURNISH POLYESTER CONCRETE OVERLAY"}
-  - {code: '839744', unit: 'LF', description: "CONCRETE BARRIER (TYPE 836 MODIFIED)"}
-  - {code: '375036', unit: 'TON', description: "PRECOATED AGGREGATE (SEAL COAT)"}
-  - {code: '600116', unit: 'LS', description: "BRIDGE REMOVAL (PORTION), LOCATION B"}
-  - {code: '600115', unit: 'LS', description: "BRIDGE REMOVAL (PORTION), LOCATION A"}
-  - {code: '398200', unit: 'SQYD', description: "COLD PLANE ASPHALT CONCRETE PAVEMENT"}
-  - {code: '510053', unit: 'CY', description: "STRUCTURAL CONCRETE, BRIDGE"}
-  - {code: '510054', unit: 'CY', description: "STRUCTURAL CONCRETE, BRIDGE (POLYMER FIBER)"}
-  - {code: '600043', unit: 'SQFT', description: "PLACE POLYESTER CONCRETE OVERLAY"}
-  - {code: '510526', unit: 'CY', description: "MINOR CONCRETE (BACKFILL)"}
-  - {code: '130100', unit: 'LS', description: "JOB SITE MANAGEMENT"}
-  - {code: '131201', unit: 'LS', description: "TEMPORARY CREEK DIVERSION SYSTEMS"}
-  - {code: '833032', unit: 'LF', description: "CHAIN LINK RAILING (TYPE 7)"}
-  - {code: '510094', unit: 'CY', description: "STRUCTURAL CONCRETE, DRAINAGE INLET"}
-  - {code: '600031', unit: 'SQFT', description: "REMOVE CONCRETE DECK SURFACE"}
-  - {code: '520102', unit: 'LB', description: "BAR REINFORCING STEEL (BRIDGE)"}
-  - {code: '190185', unit: 'TON', description: "SHOULDER BACKING"}
-  - {code: '190101', unit: 'CY', description: "ROADWAY EXCAVATION"}
-  - {code: '170103', unit: 'LS', description: "CLEARING AND GRUBBING (LS)"}
-  - {code: '832070', unit: 'SQYD', description: "VEGETATION CONTROL (MINOR CONCRETE)"}
-  - {code: '610112', unit: 'LF', description: "24' ALTERNATIVE PIPE CULVERT"}
-  - {code: '872133', unit: 'LS', description: "MODIFYING SIGNAL AND LIGHTING SYSTEMS"}
-  - {code: '120090', unit: 'LS', description: "CONSTRUCTION AREA SIGNS"}
-  - {code: '193006', unit: 'CY', description: "STRUCTURE BACKFILL (SLURRY CEMENT)"}
-  - {code: '650026', unit: 'LF', description: "36' REINFORCED CONCRETE PIPE"}
-  - {code: '130640', unit: 'LF', description: "TEMPORARY FIBER ROLL"}
-  - {code: '872002', unit: 'LS', description: "TEMPORARY SIGNAL SYSTEMS"}
-  - {code: '304450', unit: 'SQYD', description: "PARTIAL DEPTH RECYCLING"}
-  - {code: '129108', unit: 'EA', description: "TEMPORARY CRASH CUSHION TL-3"}
-  - {code: '511106', unit: 'LF', description: "DRILL AND BOND DOWEL"}
-  - {code: '621225', unit: 'EA', description: "GROSS SOLIDS REMOVAL DEVICE LINEAR RADIAL TYPE LR-2 (6)"}
-  - {code: '600117', unit: 'LS', description: "BRIDGE REMOVAL (PORTION), LOCATION C"}
-  - {code: '370120', unit: 'TON', description: "ASPHALT-RUBBER BINDER"}
-  - {code: '260203', unit: 'CY', description: "CLASS 2 AGGREGATE BASE (CY)"}
-  - {code: '650034', unit: 'LF', description: "48' REINFORCED CONCRETE PIPE"}
-  - {code: '600118', unit: 'LS', description: "BRIDGE REMOVAL (PORTION), LOCATION D"}
-  - {code: '090105', unit: 'LS', description: "TIME-RELATED OVERHEAD (LS)"}
-  - {code: '397005', unit: 'TON', description: "TACK COAT"}
-  - {code: '210610', unit: 'CY', description: "COMPOST (CY)"}
-  - {code: '731627', unit: 'CY', description: "MINOR CONCRETE (CURB, SIDEWALK AND CURB RAMP)"}
-  - {code: '510050', unit: 'CY', description: "STRUCTURAL CONCRETE"}
-  - {code: '394090', unit: 'SQYD', description: "PLACE HOT MIX ASPHALT (MISCELLANEOUS AREA)"}
-  - {code: '840502', unit: 'LF', description: "THERMOPLASTIC TRAFFIC STRIPE (ENHANCED WET NIGHT VISIBILITY)"}
-  - {code: '846007', unit: 'LF', description: "6' THERMOPLASTIC TRAFFIC STRIPE (ENHANCED WET NIGHT VISIBILITY)"}
-  - {code: '621228', unit: 'EA', description: "GROSS SOLIDS REMOVAL DEVICE LINEAR RADIAL TYPE LR-3 (6)"}
-  - {code: '710132', unit: 'LF', description: "REMOVE CULVERT (LF)"}
-  - {code: '128652', unit: 'LS', description: "PORTABLE CHANGEABLE MESSAGE SIGN (LS)"}
-  - {code: '490403', unit: 'LF', description: "30' DRILLED HOLE"}
-  - {code: '411105', unit: 'CY', description: "INDIVIDUAL SLAB REPLACEMENT (RSC)"}
-  - {code: '847218', unit: 'LF', description: "6' TRAFFIC STRIPE TAPE WITH CONTRAST (WARRANTY)"}
-  - {code: '621226', unit: 'EA', description: "GROSS SOLIDS REMOVAL DEVICE LINEAR RADIAL TYPE LR-2 (8)"}
-  - {code: '204099', unit: 'LS', description: "PLANT ESTABLISHMENT WORK"}
-  - {code: '510092', unit: 'CY', description: "STRUCTURAL CONCRETE, HEADWALL"}
-  - {code: '198010', unit: 'CY', description: "IMPORTED BORROW (CY)"}
-  - {code: '723060', unit: 'CY', description: "ROCK SLOPE PROTECTION (300 LB, CLASS IV, METHOD B) (CY)"}
-  - {code: '846030', unit: 'LF', description: "REMOVE THERMOPLASTIC TRAFFIC STRIPE"}
-  - {code: '304452', unit: 'TON', description: "RECYCLING AGENT (PARTIAL DEPTH RECYCLING)"}
-  - {code: '192003', unit: 'CY', description: "STRUCTURE EXCAVATION (BRIDGE)"}
-  - {code: '210350', unit: 'LF', description: "FIBER ROLLS"}
-  - {code: '130710', unit: 'EA', description: "TEMPORARY CONSTRUCTION ENTRANCE"}
-  - {code: '131103', unit: 'EA', description: "WATER QUALITY SAMPLING AND ANALYSIS DAY"}
-  - {code: '832006', unit: 'LF', description: "MIDWEST GUARDRAIL SYSTEM (STEEL POST)"}
-  - {code: '130670', unit: 'LF', description: "TEMPORARY REINFORCED SILT FENCE"}
-  - {code: '870009', unit: 'LS', description: "MAINTAINING EXISTING TRAFFIC MANAGEMENT SYSTEM ELEMENTS DURING"}
-  - {code: '710384', unit: 'LF', description: "24' CURED-IN-PLACE PIPELINER"}
-  - {code: '730020', unit: 'CY', description: "MINOR CONCRETE (CURB) (CY)"}
-  - {code: '510072', unit: 'CY', description: "STRUCTURAL CONCRETE, BARRIER SLAB"}
-  - {code: '600037', unit: 'SQFT', description: "PREPARE CONCRETE BRIDGE DECK SURFACE"}
-  - {code: '190105', unit: 'CY', description: "ROADWAY EXCAVATION (TYPE Z-2) (AERIALLY DEPOSITED LEAD)"}
-  - {code: '128651', unit: 'EA', description: "PORTABLE CHANGEABLE MESSAGE SIGN (EA)"}
-  - {code: '832007', unit: 'LF', description: "MIDWEST GUARDRAIL SYSTEM (WOOD POST)"}
-  - {code: '707117', unit: 'LF', description: "36' PRECAST CONCRETE PIPE INLET"}
-  - {code: '398100', unit: 'LF', description: "REMOVE ASPHALT CONCRETE DIKE"}
-  - {code: '511118', unit: 'LF', description: "CLEAN EXPANSION JOINT"}
-  - {code: '872135', unit: 'LS', description: "MODIFYING TRAFFIC MONITORING STATIONS"}
-  - {code: '600146', unit: 'EA', description: "REPLACE BEARING PAD"}
-  - {code: '840516', unit: 'SQFT', description: "THERMOPLASTIC PAVEMENT MARKING (ENHANCED WET NIGHT VISIBILITY)"}
-  - {code: '665018', unit: 'LF', description: "18' CORRUGATED STEEL PIPE (.109' THICK)"}
-  - {code: '710390', unit: 'LF', description: "36' CURED-IN-PLACE PIPELINER"}
-  - {code: '590120', unit: 'LS', description: "CLEAN AND PAINT STEEL SOLDIER PILING"}
-  - {code: '710100', unit: 'EA', description: "ABANDON CULVERT (EA)"}
-  - {code: '780446', unit: 'LS', description: "STAIN GALVANIZED SURFACES (LS)"}
-  - {code: '129161', unit: 'EA', description: "AUTOMATED FLAGGER ASSISTANCE DEVICE DAY"}
-  - {code: '650022', unit: 'LF', description: "30' REINFORCED CONCRETE PIPE"}
-  - {code: '839752', unit: 'LF', description: "REMOVE GUARDRAIL"}
-  - {code: '193003', unit: 'CY', description: "STRUCTURE BACKFILL (BRIDGE)"}
-  - {code: '210430', unit: 'SQFT', description: "HYDROSEED"}
-  - {code: '510090', unit: 'CY', description: "STRUCTURAL CONCRETE, BOX CULVERT"}
-  - {code: '394076', unit: 'LF', description: "PLACE HOT MIX ASPHALT DIKE (TYPE E)"}
-  - {code: '600029', unit: 'SQFT', description: "REMOVE ASPHALT CONCRETE SURFACING"}
-  - {code: '519088', unit: 'LF', description: "JOINT SEAL (MR 1')"}
-  - {code: '650014', unit: 'LF', description: "18' REINFORCED CONCRETE PIPE"}
+  - {code: '999990', unit: 'LS', description: "MOBILIZATION", low_bid_dollars: 438203095, contracts: 539}
+  - {code: '390137', unit: 'TON', description: "RUBBERIZED HOT MIX ASPHALT (GAP GRADED)", low_bid_dollars: 343928126, contracts: 161}
+  - {code: '390132', unit: 'TON', description: "HOT MIX ASPHALT (TYPE A)", low_bid_dollars: 232622237, contracts: 424}
+  - {code: '120100', unit: 'LS', description: "TRAFFIC CONTROL SYSTEM", low_bid_dollars: 213984629, contracts: 629}
+  - {code: '090100', unit: 'WDAY', description: "TIME-RELATED OVERHEAD (WDAY)", low_bid_dollars: 153273439, contracts: 478}
+  - {code: '590116', unit: 'LS', description: "CLEAN AND PAINT STRUCTURAL STEEL (EXISTING BRIDGE)", low_bid_dollars: 136393950, contracts: 8}
+  - {code: '398200', unit: 'SQYD', description: "COLD PLANE ASPHALT CONCRETE PAVEMENT", low_bid_dollars: 92335521, contracts: 358}
+  - {code: '390402', unit: 'TON', description: "RUBBERIZED HOT MIX ASPHALT-OPEN GRADED (OPEN GRADED FRICTION COURSE)", low_bid_dollars: 79580719, contracts: 40}
+  - {code: '190101', unit: 'CY', description: "ROADWAY EXCAVATION", low_bid_dollars: 78364450, contracts: 257}
+  - {code: '871900', unit: 'LS', description: "FIBER OPTIC CABLE SYSTEMS", low_bid_dollars: 73325973, contracts: 9}
+  - {code: '510053', unit: 'CY', description: "STRUCTURAL CONCRETE, BRIDGE", low_bid_dollars: 65905838, contracts: 75}
+  - {code: '872133', unit: 'LS', description: "MODIFYING SIGNAL AND LIGHTING SYSTEMS", low_bid_dollars: 65606363, contracts: 99}
+  - {code: '600041', unit: 'CF', description: "FURNISH POLYESTER CONCRETE OVERLAY", low_bid_dollars: 64213064, contracts: 87}
+  - {code: '411105', unit: 'CY', description: "INDIVIDUAL SLAB REPLACEMENT (RSC)", low_bid_dollars: 55364340, contracts: 35}
+  - {code: '590106', unit: 'LS', description: "CLEAN STRUCTURAL STEEL (EXISTING BRIDGE)", low_bid_dollars: 51153414, contracts: 8}
+  - {code: '090105', unit: 'LS', description: "TIME-RELATED OVERHEAD (LS)", low_bid_dollars: 50202848, contracts: 65}
+  - {code: '590111', unit: 'LS', description: "PAINT STRUCTURAL STEEL (EXISTING BRIDGE)", low_bid_dollars: 47790000, contracts: 7}
+  - {code: '260203', unit: 'CY', description: "CLASS 2 AGGREGATE BASE (CY)", low_bid_dollars: 44731922, contracts: 227}
+  - {code: '510060', unit: 'CY', description: "STRUCTURAL CONCRETE, RETAINING WALL", low_bid_dollars: 39629613, contracts: 38}
+  - {code: '400050', unit: 'CY', description: "CONTINUOUSLY REINFORCED CONCRETE PAVEMENT", low_bid_dollars: 35734400, contracts: 5}
+  - {code: '120320', unit: 'LF', description: "TEMPORARY BARRIER SYSTEM", low_bid_dollars: 32953896, contracts: 135}
+  - {code: '846007', unit: 'LF', description: "6' THERMOPLASTIC TRAFFIC STRIPE (ENHANCED WET NIGHT VISIBILITY)", low_bid_dollars: 31535896, contracts: 378}
+  - {code: '510054', unit: 'CY', description: "STRUCTURAL CONCRETE, BRIDGE (POLYMER FIBER)", low_bid_dollars: 30467001, contracts: 53}
+  - {code: '520102', unit: 'LB', description: "BAR REINFORCING STEEL (BRIDGE)", low_bid_dollars: 29577991, contracts: 102}
+  - {code: '994650', unit: 'LS', description: "BUILDING WORK", low_bid_dollars: 27053970, contracts: 10}
+  - {code: '832070', unit: 'SQYD', description: "VEGETATION CONTROL (MINOR CONCRETE)", low_bid_dollars: 26458608, contracts: 146}
+  - {code: '872131', unit: 'LS', description: "MODIFYING LIGHTING SYSTEMS", low_bid_dollars: 26450558, contracts: 70}
+  - {code: '510094', unit: 'CY', description: "STRUCTURAL CONCRETE, DRAINAGE INLET", low_bid_dollars: 26336571, contracts: 193}
+  - {code: '600114', unit: 'LS', description: "BRIDGE REMOVAL (PORTION)", low_bid_dollars: 25428954, contracts: 68}
+  - {code: '600043', unit: 'SQFT', description: "PLACE POLYESTER CONCRETE OVERLAY", low_bid_dollars: 23170841, contracts: 87}
+  - {code: '872134', unit: 'LS', description: "MODIFYING RAMP METERING SYSTEMS", low_bid_dollars: 22104550, contracts: 38}
+  - {code: '129000', unit: 'LF', description: "TEMPORARY RAILING (TYPE K)", low_bid_dollars: 21720511, contracts: 114}
+  - {code: '170103', unit: 'LS', description: "CLEARING AND GRUBBING (LS)", low_bid_dollars: 21351853, contracts: 321}
+  - {code: '130100', unit: 'LS', description: "JOB SITE MANAGEMENT", low_bid_dollars: 21296188, contracts: 629}
+  - {code: '839647', unit: 'LF', description: "CONCRETE BARRIER (TYPE 60MGC)", low_bid_dollars: 20925532, contracts: 6}
+  - {code: '872135', unit: 'LS', description: "MODIFYING TRAFFIC MONITORING STATIONS", low_bid_dollars: 20767269, contracts: 75}
+  - {code: '839640', unit: 'LF', description: "CONCRETE BARRIER (TYPE 60M)", low_bid_dollars: 20134008, contracts: 52}
+  - {code: '870200', unit: 'LS', description: "LIGHTING SYSTEM", low_bid_dollars: 19681591, contracts: 17}
+  - {code: '418002', unit: 'CY', description: "REMOVE CONCRETE PAVEMENT AND BASE", low_bid_dollars: 19444746, contracts: 10}
+  - {code: '510087', unit: 'CY', description: "STRUCTURAL CONCRETE, APPROACH SLAB (TYPE R)", low_bid_dollars: 19321360, contracts: 33}
+  - {code: '839745', unit: 'LF', description: "CONCRETE BARRIER TRANSITION", low_bid_dollars: 19288327, contracts: 92}
+  - {code: '872130', unit: 'LS', description: "MODIFYING EXISTING ELECTRICAL SYSTEM", low_bid_dollars: 19151311, contracts: 35}
+  - {code: '401050', unit: 'CY', description: "JOINTED PLAIN CONCRETE PAVEMENT", low_bid_dollars: 18861240, contracts: 18}
+  - {code: '120090', unit: 'LS', description: "CONSTRUCTION AREA SIGNS", low_bid_dollars: 18525705, contracts: 616}
+  - {code: '390095', unit: 'CY', description: "REPLACE ASPHALT CONCRETE SURFACING", low_bid_dollars: 17481181, contracts: 75}
+  - {code: '280015', unit: 'CY', description: "LEAN CONCRETE BASE RAPID SETTING", low_bid_dollars: 17110682, contracts: 13}
+  - {code: '839642', unit: 'LF', description: "CONCRETE BARRIER (TYPE 60MC)", low_bid_dollars: 16809945, contracts: 31}
+  - {code: '610108', unit: 'LF', description: "18' ALTERNATIVE PIPE CULVERT", low_bid_dollars: 16138309, contracts: 89}
+  - {code: '129011', unit: 'LS', description: "MOVABLE BARRIER SYSTEM", low_bid_dollars: 15953994, contracts: 6}
+  - {code: '397005', unit: 'TON', description: "TACK COAT", low_bid_dollars: 15805139, contracts: 400}
+  - {code: '390401', unit: 'TON', description: "HOT MIX ASPHALT-OPEN GRADED (OPEN GRADED FRICTION COURSE)", low_bid_dollars: 14349532, contracts: 28}
+  - {code: '120103', unit: 'DAY', description: "STATIONARY IMPACT ATTENUATOR VEHICLE", low_bid_dollars: 14307896, contracts: 184}
+  - {code: '130730', unit: 'LS', description: "STREET SWEEPING", low_bid_dollars: 14213438, contracts: 414}
+  - {code: '840516', unit: 'SQFT', description: "THERMOPLASTIC PAVEMENT MARKING (ENHANCED WET NIGHT VISIBILITY)", low_bid_dollars: 14032752, contracts: 268}
+  - {code: '490603', unit: 'LF', description: "24' CAST-IN-DRILLED-HOLE CONCRETE PILING", low_bid_dollars: 13324043, contracts: 29}
+  - {code: '870600', unit: 'LS', description: "TRAFFIC MONITORING STATION SYSTEM", low_bid_dollars: 13210936, contracts: 34}
+  - {code: '190105', unit: 'CY', description: "ROADWAY EXCAVATION (TYPE Z-2) (AERIALLY DEPOSITED LEAD)", low_bid_dollars: 13202338, contracts: 81}
+  - {code: '510072', unit: 'CY', description: "STRUCTURAL CONCRETE, BARRIER SLAB", low_bid_dollars: 12814942, contracts: 35}
+  - {code: '280000', unit: 'CY', description: "LEAN CONCRETE BASE", low_bid_dollars: 12625283, contracts: 15}
+  - {code: '395020', unit: 'TON', description: "RUBBERIZED HOT MIX ASPHALT-GAP GRADED (BONDED WEARING COURSE)", low_bid_dollars: 12378800, contracts: 7}
+  - {code: '590135', unit: 'SQFT', description: "SPOT BLAST CLEAN AND PAINT UNDERCOAT", low_bid_dollars: 12178097, contracts: 12}
+  - {code: '839774', unit: 'LF', description: "REMOVE CONCRETE BARRIER", low_bid_dollars: 11928300, contracts: 68}
+  - {code: '420201', unit: 'SQYD', description: "GRIND EXISTING CONCRETE PAVEMENT", low_bid_dollars: 11819325, contracts: 27}
+  - {code: '832007', unit: 'LF', description: "MIDWEST GUARDRAIL SYSTEM (WOOD POST)", low_bid_dollars: 11774571, contracts: 106}
+  - {code: '498052', unit: 'LF', description: "60' CAST-IN-DRILLED-HOLE CONCRETE PILE (SIGN FOUNDATION)", low_bid_dollars: 10399338, contracts: 27}
+  - {code: '560218', unit: 'LB', description: "FURNISH SIGN STRUCTURE (TRUSS)", low_bid_dollars: 10316752, contracts: 24}
+  - {code: '460300', unit: 'LF', description: "SOIL NAIL", low_bid_dollars: 10193907, contracts: 10}
+  - {code: '192037', unit: 'CY', description: "STRUCTURE EXCAVATION (RETAINING WALL)", low_bid_dollars: 10099934, contracts: 35}
+  - {code: '193013', unit: 'CY', description: "STRUCTURE BACKFILL (RETAINING WALL)", low_bid_dollars: 9967547, contracts: 38}
+  - {code: '520103', unit: 'LB', description: "BAR REINFORCING STEEL (RETAINING WALL)", low_bid_dollars: 9848288, contracts: 40}
+  - {code: '731627', unit: 'CY', description: "MINOR CONCRETE (CURB, SIDEWALK AND CURB RAMP)", low_bid_dollars: 9820462, contracts: 46}
+  - {code: '128651', unit: 'EA', description: "PORTABLE CHANGEABLE MESSAGE SIGN (EA)", low_bid_dollars: 9508175, contracts: 166}
+  - {code: '128652', unit: 'LS', description: "PORTABLE CHANGEABLE MESSAGE SIGN (LS)", low_bid_dollars: 9494991, contracts: 461}
+  - {code: '250201', unit: 'CY', description: "CLASS 2 AGGREGATE SUBBASE", low_bid_dollars: 9457755, contracts: 31}
+  - {code: '190185', unit: 'TON', description: "SHOULDER BACKING", low_bid_dollars: 8849965, contracts: 97}
+  - {code: '600097', unit: 'LS', description: "BRIDGE REMOVAL", low_bid_dollars: 8787975, contracts: 24}
+  - {code: '846030', unit: 'LF', description: "REMOVE THERMOPLASTIC TRAFFIC STRIPE", low_bid_dollars: 8752659, contracts: 331}
+  - {code: '131201', unit: 'LS', description: "TEMPORARY CREEK DIVERSION SYSTEMS", low_bid_dollars: 8563626, contracts: 49}
+  - {code: '210350', unit: 'LF', description: "FIBER ROLLS", low_bid_dollars: 8452795, contracts: 233}
+  - {code: '650014', unit: 'LF', description: "18' REINFORCED CONCRETE PIPE", low_bid_dollars: 8338663, contracts: 47}
+  - {code: '731521', unit: 'CY', description: "MINOR CONCRETE (SIDEWALK)", low_bid_dollars: 8325883, contracts: 57}
+  - {code: '870510', unit: 'LS', description: "RAMP METERING SYSTEM", low_bid_dollars: 8285000, contracts: 2}
+  - {code: '600152', unit: 'LB', description: "COLUMN CASING", low_bid_dollars: 8207621, contracts: 8}
+  - {code: '832006', unit: 'LF', description: "MIDWEST GUARDRAIL SYSTEM (STEEL POST)", low_bid_dollars: 8171234, contracts: 78}
+  - {code: '872002', unit: 'LS', description: "TEMPORARY SIGNAL SYSTEMS", low_bid_dollars: 8109827, contracts: 28}
+  - {code: '130640', unit: 'LF', description: "TEMPORARY FIBER ROLL", low_bid_dollars: 7999582, contracts: 242}
+  - {code: '210610', unit: 'CY', description: "COMPOST (CY)", low_bid_dollars: 7979356, contracts: 250}
+  - {code: '120101', unit: 'DAY', description: "TRAFFIC CONTROL SUPERVISOR", low_bid_dollars: 7933973, contracts: 34}
+  - {code: '198010', unit: 'CY', description: "IMPORTED BORROW (CY)", low_bid_dollars: 7929692, contracts: 69}
+  - {code: '872137', unit: 'LS', description: "MODIFYING CHANGEABLE MESSAGE SIGN SYSTEMS", low_bid_dollars: 7898806, contracts: 7}
+  - {code: '393006', unit: 'SQYD', description: "GEOSYNTHETIC PAVEMENT INTERLAYER (PAVING GRID)", low_bid_dollars: 7856515, contracts: 17}
+  - {code: '731502', unit: 'CY', description: "MINOR CONCRETE (MISCELLANEOUS CONSTRUCTION)", low_bid_dollars: 7728836, contracts: 82}
+  - {code: '250101', unit: 'CY', description: "CLASS 1 AGGREGATE SUBBASE", low_bid_dollars: 7698218, contracts: 9}
+  - {code: '846012', unit: 'SQFT', description: "THERMOPLASTIC CROSSWALK AND PAVEMENT MARKING (ENHANCED WET NIGHT", low_bid_dollars: 7672332, contracts: 68}
+  - {code: '582001', unit: 'SQFT', description: "SOUND WALL (MASONRY BLOCK)", low_bid_dollars: 7461349, contracts: 6}
+  - {code: '129015', unit: 'DAY', description: "MOBILE BARRIER SYSTEM", low_bid_dollars: 7075044, contracts: 17}
+  - {code: '477020', unit: 'SQFT', description: "MECHANICALLY STABILIZED EMBANKMENT", low_bid_dollars: 6832359, contracts: 4}
+  - {code: '490605', unit: 'LF', description: "36' CAST-IN-DRILLED-HOLE CONCRETE PILING", low_bid_dollars: 6632268, contracts: 10}
+  - {code: '192020', unit: 'CY', description: "STRUCTURE EXCAVATION (TYPE D)", low_bid_dollars: 6620945, contracts: 27}
+  - {code: '870800', unit: 'LS', description: "PEDESTRIAN HYBRID BEACON SYSTEMS", low_bid_dollars: 6620605, contracts: 11}

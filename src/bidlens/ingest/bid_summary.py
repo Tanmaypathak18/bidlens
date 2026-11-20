@@ -7,7 +7,7 @@ are kept: no bidder names, addresses, phone numbers or IDs are stored.
 from __future__ import annotations
 
 import re
-from dataclasses import asdict, dataclass, field
+from dataclasses import asdict, astuple, dataclass, field
 from datetime import date, datetime
 from pathlib import Path
 
@@ -24,15 +24,15 @@ _HEADER_FIELDS = {
     "proposals_issued": r"Proposals Issued:\s*(\d+)",
     "working_days": r"Total Number of Working Days:\s*([\d,]+)",
     "n_bidders_reported": r"Number of Bidders:\s*(\d+)",
-    "engineers_estimate": r"Engineers Est:\s*\$([\d,]+\.\d{2})",
+    "engineers_estimate": r"Engineers Est:\s*\$?([\d,]+\.\d{2})",
     "pct_over_under": r"% Over/Under Est:\s*(-?[\d,.]+)%",
 }
 _REQUIRED = ("contract_number", "bid_open_date", "engineers_estimate", "n_bidders_reported")
 
 # "1 $6,368,565.50 VC..." or "1 Cost: $7,965,469.13 VC..." (rank missing on irregular bids)
-_BID_RE = re.compile(r"^(\d{1,2})?\s*(?:Cost:\s*)?\$([\d,]+\.\d{2})\s+VC\w*", re.M)
-_TIME_RE = re.compile(r"^Time:\s*([\d,]+)\s*Days\s*x\s*\$([\d,]+\.\d{2})", re.M)
-_TOTAL_RE = re.compile(r"^Total:\s*\$([\d,]+\.\d{2})", re.M)
+_BID_RE = re.compile(r"^(\d{1,2})?\s*(?:Cost:\s*|A\)\s*)?\$([\d,]+\.\d{2})\s+VC\w*", re.M)
+_TIME_RE = re.compile(r"^(?:Time:|B\))\s*([\d,]+)\s*Days\s*[x*]\s*\$?([\d,]+(?:\.\d{2})?)", re.M)
+_TOTAL_RE = re.compile(r"^(?:Total:|A\+B\))\s*\$([\d,]+\.\d{2})", re.M)
 _ITEM_RE = re.compile(
     r"^(\d{4})\s+(?:([A-Z]{1,2})\s+)?(\d{6})\s+(.+?)\s+(\S+)\s+"
     r"(LUMP SUM|[\d,]+\.\d+)\s+([\d,]+\.\d+)\s+([\d,]+\.\d+)$"
@@ -93,6 +93,21 @@ class BidSummary:
     bids: list[Bid] = field(default_factory=list)
     low_items: list[ItemLine] = field(default_factory=list)
     unparsed_item_lines: list[str] = field(default_factory=list)
+
+    duplicate_item_lines: int = 0
+
+    def __post_init__(self) -> None:
+        """Drop item rows repeated verbatim (seen at some page breaks)."""
+        seen: set[tuple] = set()
+        kept: list[ItemLine] = []
+        for item in self.low_items:
+            key = astuple(item)
+            if key in seen:
+                self.duplicate_item_lines += 1
+                continue
+            seen.add(key)
+            kept.append(item)
+        self.low_items = kept
 
     @property
     def ranked_bids(self) -> list[Bid]:
@@ -174,7 +189,10 @@ def _type_of_work(page1: str) -> str | None:
 
 
 def parse_text(pages: list[str], source_file: str = "") -> BidSummary:
-    """Parse the extracted text of each page."""
+    """Parse the extracted text of each page (either layout)."""
+    pages = [p.replace("(cid:13)", "") for p in pages]
+    if pages and _LEGACY_MARK in pages[0]:
+        return parse_legacy_text(pages, source_file)
     if not pages or "Bid Summary" not in pages[0]:
         raise BidSummaryError("page 1 is not a Caltrans Bid Summary")
     page1 = pages[0]
@@ -248,6 +266,149 @@ def parse_text(pages: list[str], source_file: str = "") -> BidSummary:
         engineers_estimate=_num(found["engineers_estimate"]),
         pct_over_under=_num(found["pct_over_under"]) if found["pct_over_under"] else None,
         type_of_work=_type_of_work(page1),
+        is_a_plus_b=any(b.total is not None for b in bids),
+        bids=bids,
+        low_items=items,
+        unparsed_item_lines=unparsed,
+    )
+
+
+# --------------------------------------------------------------------------- legacy layout
+# Older summaries (roughly before 2023) are a fixed-width mainframe report ("BID211").
+
+_LEGACY_MARK = "B I D S U M M A R Y"
+_LEGACY_LOW_MARK = "C O N T R A C T P R O P O S A L O F L O W B I D D E R"
+_LEGACY_STOP_MARKS = ("L I S T O F S U B", "S U M M A R Y O F R E M A I N I N G", _LEGACY_LOW_MARK)
+_LEGACY_HEADER = {
+    "contract_number": r"CONTRACT NUMBER\s+(\d{2}-[0-9A-Z]{6})",
+    "bid_open_date": r"BID OPENING DATE\s+(\d{2}/\d{2}/\d{2})",
+    "n_items": r"(\d+)\s+CONTRACT ITEMS",
+    "location": r"LOCATION\s+(\S+)",
+    "proposals_issued": r"PROPOSALS ISSUED\s+(\d+)",
+    "working_days": r"TOTAL NUMBER OF WORKING DAYS\s+([\d,]+)",
+    "n_bidders_reported": r"NUMBER OF BIDDERS\s+(\d+)",
+    "engineers_estimate": r"ENGINEERS EST\s+([\d,]+\.\d{2})",
+}
+_LEGACY_PCT = re.compile(r"PERCENT (OVER|UNDER) EST\s+([\d.]+)")
+_LEGACY_BID = re.compile(r"^(\d{1,2})?\s*(?:A\)\s*)?([\d,]+\.\d{2})\s+\d{1,3}\s+\S")
+_LEGACY_TIME = re.compile(r"^B\)\s*([\d,]+)\s*DAYS\s*X\s*([\d,.]+)")
+_LEGACY_TOTAL = re.compile(r"^A\+B\)\s*([\d,]+\.\d{2})")
+_LEGACY_ITEM_START = re.compile(r"^\d{1,4}\s+(?:\(?F\)?\s+)?\d{6}\s")
+_LEGACY_ITEM = re.compile(
+    r"^(\d{1,4})\s+(?:\(?(F)\)?\s+)?(\d{6})\s+(.*?)\s+(\S+)\s+"
+    r"(LUMP SUM|[\d,]*\.?\d+)\s+([\d,]*\.\d{2})\s+([\d,]*\.\d{2})(?:\s+(.*))?$"
+)
+_LEGACY_PAGE_HEADER = re.compile(
+    r"(BID211|PAGE \d+$|^\d{2}/\d{2}/\d{2}\s+\d{2}/\d{2}/\d{2}$|^-{10,}|^ITEM\s+ITEM|^NO\.\s+CODE)"
+)
+
+
+def _legacy_num(text: str) -> float:
+    text = text.replace(",", "")
+    return float(text) if text not in ("", ".") else 0.0
+
+
+def parse_legacy_text(pages: list[str], source_file: str = "") -> BidSummary:
+    page1 = pages[0]
+    found = {
+        k: (m.group(1) if (m := re.search(p, page1)) else None) for k, p in _LEGACY_HEADER.items()
+    }
+    missing = [k for k in _REQUIRED if not found[k]]
+    if missing:
+        raise BidSummaryError(f"missing header fields (older layout): {missing}")
+    pct = None
+    if m := _LEGACY_PCT.search(page1):
+        pct = float(m.group(2)) * (1 if m.group(1) == "OVER" else -1)
+
+    bids: list[Bid] = []
+    for text in pages:
+        head, stop = text, None
+        for mark in _LEGACY_STOP_MARKS:
+            if mark in head:
+                head, stop = head.split(mark)[0], mark
+        in_list = "BID RANK" in text or text is pages[0] or not bids
+        if in_list or bids:
+            for line in head.splitlines():
+                line = line.strip()
+                if bm := _LEGACY_BID.match(line):
+                    rank = int(bm.group(1)) if bm.group(1) else None
+                    bids.append(Bid(rank=rank, cost=_num(bm.group(2))))
+                elif bids and (tm := _LEGACY_TIME.match(line)):
+                    bids[-1].time_days = int(_num(tm.group(1)))
+                    bids[-1].time_rate = _num(tm.group(2))
+                elif bids and (am := _LEGACY_TOTAL.match(line)):
+                    bids[-1].total = _num(am.group(1))
+        if stop:
+            break
+
+    # Item lines: join wrapped description lines until the next item or TOTAL.
+    body: list[str] = []
+    started = False
+    for text in pages:
+        if _LEGACY_LOW_MARK in text:
+            started = True
+        elif started:
+            break
+        if not started:
+            continue
+        for line in text.splitlines():
+            line = line.strip()
+            if line and not _LEGACY_PAGE_HEADER.search(line) and _LEGACY_LOW_MARK not in line:
+                body.append(line)
+    items: list[ItemLine] = []
+    unparsed: list[str] = []
+    current: list[str] = []
+
+    def flush() -> None:
+        if not current:
+            return
+        joined = " ".join(current)
+        m = _LEGACY_ITEM.match(current[0]) or _LEGACY_ITEM.match(joined)
+        if m:
+            no, flag, code, desc, unit, qty, price, amount, tail = m.groups()
+            extra = " ".join(current[1:]) if _LEGACY_ITEM.match(current[0]) else (tail or "")
+            items.append(
+                ItemLine(
+                    item_no=no.zfill(4),
+                    flag=flag,
+                    item_code=code,
+                    description=" ".join(f"{desc} {extra}".split()),
+                    unit=unit,
+                    quantity=None if qty == "LUMP SUM" else _legacy_num(qty),
+                    unit_price=_legacy_num(price),
+                    amount=_legacy_num(amount),
+                )
+            )
+        else:
+            unparsed.append(joined[:120])
+        current.clear()
+
+    for line in body:
+        if line.startswith("TOTAL"):
+            flush()
+            break
+        if _LEGACY_ITEM_START.match(line):
+            flush()
+        if _LEGACY_ITEM_START.match(line) or current:
+            current.append(line)
+    flush()
+
+    district, county = _location_parts(found["location"])
+    return BidSummary(
+        source_file=source_file,
+        contract_number=found["contract_number"],
+        bid_open_date=datetime.strptime(found["bid_open_date"], "%m/%d/%y").date(),
+        project_id=None,
+        location=found["location"].rstrip(",") if found["location"] else None,
+        district=district,
+        county=county,
+        n_items=int(found["n_items"]) if found["n_items"] else None,
+        proposals_issued=int(found["proposals_issued"]) if found["proposals_issued"] else None,
+        working_days=int(_num(found["working_days"])) if found["working_days"] else None,
+        n_bidders_reported=int(found["n_bidders_reported"]),
+        engineers_estimate=_num(found["engineers_estimate"]),
+        pct_over_under=pct,
+        type_of_work=None,  # wrapped into the project description; taken from sv08data instead
         is_a_plus_b=any(b.total is not None for b in bids),
         bids=bids,
         low_items=items,
