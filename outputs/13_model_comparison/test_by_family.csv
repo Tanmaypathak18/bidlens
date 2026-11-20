@@ -1,0 +1,19 @@
+family,prices,trailing_median,xgboost,lightgbm,kumo,production
+Traffic Control,955,0.6000,0.5079,0.4864,0.4678,0.4678
+Asphalt Surfacing,585,0.5541,0.3522,0.3578,0.3073,0.3073
+Water Pollution and Site Management,506,0.6929,0.5514,0.5409,0.5340,0.5340
+General and Overhead,427,0.6577,0.4314,0.3867,0.3875,0.3875
+Striping and Markings,422,0.5424,0.3474,0.3278,0.3347,0.3347
+Earthwork and Clearing,341,0.6066,0.4182,0.4149,0.4637,0.4637
+"Fencing, Guardrail and Barriers",221,0.3735,0.2751,0.2796,0.2693,0.2693
+Structural Concrete and Reinforcement,219,0.3701,0.3470,0.3419,0.2976,0.2976
+Landscape and Erosion Control,208,0.3412,0.2319,0.2344,0.2435,0.2435
+Electrical and Signals,177,0.8631,0.8133,0.7482,0.7472,0.7472
+Bridge Rehabilitation and Removal,121,0.2779,0.2768,0.3036,0.2182,0.2182
+Base and Subbase,106,0.4811,0.3486,0.3535,0.3733,0.3733
+Minor Concrete and Miscellaneous,70,0.4234,0.2814,0.2316,0.2772,0.2772
+Drainage,55,0.3630,0.2729,0.2902,0.2569,0.2569
+Concrete Pavement,45,0.3857,0.2474,0.1837,0.1196,0.1196
+Piling,22,0.4610,0.4135,0.3982,0.3774,0.3774
+"Steel Structures, Signs and Painting",21,0.7944,0.4290,0.3680,0.5547,0.5547
+Other,6,0.5432,0.5635,0.7384,0.3920,0.3920

@@ -1,0 +1,190 @@
+{
+  "default": "kumo",
+  "overrides": {},
+  "test": {
+    "trailing_median": {
+      "prices": 4507,
+      "mdape": 0.55,
+      "within_15": 0.15265143110716664,
+      "median_signed": 0.07265250773195886
+    },
+    "xgboost_frozen": {
+      "prices": 4507,
+      "mdape": 0.4613008247999871,
+      "within_15": 0.18038606611936986,
+      "median_signed": 0.2786000000000002
+    },
+    "lightgbm_frozen": {
+      "prices": 4507,
+      "mdape": 0.4339540983606557,
+      "within_15": 0.1943643221655203,
+      "median_signed": 0.2055318181818182
+    },
+    "kumo_frozen": {
+      "prices": 4507,
+      "mdape": 0.4020187391304348,
+      "within_15": 0.20479254493010873,
+      "median_signed": 0.13397749999999986
+    },
+    "xgboost": {
+      "prices": 4507,
+      "mdape": 0.40135809221500834,
+      "within_15": 0.2090082094519636,
+      "median_signed": 0.01964669977495337
+    },
+    "lightgbm": {
+      "prices": 4507,
+      "mdape": 0.38877393053504633,
+      "within_15": 0.20878633237186597,
+      "median_signed": 0.00482689037301376
+    },
+    "kumo": {
+      "prices": 4507,
+      "mdape": 0.38158530330767865,
+      "within_15": 0.20767694697137787,
+      "median_signed": -0.09263138483295386
+    },
+    "production": {
+      "prices": 4507,
+      "mdape": 0.38158530330767865,
+      "within_15": 0.20767694697137787,
+      "median_signed": -0.09263138483295386
+    }
+  },
+  "test_without_outliers": {
+    "trailing_median": 0.5400214,
+    "xgboost_frozen": 0.45736466388814195,
+    "lightgbm_frozen": 0.42976675714534074,
+    "kumo_frozen": 0.39660000000000006,
+    "xgboost": 0.39554512000097797,
+    "lightgbm": 0.38382788872554197,
+    "kumo": 0.377279243307769,
+    "production": 0.377279243307769
+  },
+  "contract_level": {
+    "trailing_median": {
+      "headline": {
+        "contracts": 178,
+        "bidlens_closer_share": 0.3146067415730337,
+        "bidlens_median_abs_error": 0.43049027859836303,
+        "ee_median_abs_error": 0.21238682952515903,
+        "bidlens_median_error": 0.3819524938099159,
+        "ee_median_error": 0.19891149897610552,
+        "bidlens_within_15": 0.20224719101123595,
+        "ee_within_15": 0.3539325842696629
+      },
+      "all_test_contracts": {
+        "contracts": 201,
+        "bidlens_closer_share": 0.31343283582089554,
+        "bidlens_median_abs_error": 0.4248122307130716,
+        "ee_median_abs_error": 0.20434988709677415,
+        "bidlens_median_error": 0.3512892284369612,
+        "ee_median_error": 0.1720889883703285,
+        "bidlens_within_15": 0.21393034825870647,
+        "ee_within_15": 0.38308457711442784
+      }
+    },
+    "xgboost": {
+      "headline": {
+        "contracts": 178,
+        "bidlens_closer_share": 0.5449438202247191,
+        "bidlens_median_abs_error": 0.21776147044039207,
+        "ee_median_abs_error": 0.21238682952515903,
+        "bidlens_median_error": 0.10909153259193263,
+        "ee_median_error": 0.19891149897610552,
+        "bidlens_within_15": 0.34269662921348315,
+        "ee_within_15": 0.3539325842696629
+      },
+      "all_test_contracts": {
+        "contracts": 201,
+        "bidlens_closer_share": 0.5174129353233831,
+        "bidlens_median_abs_error": 0.22550787280243284,
+        "ee_median_abs_error": 0.20434988709677415,
+        "bidlens_median_error": 0.08541597730904073,
+        "ee_median_error": 0.1720889883703285,
+        "bidlens_within_15": 0.3333333333333333,
+        "ee_within_15": 0.38308457711442784
+      }
+    },
+    "lightgbm": {
+      "headline": {
+        "contracts": 178,
+        "bidlens_closer_share": 0.5561797752808989,
+        "bidlens_median_abs_error": 0.22036699137117652,
+        "ee_median_abs_error": 0.21238682952515903,
+        "bidlens_median_error": 0.07559193398018407,
+        "ee_median_error": 0.19891149897610552,
+        "bidlens_within_15": 0.34831460674157305,
+        "ee_within_15": 0.3539325842696629
+      },
+      "all_test_contracts": {
+        "contracts": 201,
+        "bidlens_closer_share": 0.527363184079602,
+        "bidlens_median_abs_error": 0.2289711153215284,
+        "ee_median_abs_error": 0.20434988709677415,
+        "bidlens_median_error": 0.06305706369554444,
+        "ee_median_error": 0.1720889883703285,
+        "bidlens_within_15": 0.3283582089552239,
+        "ee_within_15": 0.38308457711442784
+      }
+    },
+    "kumo": {
+      "headline": {
+        "contracts": 178,
+        "bidlens_closer_share": 0.5786516853932584,
+        "bidlens_median_abs_error": 0.1844263843898299,
+        "ee_median_abs_error": 0.21238682952515903,
+        "bidlens_median_error": 0.008335629120205435,
+        "ee_median_error": 0.19891149897610552,
+        "bidlens_within_15": 0.43258426966292135,
+        "ee_within_15": 0.3539325842696629
+      },
+      "all_test_contracts": {
+        "contracts": 201,
+        "bidlens_closer_share": 0.5522388059701493,
+        "bidlens_median_abs_error": 0.18973030325001625,
+        "ee_median_abs_error": 0.20434988709677415,
+        "bidlens_median_error": 0.0063255252647991195,
+        "ee_median_error": 0.1720889883703285,
+        "bidlens_within_15": 0.42786069651741293,
+        "ee_within_15": 0.38308457711442784
+      }
+    },
+    "production": {
+      "headline": {
+        "contracts": 178,
+        "bidlens_closer_share": 0.5786516853932584,
+        "bidlens_median_abs_error": 0.1844263843898299,
+        "ee_median_abs_error": 0.21238682952515903,
+        "bidlens_median_error": 0.008335629120205435,
+        "ee_median_error": 0.19891149897610552,
+        "bidlens_within_15": 0.43258426966292135,
+        "ee_within_15": 0.3539325842696629
+      },
+      "all_test_contracts": {
+        "contracts": 201,
+        "bidlens_closer_share": 0.5522388059701493,
+        "bidlens_median_abs_error": 0.18973030325001625,
+        "ee_median_abs_error": 0.20434988709677415,
+        "bidlens_median_error": 0.0063255252647991195,
+        "ee_median_error": 0.1720889883703285,
+        "bidlens_within_15": 0.42786069651741293,
+        "ee_within_15": 0.38308457711442784
+      }
+    }
+  },
+  "speed": {
+    "xgboost": {
+      "seconds_per_quarter": 1.4763324686015646,
+      "quarters": 12
+    },
+    "lightgbm": {
+      "seconds_per_quarter": 11.0587904547574,
+      "quarters": 12
+    },
+    "kumo": {
+      "seconds_per_quarter": 9.763827732589561,
+      "quarters": 12
+    }
+  }
+}

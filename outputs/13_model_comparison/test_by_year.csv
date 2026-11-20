@@ -1,0 +1,4 @@
+year,trailing_median,xgboost,lightgbm,kumo,production,trailing_median_signed,xgboost_signed,lightgbm_signed,kumo_signed,production_signed
+2024,0.5550,0.3784,0.3708,0.3530,0.3530,0.1152,0.0955,0.0794,-0.0331,-0.0331
+2025,0.5326,0.4015,0.3825,0.3970,0.3970,0.0354,-0.0058,-0.0112,-0.1373,-0.1373
+2026,0.5647,0.4539,0.4399,0.4095,0.4095,0.0839,-0.0841,-0.0894,-0.1246,-0.1246
