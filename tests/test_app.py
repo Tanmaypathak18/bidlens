@@ -9,7 +9,6 @@ import pytest
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "app"))  # Streamlit puts the main script's folder on the path
-READY = (ROOT / "data" / "interim" / "app" / "04-0W0504" / "summary.json").exists()
 PAGES = [
     "app/Home.py",
     "app/pages/1_Package.py",
@@ -19,7 +18,6 @@ PAGES = [
 ]
 
 
-@pytest.mark.skipif(not READY, reason="run `python -m bidlens.estimate 04-0W0504` first")
 @pytest.mark.parametrize("page", PAGES)
 def test_page_renders(page):
     from streamlit.testing.v1 import AppTest

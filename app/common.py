@@ -13,9 +13,10 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "src"))
 
 from bidlens.documents.extract import DEFAULT_RUN, RUN_FALLBACKS, TABLES  # noqa: E402
+from bidlens.sample import app_dir, docs_dir  # noqa: E402
 
 APP = ROOT / "data" / "interim" / "app"
-DOCS = ROOT / "data" / "interim" / "docs"
+SAMPLE = ROOT / "data" / "sample" / "app"
 
 TOPIC_ORDER = [
     "scope",
@@ -32,7 +33,9 @@ TOPIC_ORDER = [
 
 
 def packages() -> list[str]:
-    return sorted(p.name for p in APP.glob("*") if (p / "summary.json").exists())
+    # Packages built on this computer, plus the committed sample (D-069).
+    found = {p.name for d in (APP, SAMPLE) for p in d.glob("*") if (p / "summary.json").exists()}
+    return sorted(found)
 
 
 def pick_package() -> str | None:
@@ -51,17 +54,17 @@ def pick_package() -> str | None:
 
 @st.cache_data
 def summary(contract: str) -> dict:
-    return json.loads((APP / contract / "summary.json").read_text())
+    return json.loads((app_dir(contract) / "summary.json").read_text())
 
 
 @st.cache_data
 def estimate(contract: str) -> pd.DataFrame:
-    return pd.read_parquet(APP / contract / "estimate.parquet")
+    return pd.read_parquet(app_dir(contract) / "estimate.parquet")
 
 
 @st.cache_data
 def comparables(contract: str) -> pd.DataFrame:
-    p = APP / contract / "comparables.parquet"
+    p = app_dir(contract) / "comparables.parquet"
     return pd.read_parquet(p) if p.exists() else pd.DataFrame()
 
 
@@ -69,7 +72,7 @@ def comparables(contract: str) -> pd.DataFrame:
 def findings(contract: str) -> tuple[pd.DataFrame, str, str]:
     """Findings of the default extraction run: (items, run name, model label)."""
     for run in (DEFAULT_RUN, *RUN_FALLBACKS):
-        p = DOCS / contract / f"extraction_{run}.json"
+        p = docs_dir(contract) / f"extraction_{run}.json"
         if p.exists():
             from bidlens.documents.report import mask
 
@@ -126,7 +129,7 @@ def header(title: str) -> str | None:
 
 @st.cache_data
 def history(contract: str) -> pd.DataFrame:
-    p = APP / contract / "history.parquet"
+    p = app_dir(contract) / "history.parquet"
     return pd.read_parquet(p) if p.exists() else pd.DataFrame()
 
 

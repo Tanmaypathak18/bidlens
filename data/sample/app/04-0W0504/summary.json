@@ -1,0 +1,80 @@
+{
+  "contract": "04-0W0504",
+  "bid_open_date": "2026-09-17",
+  "district": "04",
+  "county": "ALA,CC",
+  "type_of_work": "TRASH CAPTURE DEVICES, MVPS, MGS, EROSION CONTROL, AND MOD LIGHTING.",
+  "work": "Trash capture devices, MVPs, MGS, erosion control, and Mod lighting",
+  "where": "Construction on state highway in alameda and contra costa counties at various locations",
+  "routes": "Routes 4, 13, 24, 80, 84, etc.",
+  "key_dates": [
+    {
+      "date": "2026-07-27",
+      "label": "Bid package issued",
+      "file": "04-0W0504sp.pdf",
+      "page": 13
+    },
+    {
+      "date": "2026-08-06",
+      "label": "Addendum 1",
+      "file": "04-0W0504ad1.pdf",
+      "page": 1
+    },
+    {
+      "date": "2026-09-02",
+      "label": "Addendum 2",
+      "file": "04-0W0504ad2.pdf",
+      "page": 1
+    },
+    {
+      "date": "2026-09-02",
+      "label": "Mandatory prebid meeting",
+      "file": "04-0W0504ad1.pdf",
+      "page": 1
+    },
+    {
+      "date": "2026-09-08",
+      "label": "Addendum 3",
+      "file": "04-0W0504ad3.pdf",
+      "page": 1
+    },
+    {
+      "date": "2026-09-17",
+      "label": "Bids open",
+      "file": "04-0W0504ad1.pdf",
+      "page": 1
+    }
+  ],
+  "working_days": 600.0,
+  "engineers_estimate": 22715571.43,
+  "low_bid_cost": 14086513.18,
+  "bidders": 7,
+  "plan_holders": 16,
+  "estimate_total": 14539426.975741083,
+  "model_lines": 27,
+  "lines": 118,
+  "model_share": 0.32041532374983495,
+  "range_adjustment": {
+    "lump_sum": -0.0998494083540642,
+    "per_unit": -0.04398662982890622
+  },
+  "market": {
+    "contract_number": "04-0W0504",
+    "bid_open_date": "2026-09-17",
+    "district": "04",
+    "engineers_estimate": 22715571.43,
+    "low_bid_cost": 14086513.18,
+    "spread": -0.3799,
+    "spread_low": -0.3858,
+    "spread_kumo": -0.187,
+    "spread_high": 0.0206,
+    "spread_linear": -0.3775,
+    "spread_median": -0.2085,
+    "bidders": 7.0,
+    "bidders_low": 3.0918,
+    "bidders_kumo": 5.1507,
+    "bidders_high": 7.906,
+    "bidders_linear": 4.9147,
+    "bidders_median": 5.0
+  }
+}

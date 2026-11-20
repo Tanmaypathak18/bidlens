@@ -79,3 +79,7 @@ review is still open.
 one at a time, then the patterns, then merges), then
 `uv run python -m bidlens.documents.evaluate 04-0W0504 blind2`, hand judging, and
 `... evaluate 04-0W0504 score2`. Generated 2026-11-20.
+
+## Charts from the notebook
+
+`notebooks/07_document_extraction.ipynb` explains this stage and saved these charts here: `nb_extraction_runs.png`, `nb_recall_by_topic.png`.

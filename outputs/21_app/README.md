@@ -44,3 +44,7 @@ phone width, taken with `uv run python scripts/screenshots.py` (headless Chromiu
 `uv run python -m bidlens.estimate 04-0W0504` (3 seconds), then the app:
 `uv run streamlit run app/Home.py`. Code in `src/bidlens/estimate.py`,
 `src/bidlens/export.py` and `app/`. Generated 2026-11-20.
+
+## Charts from the notebook
+
+`notebooks/07_document_extraction.ipynb` explains this stage and saved these charts here: `nb_draft_vs_result.png`.

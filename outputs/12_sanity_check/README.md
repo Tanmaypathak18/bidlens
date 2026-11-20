@@ -124,3 +124,7 @@ nothing; the other models would be retrained), which step 2.5 decides.
 
 `uv run python -m bidlens.pricing.sanity` (code in `src/bidlens/pricing/sanity.py`), after
 stages 10 and 11. Generated 2026-11-20.
+
+## Charts from the notebook
+
+`notebooks/04_kumo_tabular.ipynb` explains this stage and saved these charts here: `nb_drift_by_year.png`, `nb_miss_by_quantity.png`.

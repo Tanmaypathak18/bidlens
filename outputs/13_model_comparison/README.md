@@ -139,3 +139,7 @@ with the commands below.
 `uv run python -m bidlens.pricing.refresh --model xgboost` (then `lightgbm`, then `kumo`;
 one process each), then `uv run python -m bidlens.pricing.select`. Code in
 `src/bidlens/pricing/`. Generated 2026-11-20.
+
+## Charts from the notebook
+
+`notebooks/05_model_comparison.ipynb` explains this stage and saved these charts here: `nb_contract_totals_vs_low_bid.png`, `nb_drift_frozen_vs_refreshed.png`, `nb_mdape_by_family_refreshed.png`.

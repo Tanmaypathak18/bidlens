@@ -27,15 +27,16 @@ WHOLE = '"$"#,##0'
 
 def _load(contract: str, root: Path):
     from bidlens.documents.extract import DEFAULT_RUN, RUN_FALLBACKS
+    from bidlens.sample import app_dir, docs_dir
 
-    app = root / "data" / "interim" / "app" / contract
+    app = app_dir(contract, root)
     s = json.loads((app / "summary.json").read_text())
     est = pd.read_parquet(app / "estimate.parquet")
     cp = app / "comparables.parquet"
     comps = pd.read_parquet(cp) if cp.exists() else pd.DataFrame()
     items, model = pd.DataFrame(), ""
     for run in (DEFAULT_RUN, *RUN_FALLBACKS):
-        p = root / "data" / "interim" / "docs" / contract / f"extraction_{run}.json"
+        p = docs_dir(contract, root) / f"extraction_{run}.json"
         if p.exists():
             res = json.loads(p.read_text())
             items, model = pd.DataFrame(res["items"]), res.get("model", run)

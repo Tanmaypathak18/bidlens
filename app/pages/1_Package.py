@@ -8,7 +8,7 @@ import re
 import altair as alt
 import pandas as pd
 import streamlit as st
-from common import DOCS, estimate, findings, header, scored, summary
+from common import docs_dir, estimate, findings, header, scored, summary
 from design import (
     AMBER,
     COLOR,
@@ -140,7 +140,7 @@ if contract:
 
     # --- closure hours
     st.subheader("When lanes and ramps may be closed")
-    cp = DOCS / contract / "charts.parquet"
+    cp = docs_dir(contract) / "charts.parquet"
     if cp.exists():
         charts = pd.read_parquet(cp)
         charts["name"] = (

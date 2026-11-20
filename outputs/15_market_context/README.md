@@ -74,3 +74,7 @@ bidder count is more predictable, mostly from the plan-holder list.
 
 `uv run python -m bidlens.market.context` (code in `src/bidlens/market/context.py`).
 Generated 2026-11-20.
+
+## Charts from the notebook
+
+`notebooks/06_market_context.ipynb` explains this stage and saved these charts here: `nb_bidders_expected_vs_actual.png`, `nb_spread_expected_vs_actual.png`.

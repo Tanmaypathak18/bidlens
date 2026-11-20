@@ -75,3 +75,7 @@ Apache-2.0 and the weights are OpenMDW-1.1 (both allow commercial use).
 
 `uv run python -m bidlens.pricing.kumo` (code in `src/bidlens/pricing/kumo.py`), after
 `bidlens.pricing.baseline`. Generated 2026-11-20.
+
+## Charts from the notebook
+
+`notebooks/04_kumo_tabular.ipynb` explains this stage and saved these charts here: `nb_mdape_by_family.png`.

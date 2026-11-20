@@ -10,10 +10,9 @@ from pathlib import Path
 import pytest
 
 ROOT = Path(__file__).resolve().parents[1]
-APP = ROOT / "data" / "interim" / "app" / "04-0W0504"
+APP = ROOT / "data" / "sample" / "app" / "04-0W0504"  # committed (D-069)
 
 
-@pytest.mark.skipif(not (APP / "summary.json").exists(), reason="sample estimate not built")
 def test_workbook_formulas_recompute_the_draft_total():
     from openpyxl import load_workbook
 

@@ -4,7 +4,9 @@
 
 BidLens helps an estimator move from "here is a new bid package" to "here is a defensible draft estimate" faster. It reads the bid documents, prices every bid item from years of real public bid results, shows what the market is likely to do, and exports a draft estimate the estimator can review and adjust.
 
-> Status: v1 in development. This README describes the full product. Sections marked *Roadmap* are planned for after v1.
+> Status: v1 is built and tested on public Caltrans data (Districts 4 and 5); a public demo is next. Sections marked *Roadmap* are planned for after v1.
+>
+> **Headline:** on 178 Caltrans contracts bid in 2024 to 2026, which BidLens never saw while learning, its contract total landed closer to the winning bid than Caltrans' own engineer's estimate on **57.9%** of contracts (typical miss 18.4% against 21.2%). [Details below](#results).
 
 ---
 
@@ -91,7 +93,7 @@ flowchart TB
     end
 
     subgraph APP["Estimator app"]
-        A1["Package, Prices, Export pages"]
+        A1["Home, Package, Prices,<br/>Market, Export pages"]
         A2["Excel estimate export"]
     end
 
@@ -120,7 +122,8 @@ flowchart TB
 ### The parts, briefly
 
 - **Data platform.** Collects public bid history at a polite rate and caches everything so runs can be repeated. It cleans the data into one standard model and runs quality checks: missing values, impossible prices, duplicates and outliers.
-- **Pricing.** Predicts unit prices by item, location, quantity and date, after adjusting history to today's dollars with the Caltrans Construction Cost Index. Two kinds of model are compared side by side on the same test: gradient-boosted trees (XGBoost, LightGBM) and NVIDIA Kumo Tabular, a foundation model for tables. The agency's own engineer's estimate is the benchmark both must beat. The best model is chosen per item family, based on the results.
+- **Pricing.** Predicts unit prices by item, location, quantity and date, after adjusting history to bid-day dollars with Caltrans' own construction cost index. Two kinds of model were compared side by side on the same test: gradient-boosted trees (XGBoost, LightGBM) and NVIDIA Kumo Tabular, a pretrained model for tables. Kumo Tabular was chosen, on 2023 bids before the test years were looked at; no item family did well enough with another model to get an exception. Every price comes with a low / likely / high range and the 10 most similar past bids.
+- **Refreshed every quarter.** The pricing models are refit each quarter on all earlier bids (a walk-forward setup), so they always learn from the latest market and never see the bids they are pricing. This was adopted after a check showed that models frozen at the end of 2023 drifted high in the test years (up to 24% over the low bid in 2026 for Kumo, 45% for XGBoost), because the statewide cost index rose much faster than these low bids.
 - **Market context.** Learns from past bid openings how many bidders a project like this attracts, and how the winning bid usually compares with the engineer's estimate.
 - **Document analyst.** Turns bid documents into structured, cited findings using an open-weight language model that runs on your own computer through [Ollama](https://ollama.com). Bid documents never leave the machine, and nothing is sent to a paid service. Every finding must quote the page it came from, and BidLens checks that the quote is really there.
 - **Estimator app.** A simple web app that follows the estimator's own order of work and ends in an Excel export.
@@ -132,21 +135,66 @@ flowchart TB
 Estimators are right to be skeptical of a number with no explanation. BidLens is built around that:
 
 - **Every number shows its evidence.** Prices come with the past bids behind them. Extracted findings come with page and section references.
-- **Honest testing.** Models are trained on older bids and tested only on newer ones, the same way they would be used in practice. Results are reported item family by item family, including where a model loses.
+- **Honest testing.** Models learn from older bids and are tested only on newer ones, the same way they would be used in practice. Choices were made on 2023 bids, before the 2024 to 2026 test was looked at. Results are reported item family by item family, including where a model loses.
 - **A real benchmark.** Each model is measured against the agency's engineer's estimate, not just against other models.
 - **Runs locally, at no cost.** Everything, including the document reading, runs on your own computer with free, open models. Bid documents never leave the machine, and there is no subscription or API bill.
 - **Market-level analysis.** The app looks at market behavior, not at individual contractors.
 
 ## Results
 
-**Follow the work step by step:** the analysis is told in numbered [Jupyter notebooks](notebooks/README.md) that read directly on GitHub, starting with [01 Data overview](notebooks/01_data_overview.ipynb). Every stage also writes its results to a numbered folder in [`outputs/`](outputs/README.md), from the source review and the 72,113 collected bid prices to the cross-checks and data quality reports. Each folder has a plain-language README. No file names a bidder.
+**Follow the work step by step:** the analysis is told in seven numbered [Jupyter notebooks](notebooks/README.md) that read directly on GitHub, from [01 Data overview](notebooks/01_data_overview.ipynb) to [07 Document extraction](notebooks/07_document_extraction.ipynb). Every stage also writes its results to a numbered folder in [`outputs/`](outputs/README.md), each with a plain-language README. No file names a bidder. What the models are for, and where they fall short, is in the [model card](docs/model_card.md).
 
-Evaluation results will be published here and in `outputs/` as v1 is completed:
+**The test.** Everything below was measured on bids BidLens never saw while learning: models learn from bids opened before 2024 and are tested on bids opened from January 2024 to November 2026 (4,507 low-bid item prices on 238 contracts). Choices of method were made on 2023 bids, before the test was looked at.
 
-- **Pricing accuracy** by item family: median error, and the share of items within 15% of the winning unit price, against the engineer's estimate.
-- **Model comparison:** XGBoost, LightGBM and NVIDIA Kumo Tabular, covering accuracy, speed and license.
-- **Market context accuracy:** bidder count and bid spread.
-- **Document extraction quality:** precision, recall and citation accuracy on a hand-labeled bid package.
+### Whole contracts: BidLens against the engineer's estimate
+
+For each test contract, BidLens prices every line of the bid list and adds them up. That total, Caltrans' engineer's estimate and the actual low bid are then compared. This is the estimator's real question: would BidLens have been a better guide to the winning number? ([notebook 05](notebooks/05_model_comparison.ipynb))
+
+| On 178 test contracts | BidLens total | Engineer's estimate |
+| --- | ---: | ---: |
+| Closer to the low bid | **57.9%** of contracts | 42.1% |
+| Typical miss (median distance from the low bid) | **18.4%** | 21.2% |
+| Within 15% of the low bid | **43.3%** | 35.4% |
+| Median over (+) or under (-) the low bid | **+0.8%** | +19.9% |
+
+The engineer's estimate is a cost build-up, not a forecast of the low bid, and in 2024 to 2026 low bids in these districts came in well under it. A total built from earlier low bids benefits from that. On 42% of contracts the estimate was still closer.
+
+### Single bid items
+
+| Method (refreshed each quarter) | Median miss | Within 15% |
+| --- | ---: | ---: |
+| Historical median of the item's low bids (yardstick) | 55.0% | 15.3% |
+| XGBoost | 40.1% | 20.9% |
+| LightGBM | 38.9% | 20.9% |
+| **NVIDIA Kumo Tabular (used by BidLens)** | **38.2%** | 20.8% |
+
+A single item's low bid is noisy: on the same line, the second-lowest bidder's price differs from the low bidder's by a median of 27.5%, so no method should be expected to match single items closely. Lump sums are the hardest. Kumo was best in 11 of 18 item families; LightGBM or XGBoost won the other 7, by margins too small on 2023 bids to justify an exception. ([notebooks 03 to 05](notebooks/README.md))
+
+**Ranges:** the low to high range held the actual low bid on **79.0%** of test prices (target 80%). Ranges are wide, typically 4x from low to high for items priced per unit and 13x for lump sums. Every price also lists its 10 most similar earlier bids, each linked to its Caltrans page.
+
+**Speed and cost:** refreshing and pricing a quarter takes about 10 seconds with Kumo on a laptop processor; no GPU and no paid service.
+
+### Market context
+
+On 208 test contracts ([notebook 06](notebooks/06_market_context.ipynb)):
+
+- **Where the low bid lands against the engineer's estimate:** typical miss **15.7 points** (a trailing median: 17.0). The 80% range held the actual result on 76.9% of contracts, but it is about 50 points wide: for one contract, the range is more useful than the middle number.
+- **Number of bidders:** typical miss **1.3 bidders**, within one bidder on 63.5% of contracts. The plan-holder list Caltrans publishes carries much of this.
+
+### Reading the bid documents
+
+On a real Caltrans bid package (contract 04-0W0504, 6 PDFs), scored against 89 facts an estimator needs ([notebook 07](notebooks/07_document_extraction.ipynb)):
+
+| Reader (all local, free) | Facts found | Findings correct | Citation supports the finding | Time on a 16 GB Mac |
+| --- | ---: | ---: | ---: | ---: |
+| qwen3:8b alone, first attempt | 55.1% | 69.7% | 80.6% | 59 min |
+| **Default: qwen3:8b + llama3.1:8b + pattern rules** | **74.2%** | **76.9%** | 86.4% | 60 min |
+
+The bid item list read from the documents matched Caltrans' bid summary exactly (118 items). The gold facts and the judging were done by Claude, the AI assistant that built BidLens, not by a human estimator; a human review is still open.
+
+### End to end on the sample package
+
+For contract 04-0W0504 (trash capture, guardrail, erosion control and lighting; bid 17 September 2026), the BidLens draft total was **$14.54M**, **3% above** the actual low bid of $14.09M. The engineer's estimate, $22.72M, was 61% above it. The actual bids were used only for this check, never in the draft.
 
 ---
 
@@ -168,7 +216,9 @@ v1 covers Caltrans Districts 4 and 5, bid years 2018 to 2026, and the 100 highes
 
 ## Getting started
 
-Requirements: Python 3.11 or newer, [uv](https://docs.astral.sh/uv/), and, for reading bid documents, [Ollama](https://ollama.com) with one local model (about 5 GB; a Mac with 16 GB of memory runs it). Everything is free and runs on your machine.
+Requirements: Python 3.11 or newer and [uv](https://docs.astral.sh/uv/). Everything is free and runs on your machine.
+
+**Try the app in three commands.** It opens on the included sample package (Caltrans contract 04-0W0504) with its draft estimate, document findings, market context and Excel export:
 
 ```bash
 git clone <repo-url> && cd bidlens
@@ -176,30 +226,49 @@ uv sync
 uv run streamlit run app/Home.py
 ```
 
-To read bid documents, install Ollama and download the two models once (about 10 GB in all):
+The sample is a small, prepared copy of one package (`data/sample/app/`, about 0.5 MB). The bid documents themselves are not in the repository, so the app shows each finding's quote and page reference but cannot display the page image until you download the package (below).
+
+**Read the analysis without running anything:** the [notebooks](notebooks/README.md) display on GitHub with their charts. Notebooks 02 to 07 also rerun in seconds on a fresh clone, because they read the results saved in `outputs/`.
+
+**Run the tests:**
 
 ```bash
-ollama pull qwen3:8b
+make test
 ```
 
-```bash
-ollama pull llama3.1:8b
-```
+### Going further: rebuilding from the public sources
 
-Then read a bid package (about an hour on a Mac with 16 GB; the two models run one after the other):
+These steps rebuild everything the sample was made from. They take longer, and two of them need files downloaded by hand.
 
-```bash
-uv run python -m bidlens.documents.extract 04-0W0504 --mode combined
-```
+1. **Bid history.** Download the Caltrans bid summary PDFs by hand into `data/raw/bid_summaries/`, following [`the download list`](the download list). Then `make data` collects item prices from the Caltrans cost database (deliberately slow: one request every 2 seconds, about 2 hours the first time, cached afterwards) and builds the database.
+2. **Pricing models.** `make pricing` (about 12 minutes) fits and scores every model. The first run downloads NVIDIA Kumo Tabular's small model (about 114 MB) from Hugging Face.
+3. **A bid package.** Download contract 04-0W0504's documents by hand into `data/raw/bid_package/04-0W0504/`, following [`the download list`](the download list). Install [Ollama](https://ollama.com) and the two local models once (about 10 GB in all; a Mac with 16 GB of memory runs them):
 
-The app runs on the included sample data. To rebuild the full dataset from the public sources, run `make data`. This takes a while, because requests are deliberately rate-limited.
+   ```bash
+   ollama pull qwen3:8b
+   ```
 
-Other commands:
+   ```bash
+   ollama pull llama3.1:8b
+   ```
 
-```bash
-make test    # run the test suite
-make lint    # lint with ruff
-```
+   Then parse the package, rebuild its closure charts and read it (about an hour; the two models run one after the other):
+
+   ```bash
+   uv run python -m bidlens.documents.parse 04-0W0504
+   ```
+
+   ```bash
+   uv run python -m bidlens.documents.charts 04-0W0504
+   ```
+
+   ```bash
+   uv run python -m bidlens.documents.extract 04-0W0504 --mode combined
+   ```
+
+4. **The draft estimate.** `uv run python -m bidlens.estimate 04-0W0504` (a few seconds), then start the app as above. The app uses what you built, and falls back to the sample otherwise.
+
+Lint with `make lint`.
 
 **Optional: hosted model.** BidLens never needs a paid service. If you have your own Anthropic API key and prefer a hosted model for document reading, set `ANTHROPIC_API_KEY` and run the extraction with `--mode hosted`. This is off by default; it sends the relevant document passages to the Claude API and is billed to your key.
 
@@ -209,12 +278,18 @@ make lint    # lint with ruff
 src/bidlens/
   ingest/      data collection
   db/          data model, loading, quality checks
-  pricing/     price escalation, models, comparison, comparable bids
+  pricing/     price escalation, models, comparison, ranges, comparable bids
   market/      bidder count and bid spread models
-  documents/   document parsing, extraction, evaluation
-  export/      Excel estimate export
+  documents/   document parsing, closure charts, extraction, evaluation
+  analysis/    tables and charts for the notebooks
+  estimate.py  the draft estimate for one bid package
+  export.py    Excel estimate export
+  sample.py    the small sample package the app ships with
 app/           Streamlit estimator app
-docs/          build plan, data dictionary, model card, results
+notebooks/     the analysis, step by step
+outputs/       every stage's results, numbered, each with a README
+data/sample/   the committed sample (all other data is rebuilt, not committed)
+docs/          build plan, data dictionary, model card, download checklists
 tests/
 ```
 
@@ -233,6 +308,9 @@ tests/
 
 - v1 uses public Caltrans data for two districts. Prices for other regions, or for private work, will differ.
 - Historical prices reflect past market conditions. Escalation adjusts for broad trends, not for local shocks such as material shortages.
+- Single item prices miss the low bid by a median of 38%, and ranges are wide. Contract totals are much closer, because over- and under-priced lines partly cancel. Lump sums and unusual quantities are the least reliable.
+- The comparison with the engineer's estimate covers 2024 to 2026, when low bids in these districts ran well under Caltrans' estimates. In a different market the margin may shrink.
+- Items that are not among the 100 modeled items are priced from the median of earlier low bids for the same item, with no range.
 - Document extraction is an aid to review, not a substitute for reading the contract.
 - On a test package, the document reader (two local models plus plain pattern rules) finds about three quarters of the facts an estimator needs, and about 1 in 4 of its findings needs correcting. Read the cited page before relying on a finding. Lane closure hour charts are read by plain code from the page layout, not by the model.
 - BidLens supports estimating judgment. It does not replace it.

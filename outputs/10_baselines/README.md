@@ -96,3 +96,7 @@ with the command below).
 
 `uv run python -m bidlens.pricing.baseline` (code in `src/bidlens/pricing/baseline.py` and
 `features.py`). Generated 2026-11-20.
+
+## Charts from the notebook
+
+`notebooks/03_xgboost_baseline.ipynb` explains this stage and saved these charts here: `nb_feature_importance.png`, `nb_mdape_by_family.png`, `nb_mdape_by_year.png`.

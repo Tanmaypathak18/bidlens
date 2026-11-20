@@ -113,3 +113,7 @@ the median of an item's comparables (in today's dollars) misses the low bid by a
 `uv run python -m bidlens.pricing.refresh --model kumo`, then
 `uv run python -m bidlens.pricing.ranges` (code in `src/bidlens/pricing/ranges.py` and
 `comparables.py`). Generated 2026-11-20.
+
+## Charts from the notebook
+
+`notebooks/05_model_comparison.ipynb` explains this stage and saved these charts here: `nb_range_coverage_by_family.png`.

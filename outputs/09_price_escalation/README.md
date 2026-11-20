@@ -80,3 +80,7 @@ can correct what the index misses.
 
 `uv run python -m bidlens.pricing.escalate` (code in `src/bidlens/pricing/escalate.py`),
 from the raw cache in `data/raw/sv08data/results/`. Generated 2026-11-20.
+
+## Charts from the notebook
+
+`notebooks/02_price_escalation.ipynb` explains this stage and saved these charts here: `nb_cost_index.png`, `nb_price_levels.png`.
