@@ -174,7 +174,7 @@ def build(contract: str) -> dict:
     priced.loc[m, "pred_unit_price"] = line_ref.loc[k, "pred_unit_price"].to_numpy()
     priced.loc[m, "low"] = line_ref.loc[k, "pred_q10"].to_numpy() * np.exp(-a)
     priced.loc[m, "high"] = line_ref.loc[k, "pred_q90"].to_numpy() * np.exp(a)
-    priced.loc[m, "source"] = "Pricing model (Kumo Tabular), with comparable bids"
+    priced.loc[m, "source"] = "Pricing model, with comparable bids"
     priced.loc[m, "tier"] = 0
     priced["pred_amount"] = priced["pred_unit_price"] * priced["quantity"]
     priced["low_amount"] = priced["low"] * priced["quantity"]
@@ -344,6 +344,13 @@ The draft estimate the BidLens app shows for the sample bid package {contract}
 
 Document findings in the app and the workbook come from the `{DEFAULT_RUN}` extraction run
 (stage 20).
+
+## Screenshots
+
+`screenshots/`: every page of the app on this package (desktop width) and the home page at
+phone width, taken with `uv run python scripts/screenshots.py` (headless Chromium).
+
+![Home](screenshots/01_overview.png)
 
 ## Files
 

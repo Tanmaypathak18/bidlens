@@ -6,7 +6,7 @@ from __future__ import annotations
 import altair as alt
 import pandas as pd
 import streamlit as st
-from common import comparables, estimate, header, history, money, pct, summary
+from common import comparables, estimate, header, history, money, pct, short_money, summary
 from design import AMBER, GREEN, NAVY, SLATE, chart, how_to_read, tile
 
 contract = header("Prices")
@@ -59,7 +59,7 @@ if contract:
         r["mid"] = 1.0
         x = alt.X(
             "lo:Q",
-            title="Unit price relative to the likely price (×, log scale)",
+            title="Price ÷ likely price (log scale)",
             scale=alt.Scale(type="log", domain=[0.1, 10]),
             axis=alt.Axis(values=[0.1, 0.25, 0.5, 1, 2, 4, 10], format="~g"),
         )
@@ -93,9 +93,11 @@ if contract:
             "Description": est["description"],
             "Unit": est["unit"],
             "Quantity": est["qty"],
-            "Low": est["low"],
             "Likely": est["pred_unit_price"],
-            "High": est["high"],
+            "Range": [
+                "—" if pd.isna(lo) else f"{short_money(lo)} to {short_money(hi)}"
+                for lo, hi in zip(est["low"], est["high"], strict=True)
+            ],
             "Amount": est["pred_amount"],
             "Share": est["share"] * 100,
             "Priced from": est["source"],
@@ -109,9 +111,8 @@ if contract:
         on_select="rerun",
         selection_mode="single-row",
         column_config={
-            "Low": st.column_config.NumberColumn("Low ($/unit)", format="$%,.2f"),
+            "Range": st.column_config.TextColumn("Low to high ($/unit)"),
             "Likely": st.column_config.NumberColumn("Likely ($/unit)", format="$%,.2f"),
-            "High": st.column_config.NumberColumn("High ($/unit)", format="$%,.2f"),
             "Amount": st.column_config.NumberColumn("Amount ($)", format="$%,.0f"),
             "Share": st.column_config.ProgressColumn(
                 "Share of total",
@@ -123,17 +124,21 @@ if contract:
         },
     )
     rows = pick.selection.rows if pick and pick.selection else []
-    r = est.iloc[rows[0] if rows else 0]
+    # Without a selection, show the largest item that has a range and comparables.
+    first = int(est.index[est["tier"] == 0][0]) if (est["tier"] == 0).any() else 0
+    r = est.iloc[rows[0] if rows else first]
     st.subheader(f"Item {r['item_no']} · {r['description']}")
     hint = (
         ""
         if rows
-        else f" <span style='color:{SLATE}'>(Showing the largest item; select a row above.)</span>"
+        else f" <span style='color:{SLATE}'>(Showing the largest item with a range; select a row "
+        "above to change it.)</span>"
     )
+    src = r["source"][0].lower() + r["source"][1:]
     st.markdown(
         f"{r['item_code']} · {r['qty']} {r['unit']} · likely "
         f"**{money(r['pred_unit_price'], True)}** per {r['unit']} = **{money(r['pred_amount'])}** "
-        f"({r['share']:.1%} of the draft). Priced from: {r['source'].lower()}.{hint}",
+        f"({r['share']:.1%} of the draft). Priced from: {src}.{hint}",
         unsafe_allow_html=True,
     )
     c = comps[comps["item_no"] == r["item_no"]] if len(comps) else comps
@@ -173,7 +178,13 @@ if contract:
     with left:
         st.markdown("**Price history**")
         if h.empty:
-            st.write("No earlier low bids for this exact item.")
+            st.write(
+                "This is a contract-specific item (its code starts with 01 to 04), so it has no "
+                "price history of its own; it is priced from earlier items with the same "
+                "description."
+                if str(r["item_code"])[:2] in ("01", "02", "03", "04")
+                else "No earlier low bids for this exact item."
+            )
         else:
             h = h.assign(when=pd.to_datetime(h["bid_open_date"]))
             p = h["unit_price_in_bid_dollars"]
@@ -231,7 +242,7 @@ if contract:
                         "Contract": c["contract_number"],
                         "Date": pd.to_datetime(c["bid_open_date"]).dt.strftime("%b %Y"),
                         "Qty": c["quantity"],
-                        "Price today": c["unit_price_in_query_dollars"],
+                        "Price (bid-date $)": c["unit_price_in_query_dollars"],
                         "Source": c["source"],
                     }
                 ),
@@ -239,13 +250,14 @@ if contract:
                 width="stretch",
                 column_config={
                     "Qty": st.column_config.NumberColumn(format="%,.0f"),
-                    "Price today": st.column_config.NumberColumn(format="$%,.2f"),
+                    "Price (bid-date $)": st.column_config.NumberColumn(format="$%,.0f"),
                     "Source": st.column_config.LinkColumn(display_text="Caltrans"),
                 },
             )
             st.caption(
                 "The 10 closest earlier low bids: similar quantity, recent, same district and "
-                "similar job size count as closer. 'Price today' is in bid-date dollars."
+                "similar job size count as closer. Prices are brought to the bid date with the "
+                "Caltrans cost index."
             )
 
     if s.get("low_bid_cost"):

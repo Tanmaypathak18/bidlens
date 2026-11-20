@@ -156,8 +156,66 @@ def rate(items: pd.DataFrame) -> pd.DataFrame:
     )
 
 
-def top_watch(items: pd.DataFrame, n: int = 5) -> pd.DataFrame:
-    """Risk findings, one per category, in category order, with a value first."""
+def support(statement: str, evidence: str) -> float:
+    """Share of the statement's words that also appear in its own quote (0 to 1). A low
+    share means the statement says more than the quote shows."""
+    stop = set(
+        [
+            "the",
+            "a",
+            "an",
+            "of",
+            "to",
+            "and",
+            "or",
+            "for",
+            "in",
+            "on",
+            "is",
+            "are",
+            "be",
+            "must",
+            "by",
+            "with",
+            "at",
+            "as",
+            "that",
+            "this",
+            "it",
+            "any",
+            "each",
+            "all",
+        ]
+    )
+    w = {x for x in re.findall(r"[a-z0-9]+", statement.lower()) if x not in stop}
+    e = set(re.findall(r"[a-z0-9]+", evidence.lower()))
+    return len(w & e) / len(w) if w else 0.0
+
+
+def damages_summary(table: pd.DataFrame) -> pd.DataFrame:
+    """One finding that sums up the late closure damages table (read by code)."""
+    if table.empty:
+        return table
+    vals = [int(x.replace("$", "").replace(",", ""))
+            for t in table["statement"] for x in re.findall(r"\$[\d,]+", t)]  # fmt: skip
+    first = table.iloc[0]
+    return pd.DataFrame([{
+        **first.to_dict(),
+        "category": "time_damages",
+        "category_name": "Working days and liquidated damages",
+        "source": "pattern",
+        "statement": f"Reopening a lane or ramp closure late costs ${min(vals):,} to "
+                     f"${max(vals):,} in liquidated damages for every 10 minutes, depending on "
+                     f"the route ({len(table)} routes in the table).",
+        "value": "",
+    }])  # fmt: skip
+
+
+def top_watch(items: pd.DataFrame, n: int = 5, table: pd.DataFrame | None = None) -> pd.DataFrame:
+    """Risk findings, one per category, in category order: exact facts read by code first,
+    then statements that stay close to their own quote, then those with a value."""
+    if table is not None and len(table):
+        items = pd.concat([damages_summary(table), items], ignore_index=True)
     r = rate(items)
     r = r[r["severity"] == "risk"].copy()
     if r.empty:
@@ -168,8 +226,11 @@ def top_watch(items: pd.DataFrame, n: int = 5) -> pd.DataFrame:
     # Facts read by plain code (pattern rules) are exact, so they come first.
     src = r["source"] if "source" in r else pd.Series("model", index=r.index)
     r["exact"] = (src.fillna("model") == "pattern").astype(int)
+    r["support"] = [support(a, b) for a, b in zip(r["statement"], r["evidence"], strict=True)]
+    r = r[(r["exact"] == 1) | (r["support"] >= 0.75)]
     r = r.sort_values(
-        ["cat_rank", "exact", "money", "has_value"], ascending=[True, False, False, False]
+        ["cat_rank", "exact", "support", "money", "has_value"],
+        ascending=[True, False, False, False, False],
     )
     first = r.drop_duplicates("category")
     rest = r.drop(first.index)

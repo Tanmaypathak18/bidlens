@@ -217,12 +217,12 @@ if contract:
                 color=alt.Color(
                     "what:N",
                     scale=alt.Scale(domain=dom, range=rng),
-                    legend=alt.Legend(title=None, orient="bottom"),
+                    legend=alt.Legend(title=None, orient="top", direction="horizontal"),
                 ),
                 tooltip=["day", "hour", "what"],
             )
         )
-        st.altair_chart(chart(heat, height=190), width="stretch")
+        st.altair_chart(chart(heat, height=300), width="stretch")
         how_to_read(
             "green hours are when this closure is allowed; grey hours allow work only where no "
             f"closure is needed. Chart {c['chart']}, special provisions page {c['page']}."

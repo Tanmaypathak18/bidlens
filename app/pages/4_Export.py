@@ -84,8 +84,21 @@ if contract:
             "Priced from",
             "Comparable bids",
         ]
+        view = est[cols].copy()
+        for k in ("Low unit price", "High unit price"):
+            view[k] = ["—" if pd.isna(v) else f"${float(v):,.2f}" for v in pd.to_numeric(view[k])]
         st.dataframe(
-            est[cols], hide_index=True, width="stretch", height=380, column_config=money_cols
+            view.drop(columns=["Comparable bids"]),
+            hide_index=True,
+            width="stretch",
+            height=380,
+            column_config={
+                **money_cols,
+                "Low unit price": st.column_config.TextColumn("Low"),
+                "Likely unit price": st.column_config.NumberColumn("Likely", format="$%,.2f"),
+                "High unit price": st.column_config.TextColumn("High"),
+                "Description": st.column_config.TextColumn(width="medium"),
+            },
         )
         st.caption(
             f"Plus the package header (engineer's estimate {money(s['engineers_estimate'])}, "

@@ -7,7 +7,7 @@ import json
 import altair as alt
 import pandas as pd
 import streamlit as st
-from common import ROOT, header, money, pct, summary
+from common import ROOT, header, pct, summary
 from design import GREEN, NAVY, SLATE, chart, how_to_read, tile
 
 contract = header("Market")
@@ -21,7 +21,12 @@ if contract:
     lo, mid, hi = (ee * (1 + mk[k]) for k in ("spread_low", "spread_kumo", "spread_high"))
 
     a, b, c = st.columns(3)
-    tile(a, "Expected low bid", money(mid), f"{pct(mk['spread_kumo'])} vs the engineer's estimate")
+    tile(
+        a,
+        "Expected low bid",
+        f"${mid / 1e6:,.1f}M",
+        f"{pct(mk['spread_kumo'])} vs the engineer's estimate",
+    )
     tile(
         b,
         "Likely range for the low bid",
@@ -60,7 +65,8 @@ if contract:
         axis=alt.Axis(format="+.0%"),
         scale=alt.Scale(domain=[-0.6, 0.6]),
     )
-    y = alt.Y("y:N", title=None)
+    # A blank row above the band holds the labels, so they are never clipped.
+    y = alt.Y("y:N", title=None, scale=alt.Scale(domain=[" ", "This job"]))
     layers = alt.Chart(band).mark_rule(strokeWidth=22, color="#C7D2E0").encode(x=x, x2="hi:Q", y=y)
     layers += (
         alt.Chart(pd.DataFrame({"x": [0]}))
@@ -69,7 +75,6 @@ if contract:
     )
     layers += alt.Chart(band).mark_tick(color=NAVY, thickness=4, size=34).encode(x="mid:Q", y=y)
     marks = [
-        {"x": 0, "t": "Engineer's estimate", "c": SLATE},
         {"x": mk["spread_kumo"], "t": f"Expected {pct(mk['spread_kumo'])}", "c": NAVY},
     ]
     if low:
@@ -80,13 +85,18 @@ if contract:
             .encode(x="x:Q", y=y)
         )
         marks.append({"x": act, "t": f"Actual {pct(act)}", "c": GREEN})
-    lab = pd.DataFrame(marks)
+    lab = pd.DataFrame(marks).assign(y=" ")
     layers += (
         alt.Chart(lab)
-        .mark_text(dy=-26, fontSize=12)
-        .encode(x="x:Q", text="t:N", color=alt.Color("c:N", scale=None))
+        .mark_text(fontSize=12, fontWeight="bold", dy=8)
+        .encode(x="x:Q", y=y, text="t:N", color=alt.Color("c:N", scale=None))
     )
-    st.altair_chart(chart(layers, height=120), width="stretch")
+    layers += (
+        alt.Chart(pd.DataFrame({"x": [0], "y": [" "], "t": ["Engineer's estimate"]}))
+        .mark_text(fontSize=12, fontWeight="bold", dy=8, dx=6, align="left", color=SLATE)
+        .encode(x="x:Q", y=y, text="t:N")
+    )
+    st.altair_chart(chart(layers, height=150), width="stretch")
     how_to_read(
         "the grey band holds the low bid on about 8 in 10 similar past jobs; the navy tick is the "
         "expected landing point; the dashed line is the engineer's estimate"

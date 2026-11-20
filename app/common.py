@@ -71,8 +71,11 @@ def findings(contract: str) -> tuple[pd.DataFrame, str, str]:
     for run in (DEFAULT_RUN, *RUN_FALLBACKS):
         p = DOCS / contract / f"extraction_{run}.json"
         if p.exists():
+            from bidlens.documents.report import mask
+
             res = json.loads(p.read_text())
-            return pd.DataFrame(res["items"]), run, res.get("model", run)
+            # No phone numbers or email addresses on screen either (D-031).
+            return mask(pd.DataFrame(res["items"])), run, res.get("model", run)
     return pd.DataFrame(), "", ""
 
 
@@ -84,6 +87,19 @@ def money(x: float | None, cents: bool = False) -> str:
     if x is None or pd.isna(x):
         return "–"
     return f"${x:,.2f}" if cents else f"${x:,.0f}"
+
+
+def short_money(x: float | None) -> str:
+    """$950, $12.5k, $1.2M: for tight table columns."""
+    if x is None or pd.isna(x):
+        return "—"
+    if x >= 1e6:
+        return f"${x / 1e6:,.1f}M"
+    if x >= 1e4:
+        return f"${x / 1e3:,.0f}k"
+    if x >= 100:
+        return f"${x:,.0f}"
+    return f"${x:,.2f}"
 
 
 def pct(x: float | None) -> str:

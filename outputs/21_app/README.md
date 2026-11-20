@@ -25,6 +25,13 @@ The draft estimate the BidLens app shows for the sample bid package 04-0W0504
 Document findings in the app and the workbook come from the `combined` extraction run
 (stage 20).
 
+## Screenshots
+
+`screenshots/`: every page of the app on this package (desktop width) and the home page at
+phone width, taken with `uv run python scripts/screenshots.py` (headless Chromium).
+
+![Home](screenshots/01_overview.png)
+
 ## Files
 
 - `draft_estimate_04-0W0504.csv`: every bid item with low, likely and high unit price,

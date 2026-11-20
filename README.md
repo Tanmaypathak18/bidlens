@@ -31,6 +31,10 @@ BidLens puts that history, and the documents, to work for the estimator.
 
 BidLens does not replace the estimator. It does the reading and the lookup work, shows its evidence, and leaves the judgment to people who know how the work gets built.
 
+![The BidLens home page for a sample Caltrans bid package: the draft estimate, the engineer's estimate and the actual low bid side by side, BidLens's track record, and the top 5 things to watch, each linked to its page](outputs/21_app/screenshots/01_overview.png)
+
+*The home page for a sample package that has already been bid (contract 04-0W0504): the BidLens draft landed 3% above the actual low bid; the engineer's estimate was 61% above it. More pages (documents, prices, market, export) are in [`outputs/21_app/screenshots/`](outputs/21_app/screenshots/).*
+
 ## Who it is for
 
 - **Estimators and preconstruction teams:** faster first-pass pricing, with evidence attached.

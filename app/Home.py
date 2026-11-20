@@ -48,9 +48,8 @@ if contract:
         df = pd.DataFrame(rows, columns=["what", "amount"])
         ref = low or ee
         df["label"] = [
-            f"{money(v)}"
-            if (low and w == "Actual low bid")
-            else f"{money(v)}  ({pct(v / ref - 1)})"
+            f"${v / 1e6:,.1f}M"
+            + ("" if (low and w == "Actual low bid") else f" ({pct(v / ref - 1)})")
             for w, v in zip(df["what"], df["amount"], strict=True)
         ]
         df["color"] = [NAVY, SLATE, GREEN][: len(df)]
@@ -97,7 +96,9 @@ priced only from bids before it):
     st.subheader("Top 5 things to watch")
     items, run, model = findings(contract)
     f = scored(items)
-    watch = top_watch(f)
+    watch = top_watch(
+        f, table=items[items["category"] == "closure_damages"] if len(items) else None
+    )
     if watch.empty:
         st.write("No document findings yet for this package.")
     else:

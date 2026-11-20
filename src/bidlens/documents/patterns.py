@@ -145,7 +145,9 @@ def match(chunks: pd.DataFrame) -> list[dict]:
                     if rule.key.startswith("money") and TIME_WORDS.search(s):
                         topic = "time_damages"
                     quote = m.group(0) if is_whole else _quote(s, m.start(), m.end())
+                    g = {k: re.sub(r"\b([ap])\.m$", r"\1.m.", v) for k, v in g.items()}
                     stmt = rule.statement.format(**g) if rule.statement else quote
+                    stmt = stmt.replace("m..", "m.")
                     found.append(
                         {
                             "rule": rule.key,
@@ -183,7 +185,9 @@ def resolve(found: list[dict]) -> list[dict]:
         if add and base and {f["value"] for f in add} != {f["value"] for f in base}:
             f = dict(add[0])
             was = ", ".join(sorted({b["value"] for b in base}))
-            f["statement"] = f"{f['statement'][:-1]} (changed by addendum; was {was})."
+            st = f["statement"]
+            core = st if st.endswith(("a.m.", "p.m.")) else st.rstrip(".")
+            f["statement"] = f"{core} (changed by addendum; was {was})."
             out.append(f)
         else:
             out.append((add or base)[0])
