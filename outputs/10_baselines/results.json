@@ -1,88 +1,90 @@
 {
   "all_prices": {
     "trailing_median": {
-      "mdape": 0.5467875048885658,
-      "within_15": 0.15819835810960728
+      "mdape": 0.55,
+      "within_15": 0.15265143110716664
     },
     "xgboost": {
-      "mdape": 0.4713133128565788,
-      "within_15": 0.1763922786776126
+      "mdape": 0.46130082430237784,
+      "within_15": 0.18038606611936986
     },
     "lightgbm": {
-      "mdape": 0.4336525210811461,
+      "mdape": 0.43395550030683205,
       "within_15": 0.1943643221655203
     }
   },
   "without_outliers": {
-    "trailing_median": 0.5380485855621235,
-    "xgboost": 0.46449843934445145,
-    "lightgbm": 0.4279716407602069
+    "trailing_median": 0.5400214032709482,
+    "xgboost": 0.45736466387951874,
+    "lightgbm": 0.4297667571434268
   },
   "families_where_median_wins": [
+    "Electrical and Signals",
     "Bridge Rehabilitation and Removal",
+    "Piling",
     "Other"
   ],
   "engineers_estimate_gain_share": {
-    "xgboost": 0.013266516747897614,
-    "lightgbm": 0.01292304651928662
+    "xgboost": 0.012485187479417304,
+    "lightgbm": 0.012500214593735758
   },
   "models": {
     "xgboost": {
       "params": {
-        "max_depth": 5,
-        "learning_rate": 0.07329154208516228,
-        "min_child_weight": 15.966805900132888,
-        "subsample": 0.956183643319872,
-        "colsample_bytree": 0.9591984289352984,
-        "reg_lambda": 0.23796567762099036
+        "max_depth": 4,
+        "learning_rate": 0.033800410486931026,
+        "min_child_weight": 11.421178227867975,
+        "subsample": 0.7972441291939523,
+        "colsample_bytree": 0.7900142265102781,
+        "reg_lambda": 0.238678186574686
       },
-      "trees": 130,
-      "val_mdape": 0.38123090909035906,
+      "trees": 457,
+      "val_mdape": 0.39614647455775903,
       "val_mdape_single_seeds": [
-        0.38123090909035906,
-        0.3891558837890624,
-        0.38928791159925197,
-        0.37544974754497146,
-        0.3873111118171016,
-        0.38145680918421465
+        0.39614647455775903,
+        0.4086029508985292,
+        0.40696300944520725,
+        0.40529738933512144,
+        0.3986548022776897,
+        0.40098505545669594
       ],
       "val_mdape_averaged": [
-        0.38394263519537936,
-        0.37891553754183516
+        0.4012741728082074,
+        0.40072323870577975
       ],
-      "tune_seconds": 16.2,
-      "fit_seconds": 0.52,
-      "predict_seconds": 0.0086,
+      "tune_seconds": 15.8,
+      "fit_seconds": 1.42,
+      "predict_seconds": 0.0165,
       "train_rows": 10091,
       "test_rows": 4507
     },
     "lightgbm": {
       "params": {
-        "num_leaves": 19,
-        "learning_rate": 0.09476963730145273,
-        "min_child_samples": 41,
-        "subsample": 0.8308710017984797,
+        "num_leaves": 124,
+        "learning_rate": 0.06225013801560157,
+        "min_child_samples": 30,
+        "subsample": 0.8320113812082225,
         "subsample_freq": 1,
-        "colsample_bytree": 0.7081353214962331,
-        "reg_lambda": 0.10083346867999449
+        "colsample_bytree": 0.5944531823772292,
+        "reg_lambda": 2.9005564145095892
       },
-      "trees": 258,
-      "val_mdape": 0.3865046371885709,
+      "trees": 212,
+      "val_mdape": 0.40819280324096713,
       "val_mdape_single_seeds": [
-        0.3865046371885709,
-        0.39728396263931315,
-        0.39869434840159634,
-        0.40533073118471136,
-        0.3950560399759773,
-        0.4031958172002126
+        0.40819280324096713,
+        0.4292422069889622,
+        0.4342174091903229,
+        0.42724452950072067,
+        0.42919049785822333,
+        0.4178818946984269
       ],
       "val_mdape_averaged": [
-        0.38763042393854347,
-        0.39890925502189084
+        0.41245631880741707,
+        0.4265553296200379
       ],
-      "tune_seconds": 89.6,
-      "fit_seconds": 2.12,
-      "predict_seconds": 0.0249,
+      "tune_seconds": 88.7,
+      "fit_seconds": 10.72,
+      "predict_seconds": 0.0461,
       "train_rows": 10091,
       "test_rows": 4507
     }

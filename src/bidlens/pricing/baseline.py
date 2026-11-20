@@ -30,7 +30,6 @@ from bidlens.pricing.setup import (
     ape,
     report_family,
     score,
-    select_test,
     use_cost_index,
 )
 
@@ -145,24 +144,12 @@ def _mdape(log_pred, log_actual) -> float:
     return float(np.median(ape(np.exp(log_pred), np.exp(log_actual))))
 
 
-def prepare(con):
-    rows = F.load_model_rows(con)
-    X_all = F.build(rows, rows)
-    y_all = np.log(F.to_ref(rows["unit_price"].clip(lower=1e-9), rows["bid_open_date"]))
-    train_mask = (
-        (rows["split"] == "train")
-        & ~rows["low_bidder_disagrees"]
-        & ~rows["is_outlier"]
-        & (rows["unit_price"] > 0)
-    )
-    test = select_test(rows)
-    cats = {c: sorted(X_all.loc[train_mask, c].dropna().unique()) for c in F.CATEGORICAL}
-    X_all = F.as_categories(X_all, cats)
-    return rows, X_all, y_all, train_mask, test
+prepare = F.prepare
 
 
 def run(con) -> dict:
-    rows, X, y, train_mask, test = prepare(con)
+    rows, X, y, train_mask, test, cats = prepare(con)
+    _, _, sel, X_lines = F.contract_lines(con, rows, cats)
     d = rows["bid_open_date"]
     inner_fit = train_mask & (d < INNER_CUTOFF)
     inner_val = train_mask & (d >= INNER_CUTOFF)
@@ -198,6 +185,7 @@ def run(con) -> dict:
         p_ref = np.exp(np.mean([m.predict(X.loc[test.index]) for m in models], axis=0))
         infer_s = time.perf_counter() - t0
         pred[kind] = F.from_ref(p_ref, test["bid_open_date"])
+        F.save_line_predictions(kind, sel, np.mean([m.predict(X_lines) for m in models], axis=0))
         imp: dict[str, float] = {}
         for i, model in enumerate(models):
             if kind == "xgboost":
@@ -237,6 +225,25 @@ def run(con) -> dict:
             ["model", "share_of_gain"], ascending=[True, False]
         ),
     }
+
+
+def load_saved(kind: str) -> list:
+    """The three fitted models of a library (D-042), as saved by `run`."""
+    if kind == "xgboost":
+        models = []
+        for i in range(N_SEEDS):
+            m = xgb.XGBRegressor()
+            m.load_model(MODELS / f"xgboost_baseline_{i}.json")
+            models.append(m)
+        return models
+    return [
+        lgb.Booster(model_file=str(MODELS / f"lightgbm_baseline_{i}.txt")) for i in range(N_SEEDS)
+    ]
+
+
+def predict_saved(models: list, X: pd.DataFrame) -> np.ndarray:
+    """Average log price over the fitted models (2023 Q4 dollars)."""
+    return np.mean([m.predict(X) for m in models], axis=0)
 
 
 MODEL_LABELS = {

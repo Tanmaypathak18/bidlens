@@ -14,5 +14,7 @@ Every stage of BidLens writes its results to a numbered folder here, so anyone c
 | 08 | [`08_target_split_metrics/`](08_target_split_metrics/README.md) | How BidLens will be tested, and how well two simple yardsticks do on that test (step 2.1). |
 | 09 | [`09_price_escalation/`](09_price_escalation/README.md) | Bringing old bid prices to today's dollars with Caltrans' own cost index (step 2.2). |
 | 10 | [`10_baselines/`](10_baselines/README.md) | Two machine-learning models that price bid items, scored on the step 2.1 test (step 2.3). |
+| 11 | [`11_kumo_tabular/`](11_kumo_tabular/README.md) | NVIDIA Kumo Tabular, a pretrained model for tables, scored on the same test as the |
+| 12 | [`12_sanity_check/`](12_sanity_check/README.md) | A check of the pricing results so far, in plain terms (after step 2.4). |
 
 Regenerate stages 01 to 06 with `uv run python -m bidlens.outputs`. Last generated 2026-11-20.

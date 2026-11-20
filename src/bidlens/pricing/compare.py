@@ -308,10 +308,7 @@ judged the same way, and we score two yardsticks that any model has to beat.
   this) and the share of predictions within 15% of the low bid. Item families with fewer
   than {MIN_FAMILY_TEST} test prices are grouped as "Other".
 - **Price levels:** every earlier price is brought to the bid date of the price being
-  predicted with Caltrans' cost index (4-quarter average, stage 09). In the test years the
-  index kept rising while prices for these items levelled off (see stage 09's check), so
-  escalated historical prices run high; the pricing models also see the bid date and can
-  correct for this.
+  predicted with Caltrans' cost index, as known before that bid opened (stage 09).
 
 {chr(10).join(split_lines)}
 

@@ -1,0 +1,185 @@
+test_set,by,model,group,n,coverage,mdape,within_15
+all prices,family,trailing_median,Traffic Control,955.0000,1.0000,0.6000,0.1319
+all prices,family,trailing_median,Asphalt Surfacing,585.0000,1.0000,0.5541,0.1521
+all prices,family,trailing_median,Water Pollution and Site Management,506.0000,1.0000,0.6929,0.1344
+all prices,family,trailing_median,General and Overhead,427.0000,1.0000,0.6577,0.1007
+all prices,family,trailing_median,Striping and Markings,422.0000,1.0000,0.5424,0.1611
+all prices,family,trailing_median,Earthwork and Clearing,341.0000,1.0000,0.6066,0.1144
+all prices,family,trailing_median,"Fencing, Guardrail and Barriers",221.0000,1.0000,0.3735,0.1946
+all prices,family,trailing_median,Structural Concrete and Reinforcement,219.0000,1.0000,0.3701,0.2146
+all prices,family,trailing_median,Landscape and Erosion Control,208.0000,1.0000,0.3412,0.2356
+all prices,family,trailing_median,Electrical and Signals,177.0000,1.0000,0.8631,0.0791
+all prices,family,trailing_median,Bridge Rehabilitation and Removal,121.0000,1.0000,0.2779,0.3140
+all prices,family,trailing_median,Base and Subbase,106.0000,1.0000,0.4811,0.1698
+all prices,family,trailing_median,Minor Concrete and Miscellaneous,70.0000,1.0000,0.4234,0.2429
+all prices,family,trailing_median,Drainage,55.0000,1.0000,0.3630,0.2727
+all prices,family,trailing_median,Concrete Pavement,45.0000,1.0000,0.3857,0.2000
+all prices,family,trailing_median,Piling,22.0000,1.0000,0.4610,0.0455
+all prices,family,trailing_median,"Steel Structures, Signs and Painting",21.0000,1.0000,0.7944,0.1429
+all prices,family,trailing_median,Other,6.0000,1.0000,0.5432,0.1667
+all prices,family,trailing_median,All,4507.0000,1.0000,0.5500,0.1527
+all prices,family,xgboost,Traffic Control,955.0000,1.0000,0.5416,0.1508
+all prices,family,xgboost,Asphalt Surfacing,585.0000,1.0000,0.4699,0.1709
+all prices,family,xgboost,Water Pollution and Site Management,506.0000,1.0000,0.6029,0.1502
+all prices,family,xgboost,General and Overhead,427.0000,1.0000,0.5504,0.1405
+all prices,family,xgboost,Striping and Markings,422.0000,1.0000,0.3793,0.2204
+all prices,family,xgboost,Earthwork and Clearing,341.0000,1.0000,0.4702,0.1848
+all prices,family,xgboost,"Fencing, Guardrail and Barriers",221.0000,1.0000,0.3147,0.2670
+all prices,family,xgboost,Structural Concrete and Reinforcement,219.0000,1.0000,0.3789,0.2055
+all prices,family,xgboost,Landscape and Erosion Control,208.0000,1.0000,0.3804,0.2596
+all prices,family,xgboost,Electrical and Signals,177.0000,1.0000,0.9432,0.1243
+all prices,family,xgboost,Bridge Rehabilitation and Removal,121.0000,1.0000,0.3505,0.1653
+all prices,family,xgboost,Base and Subbase,106.0000,1.0000,0.3650,0.2358
+all prices,family,xgboost,Minor Concrete and Miscellaneous,70.0000,1.0000,0.2837,0.3714
+all prices,family,xgboost,Drainage,55.0000,1.0000,0.2951,0.2000
+all prices,family,xgboost,Concrete Pavement,45.0000,1.0000,0.3356,0.1333
+all prices,family,xgboost,Piling,22.0000,1.0000,0.5626,0.1818
+all prices,family,xgboost,"Steel Structures, Signs and Painting",21.0000,1.0000,0.4861,0.2381
+all prices,family,xgboost,Other,6.0000,1.0000,0.9616,0.0000
+all prices,family,xgboost,All,4507.0000,1.0000,0.4613,0.1804
+all prices,family,lightgbm,Traffic Control,955.0000,1.0000,0.5312,0.1497
+all prices,family,lightgbm,Asphalt Surfacing,585.0000,1.0000,0.3980,0.2154
+all prices,family,lightgbm,Water Pollution and Site Management,506.0000,1.0000,0.5785,0.1581
+all prices,family,lightgbm,General and Overhead,427.0000,1.0000,0.5487,0.1639
+all prices,family,lightgbm,Striping and Markings,422.0000,1.0000,0.3752,0.2085
+all prices,family,lightgbm,Earthwork and Clearing,341.0000,1.0000,0.4322,0.1730
+all prices,family,lightgbm,"Fencing, Guardrail and Barriers",221.0000,1.0000,0.3123,0.2443
+all prices,family,lightgbm,Structural Concrete and Reinforcement,219.0000,1.0000,0.3113,0.2374
+all prices,family,lightgbm,Landscape and Erosion Control,208.0000,1.0000,0.3003,0.2692
+all prices,family,lightgbm,Electrical and Signals,177.0000,1.0000,0.8808,0.0904
+all prices,family,lightgbm,Bridge Rehabilitation and Removal,121.0000,1.0000,0.2808,0.3223
+all prices,family,lightgbm,Base and Subbase,106.0000,1.0000,0.3538,0.2358
+all prices,family,lightgbm,Minor Concrete and Miscellaneous,70.0000,1.0000,0.2324,0.3571
+all prices,family,lightgbm,Drainage,55.0000,1.0000,0.2961,0.2909
+all prices,family,lightgbm,Concrete Pavement,45.0000,1.0000,0.2723,0.3556
+all prices,family,lightgbm,Piling,22.0000,1.0000,0.4896,0.2273
+all prices,family,lightgbm,"Steel Structures, Signs and Painting",21.0000,1.0000,0.4844,0.2857
+all prices,family,lightgbm,Other,6.0000,1.0000,0.8928,0.0000
+all prices,family,lightgbm,All,4507.0000,1.0000,0.4340,0.1944
+all prices,family,kumo,Traffic Control,955.0000,1.0000,0.5052,0.1613
+all prices,family,kumo,Asphalt Surfacing,585.0000,1.0000,0.3794,0.2051
+all prices,family,kumo,Water Pollution and Site Management,506.0000,1.0000,0.5568,0.1383
+all prices,family,kumo,General and Overhead,427.0000,1.0000,0.4370,0.2178
+all prices,family,kumo,Striping and Markings,422.0000,1.0000,0.3117,0.2441
+all prices,family,kumo,Earthwork and Clearing,341.0000,1.0000,0.4626,0.1760
+all prices,family,kumo,"Fencing, Guardrail and Barriers",221.0000,1.0000,0.2756,0.2805
+all prices,family,kumo,Structural Concrete and Reinforcement,219.0000,1.0000,0.3210,0.2877
+all prices,family,kumo,Landscape and Erosion Control,208.0000,1.0000,0.2914,0.2596
+all prices,family,kumo,Electrical and Signals,177.0000,1.0000,0.8350,0.0960
+all prices,family,kumo,Bridge Rehabilitation and Removal,121.0000,1.0000,0.3219,0.2727
+all prices,family,kumo,Base and Subbase,106.0000,1.0000,0.3444,0.2547
+all prices,family,kumo,Minor Concrete and Miscellaneous,70.0000,1.0000,0.2698,0.3429
+all prices,family,kumo,Drainage,55.0000,1.0000,0.2709,0.3091
+all prices,family,kumo,Concrete Pavement,45.0000,1.0000,0.2090,0.4000
+all prices,family,kumo,Piling,22.0000,1.0000,0.3384,0.2273
+all prices,family,kumo,"Steel Structures, Signs and Painting",21.0000,1.0000,0.4066,0.1429
+all prices,family,kumo,Other,6.0000,1.0000,0.7575,0.0000
+all prices,family,kumo,All,4507.0000,1.0000,0.4020,0.2048
+all prices,year,trailing_median,2024,1758.0000,1.0000,0.5550,0.1354
+all prices,year,trailing_median,2025,1748.0000,1.0000,0.5326,0.1728
+all prices,year,trailing_median,2026,1001.0000,1.0000,0.5647,0.1479
+all prices,year,trailing_median,All,4507.0000,1.0000,0.5500,0.1527
+all prices,year,xgboost,2024,1758.0000,1.0000,0.4133,0.2065
+all prices,year,xgboost,2025,1748.0000,1.0000,0.4622,0.1693
+all prices,year,xgboost,2026,1001.0000,1.0000,0.5962,0.1538
+all prices,year,xgboost,All,4507.0000,1.0000,0.4613,0.1804
+all prices,year,lightgbm,2024,1758.0000,1.0000,0.3880,0.2184
+all prices,year,lightgbm,2025,1748.0000,1.0000,0.4211,0.1888
+all prices,year,lightgbm,2026,1001.0000,1.0000,0.5341,0.1618
+all prices,year,lightgbm,All,4507.0000,1.0000,0.4340,0.1944
+all prices,year,kumo,2024,1758.0000,1.0000,0.3565,0.2156
+all prices,year,kumo,2025,1748.0000,1.0000,0.4253,0.1997
+all prices,year,kumo,2026,1001.0000,1.0000,0.4521,0.1948
+all prices,year,kumo,All,4507.0000,1.0000,0.4020,0.2048
+without outliers,family,trailing_median,Traffic Control,944.0000,1.0000,0.5934,0.1335
+without outliers,family,trailing_median,Asphalt Surfacing,577.0000,1.0000,0.5522,0.1542
+without outliers,family,trailing_median,Water Pollution and Site Management,503.0000,1.0000,0.6851,0.1352
+without outliers,family,trailing_median,General and Overhead,425.0000,1.0000,0.6464,0.1012
+without outliers,family,trailing_median,Striping and Markings,414.0000,1.0000,0.5342,0.1643
+without outliers,family,trailing_median,Earthwork and Clearing,335.0000,1.0000,0.5956,0.1164
+without outliers,family,trailing_median,"Fencing, Guardrail and Barriers",219.0000,1.0000,0.3723,0.1963
+without outliers,family,trailing_median,Structural Concrete and Reinforcement,212.0000,1.0000,0.3532,0.2217
+without outliers,family,trailing_median,Landscape and Erosion Control,207.0000,1.0000,0.3401,0.2367
+without outliers,family,trailing_median,Electrical and Signals,177.0000,1.0000,0.8631,0.0791
+without outliers,family,trailing_median,Bridge Rehabilitation and Removal,118.0000,1.0000,0.2733,0.3220
+without outliers,family,trailing_median,Base and Subbase,106.0000,1.0000,0.4811,0.1698
+without outliers,family,trailing_median,Minor Concrete and Miscellaneous,69.0000,1.0000,0.4140,0.2464
+without outliers,family,trailing_median,Drainage,55.0000,1.0000,0.3630,0.2727
+without outliers,family,trailing_median,Concrete Pavement,42.0000,1.0000,0.3325,0.2143
+without outliers,family,trailing_median,Piling,22.0000,1.0000,0.4610,0.0455
+without outliers,family,trailing_median,"Steel Structures, Signs and Painting",18.0000,1.0000,0.8587,0.1667
+without outliers,family,trailing_median,Other,6.0000,1.0000,0.5432,0.1667
+without outliers,family,trailing_median,All,4449.0000,1.0000,0.5400,0.1546
+without outliers,family,xgboost,Traffic Control,944.0000,1.0000,0.5378,0.1525
+without outliers,family,xgboost,Asphalt Surfacing,577.0000,1.0000,0.4685,0.1698
+without outliers,family,xgboost,Water Pollution and Site Management,503.0000,1.0000,0.6018,0.1511
+without outliers,family,xgboost,General and Overhead,425.0000,1.0000,0.5491,0.1412
+without outliers,family,xgboost,Striping and Markings,414.0000,1.0000,0.3730,0.2246
+without outliers,family,xgboost,Earthwork and Clearing,335.0000,1.0000,0.4596,0.1881
+without outliers,family,xgboost,"Fencing, Guardrail and Barriers",219.0000,1.0000,0.3131,0.2694
+without outliers,family,xgboost,Structural Concrete and Reinforcement,212.0000,1.0000,0.3772,0.2075
+without outliers,family,xgboost,Landscape and Erosion Control,207.0000,1.0000,0.3786,0.2609
+without outliers,family,xgboost,Electrical and Signals,177.0000,1.0000,0.9432,0.1243
+without outliers,family,xgboost,Bridge Rehabilitation and Removal,118.0000,1.0000,0.3392,0.1695
+without outliers,family,xgboost,Base and Subbase,106.0000,1.0000,0.3650,0.2358
+without outliers,family,xgboost,Minor Concrete and Miscellaneous,69.0000,1.0000,0.2763,0.3768
+without outliers,family,xgboost,Drainage,55.0000,1.0000,0.2951,0.2000
+without outliers,family,xgboost,Concrete Pavement,42.0000,1.0000,0.3334,0.1429
+without outliers,family,xgboost,Piling,22.0000,1.0000,0.5626,0.1818
+without outliers,family,xgboost,"Steel Structures, Signs and Painting",18.0000,1.0000,0.5431,0.2222
+without outliers,family,xgboost,Other,6.0000,1.0000,0.9616,0.0000
+without outliers,family,xgboost,All,4449.0000,1.0000,0.4574,0.1818
+without outliers,family,lightgbm,Traffic Control,944.0000,1.0000,0.5233,0.1515
+without outliers,family,lightgbm,Asphalt Surfacing,577.0000,1.0000,0.3936,0.2166
+without outliers,family,lightgbm,Water Pollution and Site Management,503.0000,1.0000,0.5725,0.1590
+without outliers,family,lightgbm,General and Overhead,425.0000,1.0000,0.5482,0.1647
+without outliers,family,lightgbm,Striping and Markings,414.0000,1.0000,0.3648,0.2126
+without outliers,family,lightgbm,Earthwork and Clearing,335.0000,1.0000,0.4276,0.1761
+without outliers,family,lightgbm,"Fencing, Guardrail and Barriers",219.0000,1.0000,0.2992,0.2466
+without outliers,family,lightgbm,Structural Concrete and Reinforcement,212.0000,1.0000,0.3093,0.2406
+without outliers,family,lightgbm,Landscape and Erosion Control,207.0000,1.0000,0.2976,0.2705
+without outliers,family,lightgbm,Electrical and Signals,177.0000,1.0000,0.8808,0.0904
+without outliers,family,lightgbm,Bridge Rehabilitation and Removal,118.0000,1.0000,0.2681,0.3305
+without outliers,family,lightgbm,Base and Subbase,106.0000,1.0000,0.3538,0.2358
+without outliers,family,lightgbm,Minor Concrete and Miscellaneous,69.0000,1.0000,0.2318,0.3623
+without outliers,family,lightgbm,Drainage,55.0000,1.0000,0.2961,0.2909
+without outliers,family,lightgbm,Concrete Pavement,42.0000,1.0000,0.2474,0.3810
+without outliers,family,lightgbm,Piling,22.0000,1.0000,0.4896,0.2273
+without outliers,family,lightgbm,"Steel Structures, Signs and Painting",18.0000,1.0000,0.6767,0.2222
+without outliers,family,lightgbm,Other,6.0000,1.0000,0.8928,0.0000
+without outliers,family,lightgbm,All,4449.0000,1.0000,0.4298,0.1960
+without outliers,family,kumo,Traffic Control,944.0000,1.0000,0.5015,0.1631
+without outliers,family,kumo,Asphalt Surfacing,577.0000,1.0000,0.3753,0.2045
+without outliers,family,kumo,Water Pollution and Site Management,503.0000,1.0000,0.5542,0.1392
+without outliers,family,kumo,General and Overhead,425.0000,1.0000,0.4292,0.2188
+without outliers,family,kumo,Striping and Markings,414.0000,1.0000,0.3027,0.2488
+without outliers,family,kumo,Earthwork and Clearing,335.0000,1.0000,0.4554,0.1791
+without outliers,family,kumo,"Fencing, Guardrail and Barriers",219.0000,1.0000,0.2754,0.2831
+without outliers,family,kumo,Structural Concrete and Reinforcement,212.0000,1.0000,0.3089,0.2972
+without outliers,family,kumo,Landscape and Erosion Control,207.0000,1.0000,0.2903,0.2609
+without outliers,family,kumo,Electrical and Signals,177.0000,1.0000,0.8350,0.0960
+without outliers,family,kumo,Bridge Rehabilitation and Removal,118.0000,1.0000,0.3136,0.2797
+without outliers,family,kumo,Base and Subbase,106.0000,1.0000,0.3444,0.2547
+without outliers,family,kumo,Minor Concrete and Miscellaneous,69.0000,1.0000,0.2655,0.3478
+without outliers,family,kumo,Drainage,55.0000,1.0000,0.2709,0.3091
+without outliers,family,kumo,Concrete Pavement,42.0000,1.0000,0.1997,0.4286
+without outliers,family,kumo,Piling,22.0000,1.0000,0.3384,0.2273
+without outliers,family,kumo,"Steel Structures, Signs and Painting",18.0000,1.0000,0.3363,0.1667
+without outliers,family,kumo,Other,6.0000,1.0000,0.7575,0.0000
+without outliers,family,kumo,All,4449.0000,1.0000,0.3966,0.2070
+without outliers,year,trailing_median,2024,1748.0000,1.0000,0.5523,0.1362
+without outliers,year,trailing_median,2025,1719.0000,1.0000,0.5202,0.1757
+without outliers,year,trailing_median,2026,982.0000,1.0000,0.5512,0.1507
+without outliers,year,trailing_median,All,4449.0000,1.0000,0.5400,0.1546
+without outliers,year,xgboost,2024,1748.0000,1.0000,0.4112,0.2077
+without outliers,year,xgboost,2025,1719.0000,1.0000,0.4535,0.1716
+without outliers,year,xgboost,2026,982.0000,1.0000,0.5909,0.1538
+without outliers,year,xgboost,All,4449.0000,1.0000,0.4574,0.1818
+without outliers,year,lightgbm,2024,1748.0000,1.0000,0.3866,0.2197
+without outliers,year,lightgbm,2025,1719.0000,1.0000,0.4180,0.1908
+without outliers,year,lightgbm,2026,982.0000,1.0000,0.5300,0.1629
+without outliers,year,lightgbm,All,4449.0000,1.0000,0.4298,0.1960
+without outliers,year,kumo,2024,1748.0000,1.0000,0.3549,0.2168
+without outliers,year,kumo,2025,1719.0000,1.0000,0.4207,0.2019
+without outliers,year,kumo,2026,982.0000,1.0000,0.4473,0.1986
+without outliers,year,kumo,All,4449.0000,1.0000,0.3966,0.2070

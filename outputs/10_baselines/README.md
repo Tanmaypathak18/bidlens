@@ -21,65 +21,65 @@ points from seed to seed.
 ## Results
 
 All test prices: XGBoost misses the low-bid unit price by a median of
-**47.1%**, LightGBM by **43.4%**,
-against 54.7% for the trailing median. Within 15% of
-the low bid: 17.6%, 19.4%
-and 15.8%. Without flagged outliers:
-46.4%, 42.8% and
-53.8%.
+**46.1%**, LightGBM by **43.4%**,
+against 55.0% for the trailing median. Within 15% of
+the low bid: 18.0%, 19.4%
+and 15.3%. Without flagged outliers:
+45.7%, 43.0% and
+54.0%.
 
 By item family (all test prices; "Best" is the lowest MdAPE):
 
 | Item family | Prices | Median MdAPE | XGBoost MdAPE | LightGBM MdAPE | Median within 15% | XGBoost within 15% | LightGBM within 15% | Best |
 | --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | --- |
-| Traffic Control | 955 | 60.0% | 55.4% | 52.7% | 13.9% | 14.3% | 16.5% | LightGBM |
-| Asphalt Surfacing | 585 | 55.1% | 49.1% | 42.1% | 15.7% | 15.2% | 22.2% | LightGBM |
-| Water Pollution and Site Management | 506 | 69.4% | 62.1% | 56.9% | 13.0% | 15.2% | 15.6% | LightGBM |
-| General and Overhead | 427 | 66.2% | 57.6% | 52.1% | 10.8% | 14.3% | 15.5% | LightGBM |
-| Striping and Markings | 422 | 54.7% | 38.2% | 34.6% | 15.2% | 22.0% | 23.5% | LightGBM |
-| Earthwork and Clearing | 341 | 59.9% | 49.2% | 46.2% | 12.0% | 18.5% | 19.1% | LightGBM |
-| Fencing, Guardrail and Barriers | 221 | 36.1% | 33.7% | 28.5% | 21.7% | 25.8% | 29.4% | LightGBM |
-| Structural Concrete and Reinforcement | 219 | 35.8% | 35.7% | 33.7% | 22.8% | 19.6% | 20.1% | LightGBM |
-| Landscape and Erosion Control | 208 | 32.3% | 35.6% | 26.9% | 24.5% | 25.5% | 24.0% | LightGBM |
-| Electrical and Signals | 177 | 83.5% | 95.1% | 76.4% | 7.9% | 11.9% | 5.6% | LightGBM |
-| Bridge Rehabilitation and Removal | 121 | 27.6% | 38.4% | 34.5% | 33.1% | 16.5% | 24.0% | Trailing 12-month median |
-| Base and Subbase | 106 | 48.3% | 36.4% | 34.5% | 16.0% | 17.9% | 20.8% | LightGBM |
-| Minor Concrete and Miscellaneous | 70 | 37.7% | 22.1% | 22.8% | 27.1% | 38.6% | 40.0% | XGBoost |
-| Drainage | 55 | 35.6% | 25.3% | 28.3% | 27.3% | 29.1% | 27.3% | XGBoost |
-| Concrete Pavement | 45 | 39.0% | 36.3% | 28.7% | 28.9% | 15.6% | 17.8% | LightGBM |
-| Piling | 22 | 51.5% | 42.7% | 47.0% | 4.5% | 18.2% | 13.6% | XGBoost |
-| Steel Structures, Signs and Painting | 21 | 81.6% | 57.9% | 50.4% | 9.5% | 38.1% | 23.8% | LightGBM |
-| Other | 6 | 58.0% | 75.2% | 122.8% | 16.7% | 0.0% | 0.0% | Trailing 12-month median |
-| All | 4,507 | 54.7% | 47.1% | 43.4% | 15.8% | 17.6% | 19.4% | LightGBM |
+| Traffic Control | 955 | 60.0% | 54.2% | 53.1% | 13.2% | 15.1% | 15.0% | LightGBM |
+| Asphalt Surfacing | 585 | 55.4% | 47.0% | 39.8% | 15.2% | 17.1% | 21.5% | LightGBM |
+| Water Pollution and Site Management | 506 | 69.3% | 60.3% | 57.9% | 13.4% | 15.0% | 15.8% | LightGBM |
+| General and Overhead | 427 | 65.8% | 55.0% | 54.9% | 10.1% | 14.1% | 16.4% | LightGBM |
+| Striping and Markings | 422 | 54.2% | 37.9% | 37.5% | 16.1% | 22.0% | 20.9% | LightGBM |
+| Earthwork and Clearing | 341 | 60.7% | 47.0% | 43.2% | 11.4% | 18.5% | 17.3% | LightGBM |
+| Fencing, Guardrail and Barriers | 221 | 37.3% | 31.5% | 31.2% | 19.5% | 26.7% | 24.4% | LightGBM |
+| Structural Concrete and Reinforcement | 219 | 37.0% | 37.9% | 31.1% | 21.5% | 20.5% | 23.7% | LightGBM |
+| Landscape and Erosion Control | 208 | 34.1% | 38.0% | 30.0% | 23.6% | 26.0% | 26.9% | LightGBM |
+| Electrical and Signals | 177 | 86.3% | 94.3% | 88.1% | 7.9% | 12.4% | 9.0% | Trailing 12-month median |
+| Bridge Rehabilitation and Removal | 121 | 27.8% | 35.0% | 28.1% | 31.4% | 16.5% | 32.2% | Trailing 12-month median |
+| Base and Subbase | 106 | 48.1% | 36.5% | 35.4% | 17.0% | 23.6% | 23.6% | LightGBM |
+| Minor Concrete and Miscellaneous | 70 | 42.3% | 28.4% | 23.2% | 24.3% | 37.1% | 35.7% | LightGBM |
+| Drainage | 55 | 36.3% | 29.5% | 29.6% | 27.3% | 20.0% | 29.1% | XGBoost |
+| Concrete Pavement | 45 | 38.6% | 33.6% | 27.2% | 20.0% | 13.3% | 35.6% | LightGBM |
+| Piling | 22 | 46.1% | 56.3% | 49.0% | 4.5% | 18.2% | 22.7% | Trailing 12-month median |
+| Steel Structures, Signs and Painting | 21 | 79.4% | 48.6% | 48.4% | 14.3% | 23.8% | 28.6% | LightGBM |
+| Other | 6 | 54.3% | 96.2% | 89.3% | 16.7% | 0.0% | 0.0% | Trailing 12-month median |
+| All | 4,507 | 55.0% | 46.1% | 43.4% | 15.3% | 18.0% | 19.4% | LightGBM |
 
-Families where the trailing median beats both models: Bridge Rehabilitation and Removal, Other.
+Families where the trailing median beats both models: Electrical and Signals, Bridge Rehabilitation and Removal, Piling, Other.
 
 By bid year (MdAPE):
 
 | Bid year | Median | XGBoost | LightGBM |
 | --- | ---: | ---: | ---: |
-| 2024 | 54.7% | 42.4% | 41.1% |
-| 2025 | 53.5% | 47.5% | 42.7% |
-| 2026 | 56.1% | 56.7% | 48.2% |
-| All | 54.7% | 47.1% | 43.4% |
+| 2024 | 55.5% | 41.3% | 38.8% |
+| 2025 | 53.3% | 46.2% | 42.1% |
+| 2026 | 56.5% | 59.6% | 53.4% |
+| All | 55.0% | 46.1% | 43.4% |
 
 ## What the models rely on
 
-Share of each model's learning gain, top five: XGBoost: item_code 86.1%; log_trailing_median 9.5%; log_engineers_estimate 1.3%; log_quantity 1.1%; log_quantity_vs_history 0.6%. LightGBM:
-log_trailing_median 54.2%; log_quantity 25.3%; item_code 11.6%; unit 3.6%; log_engineers_estimate 1.3%. The engineer's estimate carries 1.3% (XGBoost) and
+Share of each model's learning gain, top five: XGBoost: item_code 72.1%; log_trailing_median 16.6%; log_quantity 6.6%; log_engineers_estimate 1.2%; unit 1.0%. LightGBM:
+log_trailing_median 53.1%; log_quantity 23.4%; item_code 12.3%; unit 4.5%; item_family 1.7%. The engineer's estimate carries 1.2% (XGBoost) and
 1.3% (LightGBM) of the gain.
 
 ## Tuning and speed
 
 | | XGBoost | LightGBM |
 | --- | ---: | ---: |
-| Validation MdAPE (2023 bids) | 38.1% | 38.7% |
-| Same setting, six single seeds | 37.5% to 38.9% | 38.7% to 40.5% |
-| Three-seed average, two seed sets (used, D-042) | 38.4%, 37.9% | 38.8%, 39.9% |
-| Trees | 130 | 258 |
-| Tuning time (30 trials) | 16 s | 90 s |
-| Final fit time (three fits) | 0.5 s | 2.1 s |
-| Time to price all 4,507 test items | 9 ms | 25 ms |
+| Validation MdAPE (2023 bids) | 39.6% | 40.8% |
+| Same setting, six single seeds | 39.6% to 40.9% | 40.8% to 43.4% |
+| Three-seed average, two seed sets (used, D-042) | 40.1%, 40.1% | 41.2%, 42.7% |
+| Trees | 457 | 212 |
+| Tuning time (30 trials) | 16 s | 89 s |
+| Final fit time (three fits) | 1.4 s | 10.7 s |
+| Time to price all 4,507 test items | 16 ms | 46 ms |
 
 ## Files
 

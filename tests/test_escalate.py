@@ -64,20 +64,21 @@ def _quarterly():
     )
 
 
-def test_smooth_is_a_trailing_mean_carried_forward():
+def test_smooth_uses_only_earlier_quarters_and_carries_forward():
     s = smooth(_quarterly(), through=date(2024, 11, 1)).set_index(["year", "quarter"])
-    assert s.loc[(2023, 1), "value"] == 100.0
-    assert s.loc[(2023, 2), "value"] == 105.0
-    assert s.loc[(2024, 1), "value"] == pytest.approx(125.0)  # 110..140
-    assert s.loc[(2024, 2), "value"] == pytest.approx(125.0)  # unpublished: carried forward
-    assert s.loc[(2024, 4), "value"] == pytest.approx(125.0)
+    assert s.loc[(2023, 1), "value"] == 100.0  # first quarter: its own value
+    assert s.loc[(2023, 2), "value"] == 100.0  # known before Q2: Q1 only
+    assert s.loc[(2023, 3), "value"] == 105.0
+    assert s.loc[(2024, 1), "value"] == pytest.approx(115.0)  # 2023 Q1..Q4
+    assert s.loc[(2024, 2), "value"] == pytest.approx(125.0)  # 2023 Q2..2024 Q1
+    assert s.loc[(2024, 4), "value"] == pytest.approx(125.0)  # unpublished: carried forward
     assert not s.loc[(2024, 2), "published"]
 
 
 def test_cost_index_escalates_between_quarters():
     idx = CostIndex(smooth(_quarterly()))
-    out = idx.escalate([100.0, 100.0], ["2023-02-10", "2023-05-01"], "2024-01-15")
-    np.testing.assert_allclose(out, [125.0, 100 * 125 / 105])
+    out = idx.escalate([100.0, 100.0], ["2023-02-10", "2023-08-01"], "2024-01-15")
+    np.testing.assert_allclose(out, [115.0, 100 * 115 / 105])
     # Dates outside the series use its first or last value.
     assert idx.value(["2010-01-01", "2030-01-01"]).tolist() == [100.0, 125.0]
 

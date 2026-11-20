@@ -1,0 +1,32 @@
+{
+  "mdape": {
+    "trailing_median": 0.55,
+    "xgboost": 0.4613008247999871,
+    "lightgbm": 0.4339540983606557,
+    "kumo": 0.4020187368884538
+  },
+  "within_15": {
+    "trailing_median": 0.15265143110716664,
+    "xgboost": 0.18038606611936986,
+    "lightgbm": 0.1943643221655203,
+    "kumo": 0.20479254493010873
+  },
+  "kumo_without_outliers": 0.39661951970013276,
+  "families_where_kumo_best": [
+    "Traffic Control",
+    "Asphalt Surfacing",
+    "Water Pollution and Site Management",
+    "General and Overhead",
+    "Striping and Markings",
+    "Fencing, Guardrail and Barriers",
+    "Landscape and Erosion Control",
+    "Electrical and Signals",
+    "Base and Subbase",
+    "Drainage",
+    "Concrete Pavement",
+    "Piling",
+    "Steel Structures, Signs and Painting"
+  ],
+  "infer_seconds": 11.1,
+  "context_rows": 10091
+}

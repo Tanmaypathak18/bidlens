@@ -8,7 +8,8 @@ Fills `cost_index` and the `bid_escalated` view, and writes outputs/09_price_esc
 The quarterly index (CHCCI, 2020 base) is recovered from the sv08data results pages in the
 raw cache: each page prints the current 12-month index I(c) and every row's original and
 adjusted unit price, where adjusted = original x I(c) / I(quarter). No new requests are
-made. Escalation uses the 4-quarter trailing mean, by bid-opening quarter; quarters not yet
+made. Escalation uses the 4-quarter trailing mean as known before each bid-opening quarter
+(D-044: through the previous quarter); quarters not yet
 published carry forward the last published value.
 """
 
@@ -29,7 +30,7 @@ import pandas as pd
 from bidlens.ingest.parse_sv08 import ParseError, parse_adjusted
 
 RAW_SERIES = "CHCCI_2020"
-SERIES = "CHCCI_2020_4Q"
+SERIES = "CHCCI_2020_KNOWN"  # 4-quarter mean through the previous quarter (D-044)
 MIN_PRICE = 100.0  # rows priced lower lose precision to the cent rounding of adjusted prices
 MAX_SPREAD = 0.001  # implied index values within a quarter must agree to 0.1%
 WINDOW = 4
@@ -92,8 +93,11 @@ def read_cache(cache: Path = CACHE):
 
 
 def smooth(quarterly: pd.DataFrame, through: date | None = None) -> pd.DataFrame:
-    """The D-040 series: 4-quarter trailing mean of published quarters, carried forward
-    to `through` (default: the last quarter in `quarterly`)."""
+    """The index as known before each quarter's bids open (D-040, lagged by D-044): for
+    quarter Q, the mean of the published values of the 4 quarters before Q. Caltrans
+    computes quarter Q's own value from the bids opened in Q, so it is never used for Q.
+    Carried forward to `through` (default: the last quarter in `quarterly`). The first
+    quarter has no earlier value and uses its own."""
     pub = quarterly.dropna(subset=["value"])
     s = pd.Series(
         pub["value"].to_numpy(dtype=float),
@@ -112,6 +116,9 @@ def smooth(quarterly: pd.DataFrame, through: date | None = None) -> pd.DataFrame
     if through is not None:
         last = max(last, pd.Period(pd.Timestamp(through), freq="Q"))
     full = mean.reindex(pd.period_range(s.index[0], last, freq="Q")).ffill()
+    known = full.shift(1)
+    known.iloc[0] = full.iloc[0]
+    full = known
     return pd.DataFrame(
         {
             "year": full.index.year,
@@ -167,7 +174,10 @@ class CostIndex:
 
 def store(con: duckdb.DuckDBPyConnection, quarterly: pd.DataFrame, series: pd.DataFrame) -> None:
     """Write both series to cost_index and (re)create the bid_escalated view."""
-    con.execute("DELETE FROM cost_index WHERE series IN (?, ?)", [RAW_SERIES, SERIES])
+    # CHCCI_2020_4Q is the unlagged series used before D-044.
+    con.execute(
+        "DELETE FROM cost_index WHERE series IN (?, ?, 'CHCCI_2020_4Q')", [RAW_SERIES, SERIES]
+    )
     raw = quarterly.dropna(subset=["value"])
     con.executemany(
         "INSERT INTO cost_index VALUES (?, ?, ?, ?)",
@@ -228,7 +238,13 @@ def write_chart(
     fig, (a1, a2) = plt.subplots(1, 2, figsize=(12, 4.5))
     pub = quarterly.dropna(subset=["value"])
     a1.plot(_x(pub), pub["value"], marker="o", ms=3, lw=1, color="#9aa5b1", label="Quarterly index")
-    a1.plot(_x(series), series["value"], lw=2.5, color="#1f5fa8", label="4-quarter mean (used)")
+    a1.plot(
+        _x(series),
+        series["value"],
+        lw=2.5,
+        color="#1f5fa8",
+        label="Known before the quarter: mean of previous 4 (used)",
+    )
     fwd = series[~series["published"]]
     if len(fwd):
         a1.plot(
@@ -330,13 +346,15 @@ index for the quarter the bid opened. All {int(quarterly["n_contracts"].sum()):,
 give the same value within each quarter (largest disagreement
 {quarterly["spread"].max():.4%}), so the recovered numbers are Caltrans' own.
 
-## Which version of the index is used (decision D-040)
+## Which version of the index is used (decisions D-040, D-044)
 
 The quarterly index jumps around (it rests on the few contracts bid each quarter), so
 prices are adjusted with its **4-quarter average**, the same idea as Caltrans' own
-12-month index. On 2022 and 2023 training bids, this removed most of the under-pricing
-that inflation causes in a historical median (from 8% to 16% too low, down to within 3%),
-while the raw quarterly index over-corrected.
+12-month index. And because Caltrans works out each quarter's index from the bids opened
+in that quarter, a bid is valued only with what was known before it opened: the average
+of the four previous quarters. On 2022 and 2023 training bids, this removed the
+under-pricing that inflation causes in a 12-month historical median (from 8% too low to
+0.2% too low).
 
 The last published quarter is {int(last_pub.year)} Q{int(last_pub.quarter)}. Later quarters
 ({fwd_txt}) are not published yet and use that quarter's value.
@@ -363,7 +381,7 @@ can correct what the index misses.
 ## What is stored
 
 - Database table `cost_index`: series `{RAW_SERIES}` (published quarterly values) and
-  `{SERIES}` (the 4-quarter average used, carried forward).
+  `{SERIES}` (the 4-quarter average as known before each quarter, carried forward).
 - Database view `bid_escalated`: every bid ({n_escalated:,} rows) with its unit price in
   {ref[0]} Q{ref[1]} dollars (index {ref[2]:.2f}). Models escalate to each bid's own date
   instead, through `bidlens.pricing.setup.escalate`.

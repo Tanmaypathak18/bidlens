@@ -7,6 +7,7 @@ from __future__ import annotations
 
 import re
 from datetime import date
+from pathlib import Path
 
 import duckdb
 import numpy as np
@@ -128,3 +129,73 @@ def as_categories(f: pd.DataFrame, categories: dict[str, list[str]]) -> pd.DataF
     for c in CATEGORICAL:
         f[c] = pd.Categorical(f[c], categories=categories[c])
     return f
+
+
+# ----------------------------------------------------------------- shared data setup
+# Kept here, free of XGBoost, LightGBM and PyTorch imports: their OpenMP runtimes must
+# never load into one process (they crash on macOS), so each model runs in its own process.
+
+LINE_PREDICTIONS = Path("data") / "interim" / "line_predictions_{model}.parquet"
+LINE_KEY = ["contract_number", "bid_open_date", "item_no"]
+
+
+def prepare(con: duckdb.DuckDBPyConnection):
+    """Rows, features, target, training mask, test rows and training categories."""
+    from bidlens.pricing.setup import select_test
+
+    rows = load_model_rows(con)
+    X_all = build(rows, rows)
+    y_all = np.log(to_ref(rows["unit_price"].clip(lower=1e-9), rows["bid_open_date"]))
+    train_mask = (
+        (rows["split"] == "train")
+        & ~rows["low_bidder_disagrees"]
+        & ~rows["is_outlier"]
+        & (rows["unit_price"] > 0)
+    )
+    test = select_test(rows)
+    cats = {c: sorted(X_all.loc[train_mask, c].dropna().unique()) for c in CATEGORICAL}
+    X_all = as_categories(X_all, cats)
+    return rows, X_all, y_all, train_mask, test, cats
+
+
+def contract_lines(con: duckdb.DuckDBPyConnection, rows: pd.DataFrame, cats: dict):
+    """Bid-list lines of the test contracts, priced by the D-038 tiers (`base`), plus the
+    model features of the top-100 lines (`X_lines`, indexed like `base`)."""
+    from bidlens.pricing.benchmarks import LinePricer, prepare_lines
+    from bidlens.pricing.compare import ITEMS, load_contracts, load_scope
+
+    contracts = load_contracts(con)
+    master = con.execute("SELECT item_code, unit, item_family FROM item_master ORDER BY 1").df()
+    raw = con.execute(
+        f"SELECT * FROM read_parquet('{ITEMS}') ORDER BY contract_number, bid_open_date, item_no"
+    ).df()
+    lines = prepare_lines(raw, master)
+    scope = load_scope()
+    keys = contracts[["contract_number", "bid_open_date"]].assign(
+        bid_open_date=lambda d: pd.to_datetime(d["bid_open_date"])
+    )
+    targets = lines.merge(keys, on=["contract_number", "bid_open_date"], how="inner")
+    base = LinePricer(rows, lines, scope).price_lines(targets)
+    in_scope = np.array(
+        [(c, u) in scope for c, u in zip(base["item_code"], base["unit"], strict=True)]
+    )
+    info = con.execute(
+        """SELECT contract_number, bid_open_date, district, county, type_of_work, n_items,
+                  working_days, CAST(engineers_estimate AS DOUBLE) AS engineers_estimate
+           FROM contract"""
+    ).df()
+    info["bid_open_date"] = pd.to_datetime(info["bid_open_date"])
+    sel = base[in_scope].merge(info, on=["contract_number", "bid_open_date"], how="left")
+    sel.index = base.index[in_scope]
+    X_lines = as_categories(build(sel, rows), cats)
+    return contracts, base, sel, X_lines
+
+
+def save_line_predictions(model: str, sel: pd.DataFrame, log_ref_pred) -> Path:
+    """Store a model's unit prices (bid-date dollars) for the top-100 contract lines."""
+    out = sel[LINE_KEY].copy()
+    out["pred_unit_price"] = from_ref(np.exp(log_ref_pred), sel["bid_open_date"])
+    path = Path(str(LINE_PREDICTIONS).format(model=model))
+    path.parent.mkdir(parents=True, exist_ok=True)
+    out.to_parquet(path, index=False)
+    return path

@@ -5,35 +5,35 @@
     "all prices": {
       "n": 4507,
       "coverage": 1.0,
-      "mdape": 0.5467875048885658,
-      "within_15": 0.1584202351897049
+      "mdape": 0.55,
+      "within_15": 0.15265143110716664
     },
     "without outliers": {
       "n": 4449,
       "coverage": 1.0,
-      "mdape": 0.5380485855621235,
-      "within_15": 0.1604855023600809
+      "mdape": 0.5400214032709483,
+      "within_15": 0.15464149247021802
     }
   },
   "contract_level": {
     "headline": {
       "contracts": 178,
-      "bidlens_closer_share": 0.3202247191011236,
-      "bidlens_median_abs_error": 0.41862248017087655,
+      "bidlens_closer_share": 0.3146067415730337,
+      "bidlens_median_abs_error": 0.43049027859836303,
       "ee_median_abs_error": 0.21238682952515903,
-      "bidlens_median_error": 0.37431317282823096,
+      "bidlens_median_error": 0.3819524938099159,
       "ee_median_error": 0.19891149897610552,
-      "bidlens_within_15": 0.1853932584269663,
+      "bidlens_within_15": 0.20224719101123595,
       "ee_within_15": 0.3539325842696629
     },
     "all_test_contracts": {
       "contracts": 201,
-      "bidlens_closer_share": 0.31840796019900497,
-      "bidlens_median_abs_error": 0.40044316375842665,
+      "bidlens_closer_share": 0.31343283582089554,
+      "bidlens_median_abs_error": 0.4248122307130716,
       "ee_median_abs_error": 0.20434988709677415,
-      "bidlens_median_error": 0.32713816026118675,
+      "bidlens_median_error": 0.3512892284369612,
       "ee_median_error": 0.1720889883703285,
-      "bidlens_within_15": 0.19402985074626866,
+      "bidlens_within_15": 0.21393034825870647,
       "ee_within_15": 0.38308457711442784
     }
   }
