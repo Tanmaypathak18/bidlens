@@ -1,0 +1,147 @@
+"""Market: how many bidders to expect and where the low bid should land (step 4.1, D-066)."""
+
+from __future__ import annotations
+
+import json
+
+import altair as alt
+import pandas as pd
+import streamlit as st
+from common import ROOT, header, money, pct, summary
+from design import GREEN, NAVY, SLATE, chart, how_to_read, tile
+
+contract = header("Market")
+if contract:
+    s = summary(contract)
+    mk = s.get("market") or {}
+    if not mk:
+        st.warning("No market outlook for this package yet.")
+        st.stop()
+    ee, low = s["engineers_estimate"], s.get("low_bid_cost")
+    lo, mid, hi = (ee * (1 + mk[k]) for k in ("spread_low", "spread_kumo", "spread_high"))
+
+    a, b, c = st.columns(3)
+    tile(a, "Expected low bid", money(mid), f"{pct(mk['spread_kumo'])} vs the engineer's estimate")
+    tile(
+        b,
+        "Likely range for the low bid",
+        f"${lo / 1e6:,.1f}M to ${hi / 1e6:,.1f}M",
+        f"{pct(mk['spread_low'])} to {pct(mk['spread_high'])} vs the estimate",
+    )
+    tile(
+        c,
+        "Expected bidders",
+        f"{mk['bidders_kumo']:.0f}",
+        f"likely {mk['bidders_low']:.0f} to {mk['bidders_high']:.0f}",
+    )
+
+    st.write("")
+    st.subheader("Where the low bid is likely to land")
+    st.markdown(
+        "Caltrans' engineer's estimate is the agency's own price for the job. On recent jobs "
+        "like this one, low bids have landed well away from it in both directions. BidLens "
+        "looks at jobs bid before this one (size, type of work, district, time of year, how "
+        "many contractors took out plans, and recent bidding) to say where the low bid should "
+        "land."
+    )
+    band = pd.DataFrame(
+        [
+            {
+                "lo": mk["spread_low"],
+                "hi": mk["spread_high"],
+                "mid": mk["spread_kumo"],
+                "y": "This job",
+            }
+        ]
+    )
+    x = alt.X(
+        "lo:Q",
+        title="Low bid compared with the engineer's estimate (%)",
+        axis=alt.Axis(format="+.0%"),
+        scale=alt.Scale(domain=[-0.6, 0.6]),
+    )
+    y = alt.Y("y:N", title=None)
+    layers = alt.Chart(band).mark_rule(strokeWidth=22, color="#C7D2E0").encode(x=x, x2="hi:Q", y=y)
+    layers += (
+        alt.Chart(pd.DataFrame({"x": [0]}))
+        .mark_rule(color=SLATE, strokeDash=[4, 3])
+        .encode(x="x:Q")
+    )
+    layers += alt.Chart(band).mark_tick(color=NAVY, thickness=4, size=34).encode(x="mid:Q", y=y)
+    marks = [
+        {"x": 0, "t": "Engineer's estimate", "c": SLATE},
+        {"x": mk["spread_kumo"], "t": f"Expected {pct(mk['spread_kumo'])}", "c": NAVY},
+    ]
+    if low:
+        act = low / ee - 1
+        layers += (
+            alt.Chart(pd.DataFrame({"x": [act], "y": ["This job"]}))
+            .mark_point(shape="diamond", size=220, filled=True, color=GREEN)
+            .encode(x="x:Q", y=y)
+        )
+        marks.append({"x": act, "t": f"Actual {pct(act)}", "c": GREEN})
+    lab = pd.DataFrame(marks)
+    layers += (
+        alt.Chart(lab)
+        .mark_text(dy=-26, fontSize=12)
+        .encode(x="x:Q", text="t:N", color=alt.Color("c:N", scale=None))
+    )
+    st.altair_chart(chart(layers, height=120), width="stretch")
+    how_to_read(
+        "the grey band holds the low bid on about 8 in 10 similar past jobs; the navy tick is the "
+        "expected landing point; the dashed line is the engineer's estimate"
+        + ("; the green diamond is where the low bid actually landed." if low else ".")
+    )
+
+    st.subheader("How many contractors will bid")
+    n = pd.DataFrame(
+        [
+            {
+                "lo": mk["bidders_low"],
+                "hi": mk["bidders_high"],
+                "mid": mk["bidders_kumo"],
+                "y": "This job",
+            }
+        ]
+    )
+    x = alt.X(
+        "lo:Q",
+        title="Number of bidders",
+        scale=alt.Scale(domain=[0, 14]),
+        axis=alt.Axis(tickMinStep=1, format="d"),
+    )
+    layers = alt.Chart(n).mark_rule(strokeWidth=22, color="#C7D2E0").encode(x=x, x2="hi:Q", y=y)
+    layers += alt.Chart(n).mark_tick(color=NAVY, thickness=4, size=34).encode(x="mid:Q", y=y)
+    if low:
+        layers += (
+            alt.Chart(pd.DataFrame({"x": [s["bidders"]], "y": ["This job"]}))
+            .mark_point(shape="diamond", size=220, filled=True, color=GREEN)
+            .encode(x="x:Q", y=y)
+        )
+    st.altair_chart(chart(layers, height=90), width="stretch")
+    how_to_read(
+        "grey band = likely number of bidders (8 in 10 similar jobs); navy tick = expected"
+        + (f"; green diamond = the {s['bidders']} who actually bid." if low else ".")
+    )
+    ph = s.get("plan_holders")
+    st.markdown(
+        (
+            f"**{ph} contractors took out plans** for this job. BidLens uses that count: it is "
+            "public before bids open, and it is the best single clue to how many will bid. "
+            if ph
+            else ""
+        )
+        + "More bidders usually means a sharper low bid; a thin field leaves more room."
+    )
+    res = ROOT / "outputs" / "15_market_context" / "results.json"
+    if res.exists():
+        r = json.loads(res.read_text())
+        sp, bd = r["spread"], r["bidders"]
+        st.caption(
+            f"Track record on {sp['contracts']} past jobs (each predicted only from jobs bid "
+            f"before it): the expected landing point was off by "
+            f"{100 * sp['methods']['kumo']['mae']:.0f} percentage points on average and the "
+            f"bidder count by {bd['methods']['kumo']['mae']:.1f} bidders; the ranges held the "
+            f"actual result {sp['range_coverage']:.0%} and {bd['range_coverage']:.0%} of the time."
+            " Treat these as a guide."
+        )

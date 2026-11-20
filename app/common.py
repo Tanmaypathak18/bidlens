@@ -97,9 +97,27 @@ def cite(r) -> str:
 
 
 def header(title: str) -> str | None:
-    st.set_page_config(page_title=f"BidLens · {title}", layout="wide")
+    """Page setup, the package picker and the shared page header (D-066)."""
+    from design import page_header, setup
+
+    setup(title)
     contract = pick_package()
-    st.sidebar.caption(
-        "BidLens runs on this computer. Bid documents never leave it, and no paid service is used."
-    )
+    st.sidebar.caption("No paid service is used. Bid documents stay on this computer.")
+    if contract:
+        page_header(summary(contract), title)
     return contract
+
+
+@st.cache_data
+def history(contract: str) -> pd.DataFrame:
+    p = APP / contract / "history.parquet"
+    return pd.read_parquet(p) if p.exists() else pd.DataFrame()
+
+
+@st.cache_data
+def track_record() -> dict:
+    """The stage 13 headline: BidLens totals vs the engineer's estimate on past contracts."""
+    p = ROOT / "outputs" / "13_model_comparison" / "results.json"
+    if not p.exists():
+        return {}
+    return json.loads(p.read_text())["contract_level"]["production"]["headline"]

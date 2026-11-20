@@ -55,7 +55,8 @@ def _contract(con, contract: str) -> pd.Series:
     df = con.execute(
         """SELECT contract_number, bid_open_date, district, county, type_of_work, working_days,
                   CAST(engineers_estimate AS DOUBLE) AS engineers_estimate,
-                  CAST(low_bid_cost AS DOUBLE) AS low_bid_cost, n_bidders AS n_bidders_ranked
+                  CAST(low_bid_cost AS DOUBLE) AS low_bid_cost, n_bidders AS n_bidders_ranked,
+                  proposals_issued
            FROM contract WHERE contract_number = ? ORDER BY bid_open_date DESC""",
         [contract],
     ).df()
@@ -64,6 +65,67 @@ def _contract(con, contract: str) -> pd.Series:
     r = df.iloc[0].copy()
     r["bid_open_date"] = pd.Timestamp(r["bid_open_date"])
     return r
+
+
+def notice(contract: str) -> dict:
+    """Work description, location and routes from the Notice to Bidders page."""
+    import re
+
+    pages = pd.read_parquet(DOCS / contract / "pages.parquet")
+    hit = pages[pages["text"].str.contains("General work description", na=False)]
+    if hit.empty:
+        return {}
+    t = re.sub(r"\s+", " ", hit.iloc[0]["text"])
+    out = {}
+    m = re.search(r"General work description: (.+?\.)(?= [A-Z])", t)
+    if m:
+        out["work"] = m.group(1).rstrip(".")
+    m = re.search(r"following work: (.+?)\.(?= )", t)
+    if m:
+        out["where"] = m.group(1).capitalize()
+    m = re.search(r"District-County-Route-Post Mile: \d+-([^-]+)-(.+?)-", t)
+    if m:
+        out["routes"] = "Routes " + m.group(2).replace(",", ", ").replace("  ", " ")
+    return out
+
+
+def key_dates(contract: str) -> list[dict]:
+    """Notice and addendum dates, the prebid meeting and bid opening, each with its page."""
+    import re
+
+    from bidlens.documents.patterns import MONTH, match
+
+    pages = pd.read_parquet(DOCS / contract / "pages.parquet")
+    chunks = pd.read_parquet(DOCS / contract / "chunks.parquet")
+    out = []
+    note = pages[pages["text"].str.contains("General work description", na=False)]
+    if len(note):
+        m = re.search(r"Dated (" + MONTH + ")", note.iloc[0]["text"])
+        if m:
+            out.append(
+                {
+                    "date": m.group(1),
+                    "label": "Bid package issued",
+                    "file": note.iloc[0]["file"],
+                    "page": int(note.iloc[0]["page"]),
+                }  # fmt: skip
+            )
+    for r in pages[(pages["kind"] == "addendum") & (pages["page"] == 1)].itertuples():
+        m = re.search(MONTH, r.text)
+        n = re.search(r"ADDENDUM NO\.? ?(\d+)", r.text, re.I)
+        if m and n:
+            out.append({"date": m.group(0), "label": f"Addendum {n.group(1)}",
+                        "file": r.file, "page": int(r.page)})  # fmt: skip
+    found = {f["rule"]: f for f in match(chunks)}
+    for rule, label in (("prebid", "Mandatory prebid meeting"), ("bid_open", "Bids open")):
+        if rule in found:
+            f = found[rule]
+            m = re.search(MONTH, f["value"])
+            file, pg = f["chunk_id"].split(":")[0], int(f["chunk_id"].split(":p")[1].split(":")[0])
+            out.append({"date": m.group(0), "label": label, "file": file, "page": pg})
+    for d in out:
+        d["date"] = pd.to_datetime(re.sub(r"\bSept\b", "Sep", d["date"])).strftime("%Y-%m-%d")
+    return sorted(out, key=lambda d: d["date"])
 
 
 def build(contract: str) -> dict:
@@ -130,6 +192,32 @@ def build(contract: str) -> dict:
             comps.append(c.assign(item_no=r.item_no, rank=np.arange(1, len(c) + 1)))
     comps = pd.concat(comps, ignore_index=True) if comps else pd.DataFrame()
 
+    # Price history per line: every earlier cleaned low bid for the same code and unit.
+    from bidlens.pricing.setup import escalate
+
+    past = clean[clean["bid_open_date"] < on]
+    hist = []
+    for r in priced.itertuples():
+        h = past[(past["item_code"] == r.item_code) & (past["unit"] == r.unit)]
+        if h.empty and not r.special:  # other items: low bidders' lines in bid summaries
+            h = history[(history["item_code"] == r.item_code) & (history["unit"] == r.unit)]
+            h = h[h["unit_price"] > 0]
+        if len(h):
+            hist.append(
+                pd.DataFrame(
+                    {
+                        "item_no": r.item_no,
+                        "bid_open_date": h["bid_open_date"].to_numpy(),
+                        "quantity": h["quantity"].to_numpy(),
+                        "unit_price": h["unit_price"].to_numpy(dtype=float),
+                        "unit_price_in_bid_dollars": escalate(
+                            h["unit_price"].to_numpy(dtype=float), h["bid_open_date"], on
+                        ),
+                    }
+                )
+            )
+    history_df = pd.concat(hist, ignore_index=True) if hist else pd.DataFrame()
+
     # Actual results, for the check panel only (rank 1 is the low bid; no names).
     actual = raw[(raw["contract_number"] == contract)]
     actual = actual[pd.to_datetime(actual["bid_open_date"]) == on]
@@ -170,16 +258,23 @@ def build(contract: str) -> dict:
     priced[keep].to_parquet(out / "estimate.parquet", index=False)
     if len(comps):
         comps.to_parquet(out / "comparables.parquet", index=False)
+    if len(history_df):
+        history_df.to_parquet(out / "history.parquet", index=False)
     summary = {
         "contract": contract,
         "bid_open_date": on.strftime("%Y-%m-%d"),
         "district": str(info["district"]),
         "county": str(info["county"]),
         "type_of_work": str(info["type_of_work"]),
+        **notice(contract),
+        "key_dates": key_dates(contract),
         "working_days": float(info["working_days"]),
         "engineers_estimate": float(info["engineers_estimate"]),
         "low_bid_cost": float(info["low_bid_cost"]),
         "bidders": int(info["n_bidders_ranked"]),
+        "plan_holders": None
+        if pd.isna(info["proposals_issued"])
+        else int(info["proposals_issued"]),
         "estimate_total": float(priced["pred_amount"].sum()),
         "model_lines": int(m.sum()),
         "lines": len(priced),
@@ -203,10 +298,82 @@ def quarter_adjustment(ref: pd.DataFrame, rows: pd.DataFrame, on: pd.Timestamp) 
     return {ls: float(q.loc[q["lump_sum"] == ls, "adjustment"].iloc[0]) for ls in (True, False)}
 
 
+OUT = ROOT / "outputs" / "21_app"
+
+
+def write_outputs(contract: str, s: dict, seconds: float) -> None:
+    """outputs/21_app: the draft estimate as CSV, the workbook, and a README."""
+    from datetime import date
+
+    from bidlens.documents.extract import DEFAULT_RUN
+    from bidlens.export import workbook
+
+    OUT.mkdir(parents=True, exist_ok=True)
+    est = pd.read_parquet(APP / contract / "estimate.parquet")
+    est.drop(columns=["tier"]).to_csv(OUT / f"draft_estimate_{contract}.csv", index=False)
+    (OUT / f"draft_estimate_{contract}.xlsx").write_bytes(workbook(contract))
+    m = est["tier"] == 0
+    chk = est.loc[m].dropna(subset=["low_bid_unit_price"])
+    inside = (chk["low_bid_unit_price"] >= chk["low"]) & (chk["low_bid_unit_price"] <= chk["high"])
+    mk = s.get("market") or {}
+    ee, low, tot = s["engineers_estimate"], s["low_bid_cost"], s["estimate_total"]
+    (OUT / "README.md").write_text(
+        f"""# 21 App
+
+The draft estimate the BidLens app shows for the sample bid package {contract}
+(steps 4.1 and 4.2, decisions D-064 and D-065), and the workbook it exports.
+
+## The draft
+
+| | Amount | vs the actual low bid |
+| --- | ---: | ---: |
+| BidLens draft total (likely prices) | ${tot:,.0f} | {100 * (tot / low - 1):+.1f}% |
+| Engineer's estimate | ${ee:,.0f} | {100 * (ee / low - 1):+.1f}% |
+| Actual low bid (rank 1, public result) | ${low:,.0f} | |
+
+- {s["lines"]} bid items from the package's bid item list; {int(m.sum())} of them
+  ({100 * s["model_share"]:.0f}% of the draft total) priced by the pricing model with a
+  low to high range. The rest come from earlier low bids for the same item, as in step 2.1.
+- On the {len(chk)} modeled items, the low bidder's unit price fell inside the BidLens
+  range on {100 * inside.mean():.0f}% (the range is built to hold 8 in 10).
+- Market context: the low bid was expected about {100 * mk.get("spread_kumo", float("nan")):+.0f}%
+  from the engineer's estimate (likely {100 * mk.get("spread_low", float("nan")):+.0f}% to
+  {100 * mk.get("spread_high", float("nan")):+.0f}%); it came in at {100 * (low / ee - 1):+.0f}%.
+  Expected bidders {mk.get("bidders_kumo", float("nan")):.0f}; actual {s["bidders"]}.
+- The actual results are used only for this check, never in the draft.
+
+Document findings in the app and the workbook come from the `{DEFAULT_RUN}` extraction run
+(stage 20).
+
+## Files
+
+- `draft_estimate_{contract}.csv`: every bid item with low, likely and high unit price,
+  amount, source, and the low bidder's unit price for the check.
+- `draft_estimate_{contract}.xlsx`: the exported workbook (Estimate with live formulas,
+  Comparables, Risk register, Closure hours, About).
+
+## How it was produced
+
+`uv run python -m bidlens.estimate {contract}` ({seconds:.0f} seconds), then the app:
+`uv run streamlit run app/Home.py`. Code in `src/bidlens/estimate.py`,
+`src/bidlens/export.py` and `app/`. Generated {date.today().isoformat()}.
+""",
+        encoding="utf-8",
+    )
+    from bidlens.outputs import write_index
+
+    write_index()
+
+
 def main(argv: list[str] | None = None) -> int:
+    import time
+
     ap = argparse.ArgumentParser(description=__doc__)
     ap.add_argument("contract")
-    s = build(ap.parse_args(argv).contract)
+    contract = ap.parse_args(argv).contract
+    t0 = time.perf_counter()
+    s = build(contract)
+    write_outputs(contract, s, time.perf_counter() - t0)
     print(json.dumps({k: v for k, v in s.items() if k != "market"}, indent=2, default=str))
     return 0
 

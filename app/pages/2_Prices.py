@@ -1,87 +1,227 @@
-"""Prices: every bid item with its low / likely / high price and comparable bids (step 4.1)."""
+"""Prices: every bid item by dollar impact, its range, comparable bids and price history
+(step 4.1, D-064, D-066)."""
 
 from __future__ import annotations
 
+import altair as alt
 import pandas as pd
 import streamlit as st
-from common import comparables, estimate, header, money, pct, summary
+from common import comparables, estimate, header, history, money, pct, summary
+from design import AMBER, GREEN, NAVY, SLATE, chart, how_to_read, tile
 
 contract = header("Prices")
-st.title("Prices")
 if contract:
     s = summary(contract)
-    est = estimate(contract)
-    comps = comparables(contract)
-    mk = s.get("market") or {}
+    est = estimate(contract).copy()
+    comps, hist = comparables(contract), history(contract)
+    total = est["pred_amount"].sum()
+    est["share"] = est["pred_amount"] / total
+    est = est.sort_values("pred_amount", ascending=False).reset_index(drop=True)
+    est["qty"] = est["quantity"].map(lambda q: "1" if pd.isna(q) else f"{q:,.10g}")
+    est["label"] = est["item_no"] + " " + est["description"].str.slice(0, 38)
 
-    st.caption(
-        "Unit prices in bid-date dollars. **Likely** is the price BidLens expects from the "
-        "low bidder; **low** and **high** bracket 8 in 10 past low bids for items priced by "
-        "the pricing model. Other items are priced from earlier bids and show their source."
-    )
     a, b, c = st.columns(3)
-    a.metric("Draft total (likely prices)", money(s["estimate_total"]))
-    b.metric("Engineer's estimate", money(s["engineers_estimate"]))
-    if mk:
-        c.metric(
-            "Expected low bid vs estimate",
-            pct(mk["spread_kumo"]),
-            f"likely {pct(mk['spread_low'])} to {pct(mk['spread_high'])}",
-            delta_color="off",
+    tile(a, "Draft total (likely prices)", money(total), f"{len(est)} bid items")
+    top10 = est.head(10)["share"].sum()
+    tile(b, "Top 10 items", f"{top10:.0%} of the total", "check these prices first", "watch")
+    tile(
+        c,
+        "Items with a price range",
+        f"{int((est['tier'] == 0).sum())}",
+        f"{s['model_share']:.0%} of the draft total",
+    )
+
+    st.write("")
+    left, right = st.columns(2, gap="large")
+    with left:
+        st.subheader("Where the money is")
+        t = est.head(10).assign(pct_label=lambda d: d["share"].map(lambda x: f"{x:.1%}"))
+        enc = alt.Chart(t).encode(
+            y=alt.Y("label:N", sort=None, title=None, axis=alt.Axis(labelLimit=260)),
+            x=alt.X(
+                "share:Q",
+                title="Share of the draft total (%)",
+                axis=alt.Axis(format=".0%"),
+                scale=alt.Scale(domainMax=float(t["share"].max()) * 1.25),
+            ),
+        )
+        bars = enc.mark_bar(color=NAVY, cornerRadiusEnd=3)
+        txt = enc.mark_text(align="left", dx=4, color="#1E293B").encode(text="pct_label:N")
+        st.altair_chart(chart(bars + txt, height=300), width="stretch")
+        how_to_read(
+            f"the 10 largest items make up {top10:.0%} of the draft; get these right first."
+        )
+    with right:
+        st.subheader("How sure each price is")
+        r = est[est["tier"] == 0].head(10).copy()
+        r["lo"] = r["low"] / r["pred_unit_price"]
+        r["hi"] = r["high"] / r["pred_unit_price"]
+        r["mid"] = 1.0
+        x = alt.X(
+            "lo:Q",
+            title="Unit price relative to the likely price (×, log scale)",
+            scale=alt.Scale(type="log", domain=[0.1, 10]),
+            axis=alt.Axis(values=[0.1, 0.25, 0.5, 1, 2, 4, 10], format="~g"),
+        )
+        y = alt.Y("label:N", sort=None, title=None, axis=alt.Axis(labelLimit=260))
+        rng = alt.Chart(r).mark_rule(strokeWidth=7, color="#C7D2E0").encode(x=x, x2="hi:Q", y=y)
+        dot = (
+            alt.Chart(r)
+            .mark_tick(color=NAVY, thickness=3, size=16)
+            .encode(
+                x="mid:Q",
+                y=y,
+                tooltip=[
+                    alt.Tooltip("description:N", title="Item"),
+                    alt.Tooltip("low:Q", format="$,.2f", title="Low"),
+                    alt.Tooltip("pred_unit_price:Q", format="$,.2f", title="Likely"),
+                    alt.Tooltip("high:Q", format="$,.2f", title="High"),
+                ],
+            )
+        )
+        st.altair_chart(chart(rng + dot, height=300), width="stretch")
+        how_to_read(
+            "for the 10 largest items with a range: the grey bar runs from low to high (8 in 10 "
+            "past low bids fall inside), the tick is the likely price. Wider means less certain."
         )
 
-    view = est.assign(
-        qty=est["quantity"].map(lambda q: "LS" if pd.isna(q) or q == 1 else f"{q:,.10g}"),
-    )
-    only_model = st.toggle("Only items with a modeled range", False)
-    if only_model:
-        view = view[view["tier"] == 0]
+    st.subheader("All bid items, largest first")
+    st.caption("Select a row to see its range, comparable past bids and price history.")
     table = pd.DataFrame(
         {
-            "Item": view["item_no"],
-            "Code": view["item_code"],
-            "Description": view["description"],
-            "Unit": view["unit"],
-            "Quantity": view["qty"],
-            "Low": view["low"],
-            "Likely": view["pred_unit_price"],
-            "High": view["high"],
-            "Amount (likely)": view["pred_amount"],
-            "Share of total": view["pred_amount"] / est["pred_amount"].sum(),
-            "Priced from": view["source"],
+            "Item": est["item_no"],
+            "Description": est["description"],
+            "Unit": est["unit"],
+            "Quantity": est["qty"],
+            "Low": est["low"],
+            "Likely": est["pred_unit_price"],
+            "High": est["high"],
+            "Amount": est["pred_amount"],
+            "Share": est["share"] * 100,
+            "Priced from": est["source"],
         }
     )
     pick = st.dataframe(
         table,
         hide_index=True,
         width="stretch",
+        height=360,
         on_select="rerun",
         selection_mode="single-row",
         column_config={
-            "Low": st.column_config.NumberColumn(format="$%,.2f"),
-            "Likely": st.column_config.NumberColumn(format="$%,.2f"),
-            "High": st.column_config.NumberColumn(format="$%,.2f"),
-            "Amount (likely)": st.column_config.NumberColumn(format="$%,.0f"),
-            "Share of total": st.column_config.ProgressColumn(format="%.1f%%", max_value=1),
+            "Low": st.column_config.NumberColumn("Low ($/unit)", format="$%,.2f"),
+            "Likely": st.column_config.NumberColumn("Likely ($/unit)", format="$%,.2f"),
+            "High": st.column_config.NumberColumn("High ($/unit)", format="$%,.2f"),
+            "Amount": st.column_config.NumberColumn("Amount ($)", format="$%,.0f"),
+            "Share": st.column_config.ProgressColumn(
+                "Share of total",
+                format="%.1f%%",
+                min_value=0,
+                max_value=float(table["Share"].max()),
+            ),
+            "Description": st.column_config.TextColumn(width="large"),
         },
     )
     rows = pick.selection.rows if pick and pick.selection else []
-    st.subheader("Comparable bids")
-    if not rows:
-        st.write("Select a bid item above to see the earlier low bids it is compared with.")
-    else:
-        r = view.iloc[rows[0]]
-        st.markdown(
-            f"**Item {r['item_no']} · {r['description']}** ({r['item_code']}, {r['qty']} "
-            f"{r['unit']}): likely {money(r['pred_unit_price'], True)}"
-            + (
-                f", range {money(r['low'], True)} to {money(r['high'], True)}"
-                if pd.notna(r["low"])
-                else ""
-            )
-            + f". Priced from: {r['source'].lower()}."
+    r = est.iloc[rows[0] if rows else 0]
+    st.subheader(f"Item {r['item_no']} · {r['description']}")
+    hint = (
+        ""
+        if rows
+        else f" <span style='color:{SLATE}'>(Showing the largest item; select a row above.)</span>"
+    )
+    st.markdown(
+        f"{r['item_code']} · {r['qty']} {r['unit']} · likely "
+        f"**{money(r['pred_unit_price'], True)}** per {r['unit']} = **{money(r['pred_amount'])}** "
+        f"({r['share']:.1%} of the draft). Priced from: {r['source'].lower()}.{hint}",
+        unsafe_allow_html=True,
+    )
+    c = comps[comps["item_no"] == r["item_no"]] if len(comps) else comps
+    h = hist[hist["item_no"] == r["item_no"]] if len(hist) else hist
+    on = pd.Timestamp(s["bid_open_date"])
+
+    if pd.notna(r["low"]):
+        band = pd.DataFrame(
+            {"low": [r["low"]], "high": [r["high"]], "likely": [r["pred_unit_price"]]}
         )
-        c = comps[comps["item_no"] == r["item_no"]] if len(comps) else comps
+        x = alt.X(
+            "low:Q",
+            title=f"Unit price ($ per {r['unit']}, bid-date dollars)",
+            axis=alt.Axis(format="$,.0f"),
+        )
+        layers = alt.Chart(band).mark_rule(strokeWidth=14, color="#C7D2E0").encode(x=x, x2="high:Q")
+        layers += alt.Chart(band).mark_tick(color=NAVY, thickness=3, size=30).encode(x="likely:Q")
+        if len(c):
+            layers += (
+                alt.Chart(c)
+                .mark_circle(color=AMBER, size=60, opacity=0.8)
+                .encode(
+                    x=alt.X("unit_price_in_query_dollars:Q"),
+                    tooltip=[
+                        alt.Tooltip("contract_number:N", title="Contract"),
+                        alt.Tooltip("unit_price_in_query_dollars:Q", format="$,.2f", title="Price"),
+                    ],
+                )
+            )
+        st.altair_chart(chart(layers, height=80), width="stretch")
+        how_to_read(
+            f"grey bar = range {money(r['low'], True)} to {money(r['high'], True)}; navy tick = "
+            "likely price; amber dots = the comparable past bids below, in bid-date dollars."
+        )
+
+    left, right = st.columns([3, 2], gap="large")
+    with left:
+        st.markdown("**Price history**")
+        if h.empty:
+            st.write("No earlier low bids for this exact item.")
+        else:
+            h = h.assign(when=pd.to_datetime(h["bid_open_date"]))
+            p = h["unit_price_in_bid_dollars"]
+            log = p.max() / max(p.min(), 0.01) > 30
+            y = alt.Y(
+                "unit_price_in_bid_dollars:Q",
+                title=f"Low bid ($ per {r['unit']}, bid-date dollars)",
+                scale=alt.Scale(type="log" if log else "linear"),
+                axis=alt.Axis(format="$,.0f"),
+            )
+            pts = (
+                alt.Chart(h)
+                .mark_circle(color=SLATE, opacity=0.45, size=30)
+                .encode(
+                    x=alt.X("when:T", title="Bid date"),
+                    y=y,
+                    tooltip=[
+                        alt.Tooltip("when:T", title="Bid date"),
+                        alt.Tooltip("unit_price_in_bid_dollars:Q", format="$,.2f", title="Price"),
+                        alt.Tooltip("quantity:Q", format=",.0f", title="Quantity"),
+                    ],
+                )
+            )
+            now = pd.DataFrame(
+                {
+                    "when": [on],
+                    "unit_price_in_bid_dollars": [r["pred_unit_price"]],
+                    "lo": [r["low"]],
+                    "hi": [r["high"]],
+                }
+            )
+            layers = pts + alt.Chart(now).mark_point(
+                shape="diamond", size=180, filled=True, color=NAVY
+            ).encode(x="when:T", y="unit_price_in_bid_dollars:Q")
+            if pd.notna(r["low"]):
+                layers += (
+                    alt.Chart(now)
+                    .mark_rule(color=NAVY, strokeWidth=2)
+                    .encode(x="when:T", y="lo:Q", y2="hi:Q")
+                )
+            st.altair_chart(chart(layers, height=260), width="stretch")
+            how_to_read(
+                f"grey dots are {len(h)} earlier low bids for this item, in bid-date dollars; the "
+                "navy diamond is BidLens's likely price on this bid date"
+                + (", with its range as a line." if pd.notna(r["low"]) else ".")
+            )
+    with right:
+        st.markdown("**Comparable past bids**")
         if c.empty:
             st.write("No earlier low bids for this exact item and unit.")
         else:
@@ -89,26 +229,23 @@ if contract:
                 pd.DataFrame(
                     {
                         "Contract": c["contract_number"],
-                        "Bid date": pd.to_datetime(c["bid_open_date"]).dt.date,
-                        "District": c["district"],
-                        "Quantity": c["quantity"],
-                        "Low bid unit price": c["unit_price"],
-                        "In today's dollars": c["unit_price_in_query_dollars"],
-                        "Caltrans page": c["source"],
+                        "Date": pd.to_datetime(c["bid_open_date"]).dt.strftime("%b %Y"),
+                        "Qty": c["quantity"],
+                        "Price today": c["unit_price_in_query_dollars"],
+                        "Source": c["source"],
                     }
                 ),
                 hide_index=True,
                 width="stretch",
                 column_config={
-                    "Low bid unit price": st.column_config.NumberColumn(format="$%,.2f"),
-                    "In today's dollars": st.column_config.NumberColumn(format="$%,.2f"),
-                    "Caltrans page": st.column_config.LinkColumn(display_text="open"),
+                    "Qty": st.column_config.NumberColumn(format="%,.0f"),
+                    "Price today": st.column_config.NumberColumn(format="$%,.2f"),
+                    "Source": st.column_config.LinkColumn(display_text="Caltrans"),
                 },
             )
             st.caption(
-                "The 10 closest earlier low bids for this item: similar quantity, recent, same "
-                "district and similar contract size count as closer. Prices are brought to the "
-                "bid date with the Caltrans construction cost index."
+                "The 10 closest earlier low bids: similar quantity, recent, same district and "
+                "similar job size count as closer. 'Price today' is in bid-date dollars."
             )
 
     if s.get("low_bid_cost"):
@@ -118,29 +255,13 @@ if contract:
             ok = (inside["low_bid_unit_price"] >= inside["low"]) & (
                 inside["low_bid_unit_price"] <= inside["high"]
             )
-            gap = pct(s["estimate_total"] / s["low_bid_cost"] - 1)
-            st.write(
-                f"Low bid total {money(s['low_bid_cost'])}; BidLens draft "
-                f"{money(s['estimate_total'])} ({gap}). "
-                f"The low bidder's unit price fell inside the BidLens range on "
-                f"{ok.mean():.0%} of the {len(inside)} modeled items."
-            )
-            st.dataframe(
-                pd.DataFrame(
-                    {
-                        "Item": chk["item_no"],
-                        "Description": chk["description"],
-                        "BidLens likely": chk["pred_unit_price"],
-                        "Low bid": chk["low_bid_unit_price"],
-                        "Difference": chk["pred_unit_price"] / chk["low_bid_unit_price"] - 1,
-                    }
-                ),
-                hide_index=True,
-                width="stretch",
-                column_config={
-                    "BidLens likely": st.column_config.NumberColumn(format="$%,.2f"),
-                    "Low bid": st.column_config.NumberColumn(format="$%,.2f"),
-                    "Difference": st.column_config.NumberColumn(format="percent"),
-                },
+            gap = s["estimate_total"] / s["low_bid_cost"] - 1
+            col = GREEN if abs(gap) <= 0.10 else AMBER
+            st.markdown(
+                f"Low bid {money(s['low_bid_cost'])}; BidLens draft {money(s['estimate_total'])} "
+                f"(<span style='color:{col}'><b>{pct(gap)}</b></span>). The low bidder's price "
+                f"fell inside the BidLens range on **{ok.mean():.0%}** of the {len(inside)} items "
+                "with a range.",
+                unsafe_allow_html=True,
             )
             st.caption("Shown only to check BidLens on a past bid; never used in the draft.")

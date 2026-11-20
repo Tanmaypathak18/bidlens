@@ -30,6 +30,7 @@ dev = [
     "jupyter>=1.1.1",
     "nbconvert>=7.17.2",
     "nbformat>=5.11.1",
+    "playwright>=1.65.2",
     "pytest>=8",
     "ruff>=0.6",
 ]
