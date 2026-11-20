@@ -28,8 +28,8 @@ item_code,description,item_family,on_2026_list,bid_rows,contracts
 832007,MIDWEST GUARDRAIL SYSTEM (WOOD POST),"Fencing, Guardrail and Barriers",true,725,131
 520102,BAR REINFORCING STEEL (BRIDGE),Structural Concrete and Reinforcement,true,713,136
 610108,"18"" ALTERNATIVE PIPE CULVERT",Drainage,true,607,118
-600041,FURNISH POLYESTER CONCRETE OVERLAY,Bridge Rehabilitation and Removal,true,561,110
 600043,PLACE POLYESTER CONCRETE OVERLAY,Bridge Rehabilitation and Removal,true,561,110
+600041,FURNISH POLYESTER CONCRETE OVERLAY,Bridge Rehabilitation and Removal,true,561,110
 839745,CONCRETE BARRIER TRANSITION,"Fencing, Guardrail and Barriers",true,547,111
 872133,MODIFYING SIGNAL AND LIGHTING SYSTEMS,Electrical and Signals,true,528,108
 510053,"STRUCTURAL CONCRETE, BRIDGE",Structural Concrete and Reinforcement,true,517,101
@@ -55,8 +55,8 @@ item_code,description,item_family,on_2026_list,bid_rows,contracts
 390402,RUBBERIZED HOT MIX ASPHALT-OPEN GRADED (OPEN GRADED FRICTION COURSE),Asphalt Surfacing,true,251,55
 520103,BAR REINFORCING STEEL (RETAINING WALL),Structural Concrete and Reinforcement,true,245,53
 193013,STRUCTURE BACKFILL (RETAINING WALL),Earthwork and Clearing,true,228,51
-510087,"STRUCTURAL CONCRETE, APPROACH SLAB (TYPE R)",Structural Concrete and Reinforcement,true,227,45
 510060,"STRUCTURAL CONCRETE, RETAINING WALL",Structural Concrete and Reinforcement,true,227,51
+510087,"STRUCTURAL CONCRETE, APPROACH SLAB (TYPE R)",Structural Concrete and Reinforcement,true,227,45
 872134,MODIFYING RAMP METERING SYSTEMS,Electrical and Signals,true,220,42
 250201,CLASS 2 AGGREGATE SUBBASE,Base and Subbase,true,201,38
 192037,STRUCTURE EXCAVATION (RETAINING WALL),Earthwork and Clearing,true,197,45
@@ -66,8 +66,8 @@ item_code,description,item_family,on_2026_list,bid_rows,contracts
 839642,CONCRETE BARRIER (TYPE 60MC),"Fencing, Guardrail and Barriers",true,182,35
 490603,"24"" CAST-IN-DRILLED-HOLE CONCRETE PILING",Piling,true,182,35
 872002,TEMPORARY SIGNAL SYSTEMS,Electrical and Signals,true,176,28
-498052,"60"" CAST-IN-DRILLED-HOLE CONCRETE PILE (SIGN FOUNDATION)",Piling,true,167,39
 120101,TRAFFIC CONTROL SUPERVISOR,Traffic Control,true,167,45
+498052,"60"" CAST-IN-DRILLED-HOLE CONCRETE PILE (SIGN FOUNDATION)",Piling,true,167,39
 600097,BRIDGE REMOVAL,Bridge Rehabilitation and Removal,true,164,31
 870600,TRAFFIC MONITORING STATION SYSTEM,Electrical and Signals,true,159,42
 420201,GRIND EXISTING CONCRETE PAVEMENT,Concrete Pavement,true,149,40
@@ -96,6 +96,6 @@ item_code,description,item_family,on_2026_list,bid_rows,contracts
 582001,SOUND WALL (MASONRY BLOCK),Walls and Ground Support,true,37,8
 872137,MODIFYING CHANGEABLE MESSAGE SIGN SYSTEMS,Electrical and Signals,true,34,8
 129011,MOVABLE BARRIER SYSTEM,Traffic Control,true,27,6
-477020,MECHANICALLY STABILIZED EMBANKMENT,Walls and Ground Support,true,25,4
 839647,CONCRETE BARRIER (TYPE 60MGC),"Fencing, Guardrail and Barriers",true,25,6
+477020,MECHANICALLY STABILIZED EMBANKMENT,Walls and Ground Support,true,25,4
 870510,RAMP METERING SYSTEM,Electrical and Signals,true,19,3

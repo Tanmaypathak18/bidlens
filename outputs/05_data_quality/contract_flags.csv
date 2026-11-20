@@ -1,0 +1,196 @@
+contract_number,bid_open_date,flag,detail
+04-2K8104,2022-08-30,bidder_count_mismatch,"cost database 2, bid summary 1"
+05-1H4304,2022-11-17,bidder_count_mismatch,"cost database 3, bid summary 2"
+04-4Q2504,2023-06-01,bidder_count_mismatch,"cost database 3, bid summary 2"
+04-0Q1804,2024-01-23,bidder_count_mismatch,"cost database 5, bid summary 6"
+04-2Q7604,2024-02-22,bidder_count_mismatch,"cost database 7, bid summary 8"
+04-2Y5404,2025-04-15,bidder_count_mismatch,"cost database 3, bid summary 4"
+04-0X5904,2025-05-06,bidder_count_mismatch,"cost database 2, bid summary 4"
+04-0W0604,2026-09-01,bidder_count_mismatch,"cost database 9, bid summary 8"
+04-1G4304,2019-01-09,low_bidder_disagrees,28 of 29 compared prices differ
+04-2J8404,2020-03-24,low_bidder_disagrees,14 of 14 compared prices differ
+04-3K3304,2021-03-24,low_bidder_disagrees,15 of 15 compared prices differ
+04-0K5104,2022-03-23,low_bidder_disagrees,8 of 9 compared prices differ
+04-2K8104,2022-08-30,low_bidder_disagrees,8 of 8 compared prices differ
+04-2G7404,2022-11-01,low_bidder_disagrees,16 of 16 compared prices differ
+05-1H4304,2022-11-17,low_bidder_disagrees,35 of 38 compared prices differ
+04-0Q1804,2024-01-23,low_bidder_disagrees,13 of 14 compared prices differ
+04-2Q7604,2024-02-22,low_bidder_disagrees,19 of 23 compared prices differ
+04-2Y5404,2025-04-15,low_bidder_disagrees,8 of 10 compared prices differ
+04-0X5904,2025-05-06,low_bidder_disagrees,9 of 9 compared prices differ
+04-3G6034,2018-01-10,missing_engineers_estimate,no usable bid summary
+05-1J2004,2018-01-11,missing_engineers_estimate,no usable bid summary
+04-4G8304,2018-01-17,missing_engineers_estimate,no usable bid summary
+05-1H3804,2018-01-17,missing_engineers_estimate,no usable bid summary
+05-1J7404,2018-01-17,missing_engineers_estimate,no usable bid summary
+05-1H6704,2018-01-23,missing_engineers_estimate,no usable bid summary
+05-1J7204,2018-01-23,missing_engineers_estimate,no usable bid summary
+04-4G8504,2018-01-24,missing_engineers_estimate,no usable bid summary
+05-1J2604,2018-01-24,missing_engineers_estimate,no usable bid summary
+05-0G0714,2018-01-25,missing_engineers_estimate,no usable bid summary
+04-3G1404,2018-01-30,missing_engineers_estimate,no usable bid summary
+05-1J7304,2018-02-01,missing_engineers_estimate,no usable bid summary
+04-4H2104,2018-02-06,missing_engineers_estimate,no usable bid summary
+05-1F7104,2018-02-08,missing_engineers_estimate,no usable bid summary
+04-4G8104,2018-02-14,missing_engineers_estimate,no usable bid summary
+05-1J3004,2018-02-14,missing_engineers_estimate,no usable bid summary
+05-1J2804,2018-02-15,missing_engineers_estimate,no usable bid summary
+05-1G5604,2018-02-21,missing_engineers_estimate,no usable bid summary
+04-1K5904,2018-02-22,missing_engineers_estimate,no usable bid summary
+04-3G4424,2018-02-22,missing_engineers_estimate,no usable bid summary
+05-1J5204,2018-02-22,missing_engineers_estimate,no usable bid summary
+04-3J7404,2018-03-06,missing_engineers_estimate,no usable bid summary
+04-4G7904,2018-03-06,missing_engineers_estimate,no usable bid summary
+04-2640N4,2018-03-07,missing_engineers_estimate,no usable bid summary
+04-0Q5104,2018-03-08,missing_engineers_estimate,no usable bid summary
+05-1C9904,2018-03-08,missing_engineers_estimate,no usable bid summary
+04-0Q5004,2018-03-13,missing_engineers_estimate,no usable bid summary
+04-0Q5304,2018-03-20,missing_engineers_estimate,no usable bid summary
+05-1G9104,2018-03-20,missing_engineers_estimate,no usable bid summary
+04-0Q5204,2018-03-22,missing_engineers_estimate,no usable bid summary
+04-2J4604,2018-03-22,missing_engineers_estimate,no usable bid summary
+05-1H6604,2018-03-28,missing_engineers_estimate,no usable bid summary
+04-4S7804,2018-04-03,missing_engineers_estimate,no usable bid summary
+04-2G3504,2018-04-04,missing_engineers_estimate,no usable bid summary
+04-3K5704,2018-04-10,missing_engineers_estimate,no usable bid summary
+04-4H7514,2018-04-10,missing_engineers_estimate,no usable bid summary
+04-4G8904,2018-04-11,missing_engineers_estimate,no usable bid summary
+05-1J1704,2018-04-11,missing_engineers_estimate,no usable bid summary
+05-1G9004,2018-04-12,missing_engineers_estimate,no usable bid summary
+04-1K7804,2018-04-17,missing_engineers_estimate,no usable bid summary
+04-1K6204,2018-04-18,missing_engineers_estimate,no usable bid summary
+04-2J0414,2018-04-19,missing_engineers_estimate,no usable bid summary
+04-3K6504,2018-04-24,missing_engineers_estimate,no usable bid summary
+04-2K1604,2018-04-26,missing_engineers_estimate,no usable bid summary
+04-2K0104,2018-05-01,missing_engineers_estimate,no usable bid summary
+04-3K6704,2018-05-02,missing_engineers_estimate,no usable bid summary
+04-0P6504,2018-05-03,missing_engineers_estimate,no usable bid summary
+04-1K6004,2018-05-08,missing_engineers_estimate,no usable bid summary
+04-1K6104,2018-05-09,missing_engineers_estimate,no usable bid summary
+04-0Q9404,2018-05-10,missing_engineers_estimate,no usable bid summary
+04-3K6104,2018-05-10,missing_engineers_estimate,no usable bid summary
+04-3K6304,2018-05-15,missing_engineers_estimate,no usable bid summary
+04-1K5704,2018-05-16,missing_engineers_estimate,no usable bid summary
+04-0P6804,2018-05-17,missing_engineers_estimate,no usable bid summary
+04-1J0104,2018-05-17,missing_engineers_estimate,no usable bid summary
+05-492824,2018-05-23,missing_engineers_estimate,no usable bid summary
+04-3J5704,2018-05-30,missing_engineers_estimate,no usable bid summary
+05-1J1704,2018-05-30,missing_engineers_estimate,no usable bid summary
+04-0P6104,2018-05-31,missing_engineers_estimate,no usable bid summary
+04-2K0004,2018-05-31,missing_engineers_estimate,no usable bid summary
+04-4A1104,2018-06-07,missing_engineers_estimate,no usable bid summary
+04-1J7504,2018-06-13,missing_engineers_estimate,no usable bid summary
+05-1F3504,2018-06-13,missing_engineers_estimate,no usable bid summary
+04-155004,2018-07-12,missing_engineers_estimate,no usable bid summary
+05-0C6414,2018-07-18,missing_engineers_estimate,no usable bid summary
+04-2J4804,2018-08-14,missing_engineers_estimate,no usable bid summary
+04-2J5504,2018-08-21,missing_engineers_estimate,no usable bid summary
+05-1F0804,2018-08-29,missing_engineers_estimate,no usable bid summary
+04-4G9204,2018-09-05,missing_engineers_estimate,no usable bid summary
+05-1G1404,2018-09-05,missing_engineers_estimate,no usable bid summary
+05-0A0504,2018-09-13,missing_engineers_estimate,no usable bid summary
+04-2A2514,2018-09-20,missing_engineers_estimate,no usable bid summary
+04-2J6704,2018-09-25,missing_engineers_estimate,no usable bid summary
+04-2J0004,2018-09-26,missing_engineers_estimate,no usable bid summary
+04-2J4404,2018-10-04,missing_engineers_estimate,no usable bid summary
+04-1K3404,2018-10-09,missing_engineers_estimate,no usable bid summary
+04-0G2214,2018-10-10,missing_engineers_estimate,no usable bid summary
+05-1C3704,2018-10-10,missing_engineers_estimate,no usable bid summary
+04-3J9004,2018-10-11,missing_engineers_estimate,no usable bid summary
+05-1H2904,2018-10-11,missing_engineers_estimate,no usable bid summary
+04-2J5604,2018-10-16,missing_engineers_estimate,no usable bid summary
+05-1C2504,2018-10-16,missing_engineers_estimate,no usable bid summary
+04-1J3704,2018-10-17,missing_engineers_estimate,no usable bid summary
+05-1C2604,2018-10-18,missing_engineers_estimate,no usable bid summary
+04-2J5704,2018-10-25,missing_engineers_estimate,no usable bid summary
+04-0J1404,2018-10-30,missing_engineers_estimate,no usable bid summary
+04-2J5904,2018-10-30,missing_engineers_estimate,no usable bid summary
+05-1E0204,2018-10-30,missing_engineers_estimate,no usable bid summary
+04-4H9804,2018-10-31,missing_engineers_estimate,no usable bid summary
+04-4J2814,2018-10-31,missing_engineers_estimate,no usable bid summary
+05-1F4304,2018-10-31,missing_engineers_estimate,no usable bid summary
+05-1C6504,2018-11-01,missing_engineers_estimate,no usable bid summary
+05-1F7604,2018-11-01,missing_engineers_estimate,no usable bid summary
+04-1J7004,2018-11-06,missing_engineers_estimate,no usable bid summary
+04-4G1134,2018-11-07,missing_engineers_estimate,no usable bid summary
+05-1A0004,2018-11-07,missing_engineers_estimate,no usable bid summary
+04-4G8804,2018-11-08,missing_engineers_estimate,no usable bid summary
+05-1F75U4,2018-11-08,missing_engineers_estimate,no usable bid summary
+04-0J2104,2018-11-15,missing_engineers_estimate,no usable bid summary
+04-1J0104,2018-11-15,missing_engineers_estimate,no usable bid summary
+04-2J5404,2018-11-15,missing_engineers_estimate,no usable bid summary
+05-1C8904,2018-11-15,missing_engineers_estimate,no usable bid summary
+04-151614,2018-11-27,missing_engineers_estimate,no usable bid summary
+04-2J5004,2018-11-28,missing_engineers_estimate,no usable bid summary
+05-1J2504,2018-11-28,missing_engineers_estimate,no usable bid summary
+04-3K5804,2018-11-29,missing_engineers_estimate,no usable bid summary
+04-4H0804,2018-11-29,missing_engineers_estimate,no usable bid summary
+04-3K6204,2018-12-04,missing_engineers_estimate,no usable bid summary
+05-1J5604,2018-12-05,missing_engineers_estimate,no usable bid summary
+04-0P6404,2018-12-11,missing_engineers_estimate,no usable bid summary
+04-270104,2018-12-11,missing_engineers_estimate,no usable bid summary
+05-1J4904,2018-12-11,missing_engineers_estimate,no usable bid summary
+04-1K0104,2018-12-12,missing_engineers_estimate,no usable bid summary
+04-2J0424,2018-12-12,missing_engineers_estimate,no usable bid summary
+04-3G6904,2018-12-13,missing_engineers_estimate,no usable bid summary
+05-1J2704,2018-12-13,missing_engineers_estimate,no usable bid summary
+04-4G5604,2018-12-18,missing_engineers_estimate,no usable bid summary
+04-0J3804,2018-12-20,missing_engineers_estimate,no usable bid summary
+04-2J1004,2018-12-20,missing_engineers_estimate,no usable bid summary
+04-3K6004,2018-12-20,missing_engineers_estimate,no usable bid summary
+05-1K4004,2019-01-24,missing_engineers_estimate,no usable bid summary
+04-4G8204,2019-02-13,missing_engineers_estimate,no usable bid summary
+04-0P1104,2019-06-13,missing_engineers_estimate,no usable bid summary
+05-1E0104,2019-10-16,missing_engineers_estimate,no usable bid summary
+04-4G8204,2019-11-13,missing_engineers_estimate,no usable bid summary
+04-1A6614,2020-08-26,missing_engineers_estimate,no usable bid summary
+04-0P1104,2021-05-20,missing_engineers_estimate,no usable bid summary
+05-0N71Y4,2022-01-31,missing_engineers_estimate,no usable bid summary
+05-3307A4,2022-02-11,missing_engineers_estimate,no usable bid summary
+04-4J9704,2022-04-21,missing_engineers_estimate,no usable bid summary
+05-1G4104,2022-07-05,missing_engineers_estimate,no usable bid summary
+05-1K03U4,2022-10-07,missing_engineers_estimate,no usable bid summary
+05-3307C4,2023-02-13,missing_engineers_estimate,no usable bid summary
+05-0T9914,2023-03-29,missing_engineers_estimate,no usable bid summary
+04-2W5104,2023-05-25,missing_engineers_estimate,no usable bid summary
+05-0N74U4,2023-06-09,missing_engineers_estimate,no usable bid summary
+05-0N73Y4,2023-06-12,missing_engineers_estimate,no usable bid summary
+05-1P5374,2023-07-11,missing_engineers_estimate,no usable bid summary
+05-1P5334,2023-08-03,missing_engineers_estimate,no usable bid summary
+05-1P5354,2023-08-17,missing_engineers_estimate,no usable bid summary
+05-1C9504,2024-02-01,missing_engineers_estimate,no usable bid summary
+05-0N74V4,2024-03-01,missing_engineers_estimate,no usable bid summary
+05-0N7054,2024-03-05,missing_engineers_estimate,no usable bid summary
+04-0Y9804,2024-05-30,missing_engineers_estimate,no usable bid summary
+05-1P5364,2024-07-09,missing_engineers_estimate,no usable bid summary
+05-0N72Y4,2024-07-18,missing_engineers_estimate,no usable bid summary
+04-0Q2104,2024-07-25,missing_engineers_estimate,no usable bid summary
+04-3W5604,2024-08-07,missing_engineers_estimate,no usable bid summary
+04-3W9104,2024-08-12,missing_engineers_estimate,no usable bid summary
+05-1Q4704,2024-08-28,missing_engineers_estimate,no usable bid summary
+04-0Y6804,2025-02-28,missing_engineers_estimate,no usable bid summary
+04-4Y1804,2025-03-07,missing_engineers_estimate,no usable bid summary
+04-0A53T4,2025-04-28,missing_engineers_estimate,no usable bid summary
+04-1Q8204,2025-05-23,missing_engineers_estimate,no usable bid summary
+04-0W0304,2025-06-10,missing_engineers_estimate,no usable bid summary
+04-0X7204,2025-07-21,missing_engineers_estimate,no usable bid summary
+04-0Q0204,2025-08-26,missing_engineers_estimate,no usable bid summary
+04-0K81U4,2025-09-03,missing_engineers_estimate,no usable bid summary
+04-0X6504,2025-09-26,missing_engineers_estimate,no usable bid summary
+05-0N7064,2025-12-17,missing_engineers_estimate,no usable bid summary
+04-1Y6904,2025-12-18,missing_engineers_estimate,no usable bid summary
+04-2X5304,2026-03-25,missing_engineers_estimate,no usable bid summary
+04-2X7404,2026-03-26,missing_engineers_estimate,no usable bid summary
+04-2X7504,2026-05-07,missing_engineers_estimate,no usable bid summary
+04-2X7804,2026-05-13,missing_engineers_estimate,no usable bid summary
+04-2X7204,2026-05-14,missing_engineers_estimate,no usable bid summary
+04-2X7104,2026-05-20,missing_engineers_estimate,no usable bid summary
+04-2X7904,2026-05-28,missing_engineers_estimate,no usable bid summary
+04-2X8104,2026-05-28,missing_engineers_estimate,no usable bid summary
+04-2X7304,2026-06-02,missing_engineers_estimate,no usable bid summary
+04-2X7604,2026-06-03,missing_engineers_estimate,no usable bid summary
+04-3X6904,2026-06-04,missing_engineers_estimate,no usable bid summary
+04-2X7004,2026-07-10,missing_engineers_estimate,no usable bid summary
+04-2X8004,2026-08-14,missing_engineers_estimate,no usable bid summary
+04-2W3704,2026-08-25,missing_engineers_estimate,no usable bid summary
+04-0W1404,2026-09-16,missing_engineers_estimate,no usable bid summary

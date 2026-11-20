@@ -3,9 +3,15 @@
 setup:
 	uv sync
 
+# Rebuild everything from the raw cache (step 1.6). Network requests happen only for
+# pages missing from data/raw/sv08data; bid summary PDFs must already be in
+# data/raw/bid_summaries (downloaded by hand, D-014).
 data:
-	@echo "make data: the pipeline is built in steps 1.2-1.6 and is not implemented yet." >&2
-	@exit 1
+	uv run python -m bidlens.ingest.caltrans all
+	uv run python -m bidlens.ingest.check_bid_summaries
+	uv run python -m bidlens.db.load
+	uv run python -m bidlens.db.checks
+	uv run python -m bidlens.outputs
 
 test:
 	uv run pytest
