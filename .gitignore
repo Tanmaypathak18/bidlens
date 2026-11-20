@@ -19,6 +19,8 @@ data/interim/
 
 # Bid documents are not committed; only manifests
 *.pdf
+# Bid summaries, the maintainer's checklist copy and not-found list hold bidder names and phones
+data/raw/bid_summaries/
 
 # OS / editors
 .DS_Store
