@@ -281,7 +281,7 @@ class LocalBackend:
 
         payload = {
             "model": self.model,
-            "stream": False,
+            "stream": True,  # D-057: keep what was written if the reply is aborted
             "format": schema,
             "think": False,  # D-054: qwen3's reasoning mode off, same as llama3.1
             "options": {"temperature": 0, "num_ctx": NUM_CTX, "num_predict": NUM_PREDICT},
@@ -293,24 +293,42 @@ class LocalBackend:
         # The Ollama desktop app can restart itself (e.g. to apply an update); wait for it.
         for attempt in range(RETRIES + 1):
             try:
-                r = self.http.post("/api/chat", json=payload)
-                r.raise_for_status()
+                text, last = self._stream(payload)
                 break
-            except (httpx.TransportError, httpx.HTTPStatusError) as e:
+            except (httpx.TransportError, httpx.HTTPStatusError, OllamaError) as e:
                 if attempt == RETRIES:
                     raise
                 print(f"Ollama call failed ({e!r}); retrying in {RETRY_WAIT} s", flush=True)
                 time.sleep(RETRY_WAIT)
-        body = r.json()
-        if (body.get("prompt_eval_count") or 0) >= NUM_CTX - 1024:
+        if (last.get("prompt_eval_count") or 0) >= NUM_CTX - 1024:
             raise RuntimeError("prompt filled the context window; Ollama may have cut it")
         self.last_usage = {
-            "input_tokens": body.get("prompt_eval_count"),
-            "output_tokens": body.get("eval_count"),
+            "input_tokens": last.get("prompt_eval_count"),
+            "output_tokens": last.get("eval_count"),
             "model": self.model,
-            "truncated": body.get("done_reason") == "length",
+            "truncated": last.get("done_reason") in ("length", "repeat"),
         }
-        return salvage(body["message"]["content"])
+        return salvage(text)
+
+    def _stream(self, payload: dict) -> tuple[str, dict]:
+        """Read a streamed reply. A repeat-limit abort ends it like a cut-off (D-057)."""
+        parts: list[str] = []
+        with self.http.stream("POST", "/api/chat", json=payload) as r:
+            for line in r.iter_lines():
+                if not line.strip():
+                    continue
+                msg = json.loads(line)
+                if "error" in msg:
+                    if "repeat" in msg["error"]:
+                        print(f"model looped, keeping items so far: {msg['error']}", flush=True)
+                        return "".join(parts), {"done_reason": "repeat"}
+                    raise OllamaError(msg["error"])
+                parts.append(msg.get("message", {}).get("content", ""))
+                if msg.get("done"):
+                    return "".join(parts), msg
+            if r.status_code >= 400:
+                r.raise_for_status()
+        raise OllamaError("stream ended without a final message")
 
     def close(self) -> None:
         """Unload the model so only one is in memory at a time (D-054)."""
@@ -319,6 +337,10 @@ class LocalBackend:
         # If the server is already gone, nothing is loaded.
         with contextlib.suppress(httpx.TransportError):
             self.http.post("/api/generate", json={"model": self.model, "keep_alive": 0})
+
+
+class OllamaError(RuntimeError):
+    """An error message from the Ollama server (retried, D-054)."""
 
 
 def salvage(text: str) -> dict:

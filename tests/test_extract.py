@@ -165,3 +165,22 @@ def test_salvage_keeps_complete_items_from_a_cut_off_reply():
     assert salvage(cut) == {"items": [{"statement": "a"}, {"statement": "b"}]}
     assert salvage('{"items": [{"statem') == {"items": []}
     assert salvage('{"items": []}') == {"items": []}
+
+
+def test_local_backend_keeps_items_written_before_a_repeat_abort():
+    import json
+
+    import httpx
+
+    from bidlens.documents.extract import LocalBackend
+
+    reply = '{"items": [{"statement": "a"}, {"statement": "b C C C'
+    lines = [json.dumps({"message": {"content": ch}, "done": False}) for ch in reply]
+    lines.append(json.dumps({"error": "prediction aborted, token repeat limit reached"}))
+    be = LocalBackend("fake:1b")
+    be.http = httpx.Client(
+        base_url="http://x",
+        transport=httpx.MockTransport(lambda req: httpx.Response(200, text="\n".join(lines))),
+    )
+    assert be.complete("s", "u", {}) == {"items": [{"statement": "a"}]}
+    assert be.last_usage["truncated"] is True
