@@ -1,0 +1,70 @@
+{
+  "spread": {
+    "methods": {
+      "kumo": {
+        "mae": 0.15723609044787773,
+        "within": 0.4182692307692308,
+        "median_signed": 0.03714205360450262
+      },
+      "linear": {
+        "mae": 0.1825060500254943,
+        "within": 0.3317307692307692,
+        "median_signed": 0.08104028601545905
+      },
+      "median": {
+        "mae": 0.170367772021957,
+        "within": 0.36538461538461536,
+        "median_signed": 0.04600369012051757
+      },
+      "kumo_no_planholders": {
+        "mae": 0.16439684222362833,
+        "within": 0.3894230769230769,
+        "median_signed": 0.04190561632907411
+      },
+      "linear_no_planholders": {
+        "mae": 0.18459060221217966,
+        "within": 0.34134615384615385,
+        "median_signed": 0.08061389538231116
+      }
+    },
+    "range_coverage": 0.7692307692307693,
+    "native_range_coverage": 0.7836538461538461,
+    "median_range_width": 0.4987376742064953,
+    "actual_mean": -0.1274566940690922,
+    "contracts": 208
+  },
+  "bidders": {
+    "methods": {
+      "kumo": {
+        "mae": 1.3269230769230769,
+        "within": 0.6346153846153846,
+        "median_signed": 0.0
+      },
+      "linear": {
+        "mae": 1.5,
+        "within": 0.5817307692307693,
+        "median_signed": 0.0
+      },
+      "median": {
+        "mae": 1.7884615384615385,
+        "within": 0.5048076923076923,
+        "median_signed": 0.0
+      },
+      "kumo_no_planholders": {
+        "mae": 1.5961538461538463,
+        "within": 0.5240384615384616,
+        "median_signed": 0.0
+      },
+      "linear_no_planholders": {
+        "mae": 1.7307692307692308,
+        "within": 0.5,
+        "median_signed": 0.0
+      }
+    },
+    "range_coverage": 0.8173076923076923,
+    "native_range_coverage": 0.8173076923076923,
+    "median_range_width": 4.357800722122192,
+    "actual_mean": 5.153846153846154,
+    "contracts": 208
+  }
+}

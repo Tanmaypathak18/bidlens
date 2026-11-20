@@ -2,13 +2,15 @@
 
 from __future__ import annotations
 
+import importlib.util
 import os
 import subprocess
 import sys
 
 import pytest
 
-pytest.importorskip("sdm")
+if importlib.util.find_spec("sdm") is None:  # checks without importing PyTorch here
+    pytest.skip("structured-data-models not installed", allow_module_level=True)
 
 
 def _cached() -> bool:
