@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import pandas as pd
 
-from bidlens.documents.extract import BM25, CATEGORIES, cite, norm, retrieve
+from bidlens.documents.extract import BM25, CATEGORIES, cite, norm, retrieve, slug
 
 
 def _chunks():
@@ -115,3 +115,8 @@ def test_cite_keeps_true_quotes_and_takes_the_page_from_the_chunk():
 
 def test_norm_ignores_whitespace_and_case():
     assert norm(" A\n b  C ") == "a b c"
+
+
+def test_slug_names_one_results_file_per_local_model():
+    assert slug("qwen3:8b") == "qwen3-8b"
+    assert slug("llama3.1:8b") == "llama3.1-8b"

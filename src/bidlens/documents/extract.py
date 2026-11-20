@@ -1,8 +1,11 @@
 """Step 3.3: extract scope, risks and requirements with page citations (decision D-052).
 
-Usage:
-    uv run python -m bidlens.documents.extract 04-0W0504 --mode hosted   # Claude API
-    uv run python -m bidlens.documents.extract 04-0W0504 --mode local    # Ollama
+Usage (local is the default; documents never leave this machine, no paid service):
+    uv run python -m bidlens.documents.extract 04-0W0504 --model qwen3:8b
+    uv run python -m bidlens.documents.extract 04-0W0504 --model llama3.1:8b
+
+Optional, for users with their own Anthropic API key (sends the document passages to the
+Claude API, which is a paid service): set ANTHROPIC_API_KEY and add `--mode hosted`.
 
 Needs the chunks from step 3.2. For each category, the most relevant chunks are retrieved
 (BM25, plus every addendum chunk), and the model returns items as JSON, each with a
@@ -31,7 +34,7 @@ TOP_K = 25
 MAX_QUOTE = 400
 
 HOSTED_MODEL = os.environ.get("BIDLENS_HOSTED_MODEL", "claude-opus-5-5")
-LOCAL_MODEL = os.environ.get("BIDLENS_LOCAL_MODEL", "")
+LOCAL_MODEL = os.environ.get("BIDLENS_LOCAL_MODEL", "qwen3:8b")
 
 
 @dataclass(frozen=True)
@@ -215,7 +218,11 @@ def prompt(cat: Category, ctx: pd.DataFrame) -> str:
 
 
 class HostedBackend:
-    """Claude API, structured JSON output (step 3.4)."""
+    """Optional, off by default: Claude API with structured JSON output.
+
+    Only for users who bring their own ANTHROPIC_API_KEY; it sends the retrieved passages
+    to Anthropic and is billed per token (D-053). BidLens itself never needs it.
+    """
 
     name = "hosted"
 
@@ -257,11 +264,10 @@ class LocalBackend:
     name = "local"
 
     def __init__(self, model: str = LOCAL_MODEL) -> None:
-        if not model:
-            raise RuntimeError("set BIDLENS_LOCAL_MODEL to an installed Ollama model")
         import httpx
 
         self.model = model
+        self.name = f"local_{slug(model)}"
         self.http = httpx.Client(
             base_url=os.environ.get("OLLAMA_HOST", "http://localhost:11434"), timeout=1800
         )
@@ -273,6 +279,7 @@ class LocalBackend:
                 "model": self.model,
                 "stream": False,
                 "format": schema,
+                "think": False,  # D-054: qwen3's reasoning mode off, same as llama3.1
                 "options": {"temperature": 0, "num_ctx": 32768},
                 "messages": [
                     {"role": "system", "content": system},
@@ -288,6 +295,15 @@ class LocalBackend:
             "model": self.model,
         }
         return json.loads(body["message"]["content"])
+
+    def close(self) -> None:
+        """Unload the model so only one is in memory at a time (D-054)."""
+        self.http.post("/api/generate", json={"model": self.model, "keep_alive": 0})
+
+
+def slug(model: str) -> str:
+    """qwen3:8b -> qwen3-8b, for file names."""
+    return re.sub(r"[^a-z0-9.]+", "-", model.lower()).strip("-")
 
 
 # ----------------------------------------------------------------- citations
@@ -391,6 +407,7 @@ def run(contract: str, backend, categories=CATEGORIES) -> dict:
     return {
         "contract": contract,
         "mode": backend.name,
+        "model": getattr(backend, "model", ""),
         "items": items,
         "rejected": rejected,
         "calls": calls,
@@ -406,10 +423,18 @@ def save(result: dict) -> Path:
 def main(argv: list[str] | None = None) -> int:
     ap = argparse.ArgumentParser(description=__doc__)
     ap.add_argument("contract")
-    ap.add_argument("--mode", choices=["hosted", "local"], default="hosted")
+    ap.add_argument("--mode", choices=["local", "hosted"], default="local")
+    ap.add_argument("--model", help=f"Ollama model for local mode (default {LOCAL_MODEL})")
     args = ap.parse_args(argv)
-    backend = HostedBackend() if args.mode == "hosted" else LocalBackend()
-    result = run(args.contract, backend)
+    if args.mode == "hosted":
+        backend = HostedBackend(args.model or HOSTED_MODEL)
+    else:
+        backend = LocalBackend(args.model or LOCAL_MODEL)
+    try:
+        result = run(args.contract, backend)
+    finally:
+        if hasattr(backend, "close"):
+            backend.close()
     path = save(result)
     from bidlens.documents.report import write_extraction_report
 

@@ -11,14 +11,18 @@ import pandas as pd
 ROOT = Path(".")
 CACHE = ROOT / "data" / "interim" / "docs"
 OUT = ROOT / "outputs" / "18_extraction"
-MODES = {"hosted": "Hosted (Claude API)", "local": "Local (Ollama, on this machine)"}
+
+
+def label(mode: str, model: str) -> str:
+    if mode == "hosted":
+        return f"Hosted (optional Claude API): {model}"
+    return f"Local (Ollama, on this machine): {model}"
 
 
 def write_extraction_report(contract: str) -> None:
     runs = {
-        m: json.loads(p.read_text())
-        for m in MODES
-        if (p := CACHE / contract / f"extraction_{m}.json").exists()
+        p.stem.removeprefix("extraction_"): json.loads(p.read_text())
+        for p in sorted((CACHE / contract).glob("extraction_*.json"))
     }
     if not runs:
         return
@@ -30,7 +34,8 @@ def write_extraction_report(contract: str) -> None:
         pd.DataFrame(res["rejected"]).to_csv(OUT / f"rejected_{mode}.csv", index=False)
         cited = items["page"].notna().all() and items["file"].notna().all()
         calls = pd.DataFrame(res["calls"])
-        model = calls["model"].dropna().iloc[0] if "model" in calls else ""
+        model = res.get("model") or (calls["model"].dropna().iloc[0] if "model" in calls else "")
+        secs = calls["seconds"].sum()
         lines = [
             "| Category | Items kept | Returned by the model | Seconds |",
             "| --- | ---: | ---: | ---: |",
@@ -43,8 +48,9 @@ def write_extraction_report(contract: str) -> None:
             src = f"{r.document}, page {r.page}" + (f" ({r.section})" if r.section else "")
             ex.append(f"| {r.category_name} | {r.statement} | {r.value} | {src} |")
         sections.append(f"""
-## {MODES[mode]}{f": {model}" if model else ""}
+## {label(res.get("mode", mode).split("_")[0], model)}
 
+Run time {secs / 60:.1f} minutes for {len(calls)} topics.
 {len(items):,} items, of which {int((items["category"] == "quantities").sum())} are bid items
 with quantities read straight from the bid item list. Every item cites a document and page:
 **{"yes" if cited else "no"}**. The model's answers that quoted text not found in the cited
@@ -78,7 +84,10 @@ read by the model at all: they come from the bid item list (stage 17).
 
 ## How it was produced
 
-`uv run python -m bidlens.documents.extract {contract} --mode hosted` (or `--mode local`).
+`uv run python -m bidlens.documents.extract {contract} --model <ollama model>`, once per
+local model, one model loaded at a time (D-053, D-054). Everything runs on this machine at
+no cost; the documents never leave it. The optional `--mode hosted` (Claude API, needs the
+user's own key) is not used here. File names use the run's name, e.g. `local_qwen3-8b`.
 Code in `src/bidlens/documents/extract.py`. Generated {date.today().isoformat()}.
 """
     (OUT / "README.md").write_text(
