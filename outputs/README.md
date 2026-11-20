@@ -19,5 +19,6 @@ Every stage of BidLens writes its results to a numbered folder here, so anyone c
 | 13 | [`13_model_comparison/`](13_model_comparison/README.md) | Which pricing method BidLens uses, and how it compares with Caltrans' engineer's estimate |
 | 14 | [`14_price_ranges/`](14_price_ranges/README.md) | A low / likely / high price for every bid item, and the past bids behind it (step 2.6). |
 | 15 | [`15_market_context/`](15_market_context/README.md) | What the market is likely to do on a contract: how the low bid will compare with the |
+| 16 | [`16_bid_package/`](16_bid_package/README.md) | The sample bid package BidLens reads in Phase 3: Caltrans contract 04-0W0504 (step 3.1). |
 
 Regenerate stages 01 to 06 with `uv run python -m bidlens.outputs`. Last generated 2026-11-20.
