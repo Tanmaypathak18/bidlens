@@ -1,0 +1,118 @@
+# BidLens data scope (decision D-007).
+# Read by src/bidlens/ingest/caltrans.py.
+
+districts: [4, 5]
+years: [2018, 2019, 2020, 2021, 2022, 2023, 2024, 2025, 2026]
+
+# Seconds between requests to sv08data.dot.ca.gov (D-013). Never below 1.
+min_interval_s: 2.0
+
+# Items nearly every contract has. Their union lists the contracts in scope (D-015).
+contract_list_items: ['999990', '120090', '120100', '130100']
+
+# Top 100 items by total low-bid dollars (D-016).
+# PROVISIONAL: built from the 10 pilot bid summaries (2025). Regenerate once
+# Tier 1 of the download list is downloaded.
+# One-time-use codes (starting 01-04) are excluded.
+items_source: provisional_pilot_10
+items:
+  - {code: '999990', unit: 'LS', description: "MOBILIZATION"}
+  - {code: '390137', unit: 'TON', description: "RUBBERIZED HOT MIX ASPHALT (GAP GRADED)"}
+  - {code: '120100', unit: 'LS', description: "TRAFFIC CONTROL SYSTEM"}
+  - {code: '390132', unit: 'TON', description: "HOT MIX ASPHALT (TYPE A)"}
+  - {code: '090100', unit: 'WDAY', description: "TIME-RELATED OVERHEAD (WDAY)"}
+  - {code: '390095', unit: 'CY', description: "REPLACE ASPHALT CONCRETE SURFACING"}
+  - {code: '120320', unit: 'LF', description: "TEMPORARY BARRIER SYSTEM"}
+  - {code: '480600', unit: 'LS', description: "TEMPORARY SHORING"}
+  - {code: '600041', unit: 'CF', description: "FURNISH POLYESTER CONCRETE OVERLAY"}
+  - {code: '839744', unit: 'LF', description: "CONCRETE BARRIER (TYPE 836 MODIFIED)"}
+  - {code: '375036', unit: 'TON', description: "PRECOATED AGGREGATE (SEAL COAT)"}
+  - {code: '600116', unit: 'LS', description: "BRIDGE REMOVAL (PORTION), LOCATION B"}
+  - {code: '600115', unit: 'LS', description: "BRIDGE REMOVAL (PORTION), LOCATION A"}
+  - {code: '398200', unit: 'SQYD', description: "COLD PLANE ASPHALT CONCRETE PAVEMENT"}
+  - {code: '510053', unit: 'CY', description: "STRUCTURAL CONCRETE, BRIDGE"}
+  - {code: '510054', unit: 'CY', description: "STRUCTURAL CONCRETE, BRIDGE (POLYMER FIBER)"}
+  - {code: '600043', unit: 'SQFT', description: "PLACE POLYESTER CONCRETE OVERLAY"}
+  - {code: '510526', unit: 'CY', description: "MINOR CONCRETE (BACKFILL)"}
+  - {code: '130100', unit: 'LS', description: "JOB SITE MANAGEMENT"}
+  - {code: '131201', unit: 'LS', description: "TEMPORARY CREEK DIVERSION SYSTEMS"}
+  - {code: '833032', unit: 'LF', description: "CHAIN LINK RAILING (TYPE 7)"}
+  - {code: '510094', unit: 'CY', description: "STRUCTURAL CONCRETE, DRAINAGE INLET"}
+  - {code: '600031', unit: 'SQFT', description: "REMOVE CONCRETE DECK SURFACE"}
+  - {code: '520102', unit: 'LB', description: "BAR REINFORCING STEEL (BRIDGE)"}
+  - {code: '190185', unit: 'TON', description: "SHOULDER BACKING"}
+  - {code: '190101', unit: 'CY', description: "ROADWAY EXCAVATION"}
+  - {code: '170103', unit: 'LS', description: "CLEARING AND GRUBBING (LS)"}
+  - {code: '832070', unit: 'SQYD', description: "VEGETATION CONTROL (MINOR CONCRETE)"}
+  - {code: '610112', unit: 'LF', description: "24' ALTERNATIVE PIPE CULVERT"}
+  - {code: '872133', unit: 'LS', description: "MODIFYING SIGNAL AND LIGHTING SYSTEMS"}
+  - {code: '120090', unit: 'LS', description: "CONSTRUCTION AREA SIGNS"}
+  - {code: '193006', unit: 'CY', description: "STRUCTURE BACKFILL (SLURRY CEMENT)"}
+  - {code: '650026', unit: 'LF', description: "36' REINFORCED CONCRETE PIPE"}
+  - {code: '130640', unit: 'LF', description: "TEMPORARY FIBER ROLL"}
+  - {code: '872002', unit: 'LS', description: "TEMPORARY SIGNAL SYSTEMS"}
+  - {code: '304450', unit: 'SQYD', description: "PARTIAL DEPTH RECYCLING"}
+  - {code: '129108', unit: 'EA', description: "TEMPORARY CRASH CUSHION TL-3"}
+  - {code: '511106', unit: 'LF', description: "DRILL AND BOND DOWEL"}
+  - {code: '621225', unit: 'EA', description: "GROSS SOLIDS REMOVAL DEVICE LINEAR RADIAL TYPE LR-2 (6)"}
+  - {code: '600117', unit: 'LS', description: "BRIDGE REMOVAL (PORTION), LOCATION C"}
+  - {code: '370120', unit: 'TON', description: "ASPHALT-RUBBER BINDER"}
+  - {code: '260203', unit: 'CY', description: "CLASS 2 AGGREGATE BASE (CY)"}
+  - {code: '650034', unit: 'LF', description: "48' REINFORCED CONCRETE PIPE"}
+  - {code: '600118', unit: 'LS', description: "BRIDGE REMOVAL (PORTION), LOCATION D"}
+  - {code: '090105', unit: 'LS', description: "TIME-RELATED OVERHEAD (LS)"}
+  - {code: '397005', unit: 'TON', description: "TACK COAT"}
+  - {code: '210610', unit: 'CY', description: "COMPOST (CY)"}
+  - {code: '731627', unit: 'CY', description: "MINOR CONCRETE (CURB, SIDEWALK AND CURB RAMP)"}
+  - {code: '510050', unit: 'CY', description: "STRUCTURAL CONCRETE"}
+  - {code: '394090', unit: 'SQYD', description: "PLACE HOT MIX ASPHALT (MISCELLANEOUS AREA)"}
+  - {code: '840502', unit: 'LF', description: "THERMOPLASTIC TRAFFIC STRIPE (ENHANCED WET NIGHT VISIBILITY)"}
+  - {code: '846007', unit: 'LF', description: "6' THERMOPLASTIC TRAFFIC STRIPE (ENHANCED WET NIGHT VISIBILITY)"}
+  - {code: '621228', unit: 'EA', description: "GROSS SOLIDS REMOVAL DEVICE LINEAR RADIAL TYPE LR-3 (6)"}
+  - {code: '710132', unit: 'LF', description: "REMOVE CULVERT (LF)"}
+  - {code: '128652', unit: 'LS', description: "PORTABLE CHANGEABLE MESSAGE SIGN (LS)"}
+  - {code: '490403', unit: 'LF', description: "30' DRILLED HOLE"}
+  - {code: '411105', unit: 'CY', description: "INDIVIDUAL SLAB REPLACEMENT (RSC)"}
+  - {code: '847218', unit: 'LF', description: "6' TRAFFIC STRIPE TAPE WITH CONTRAST (WARRANTY)"}
+  - {code: '621226', unit: 'EA', description: "GROSS SOLIDS REMOVAL DEVICE LINEAR RADIAL TYPE LR-2 (8)"}
+  - {code: '204099', unit: 'LS', description: "PLANT ESTABLISHMENT WORK"}
+  - {code: '510092', unit: 'CY', description: "STRUCTURAL CONCRETE, HEADWALL"}
+  - {code: '198010', unit: 'CY', description: "IMPORTED BORROW (CY)"}
+  - {code: '723060', unit: 'CY', description: "ROCK SLOPE PROTECTION (300 LB, CLASS IV, METHOD B) (CY)"}
+  - {code: '846030', unit: 'LF', description: "REMOVE THERMOPLASTIC TRAFFIC STRIPE"}
+  - {code: '304452', unit: 'TON', description: "RECYCLING AGENT (PARTIAL DEPTH RECYCLING)"}
+  - {code: '192003', unit: 'CY', description: "STRUCTURE EXCAVATION (BRIDGE)"}
+  - {code: '210350', unit: 'LF', description: "FIBER ROLLS"}
+  - {code: '130710', unit: 'EA', description: "TEMPORARY CONSTRUCTION ENTRANCE"}
+  - {code: '131103', unit: 'EA', description: "WATER QUALITY SAMPLING AND ANALYSIS DAY"}
+  - {code: '832006', unit: 'LF', description: "MIDWEST GUARDRAIL SYSTEM (STEEL POST)"}
+  - {code: '130670', unit: 'LF', description: "TEMPORARY REINFORCED SILT FENCE"}
+  - {code: '870009', unit: 'LS', description: "MAINTAINING EXISTING TRAFFIC MANAGEMENT SYSTEM ELEMENTS DURING"}
+  - {code: '710384', unit: 'LF', description: "24' CURED-IN-PLACE PIPELINER"}
+  - {code: '730020', unit: 'CY', description: "MINOR CONCRETE (CURB) (CY)"}
+  - {code: '510072', unit: 'CY', description: "STRUCTURAL CONCRETE, BARRIER SLAB"}
+  - {code: '600037', unit: 'SQFT', description: "PREPARE CONCRETE BRIDGE DECK SURFACE"}
+  - {code: '190105', unit: 'CY', description: "ROADWAY EXCAVATION (TYPE Z-2) (AERIALLY DEPOSITED LEAD)"}
+  - {code: '128651', unit: 'EA', description: "PORTABLE CHANGEABLE MESSAGE SIGN (EA)"}
+  - {code: '832007', unit: 'LF', description: "MIDWEST GUARDRAIL SYSTEM (WOOD POST)"}
+  - {code: '707117', unit: 'LF', description: "36' PRECAST CONCRETE PIPE INLET"}
+  - {code: '398100', unit: 'LF', description: "REMOVE ASPHALT CONCRETE DIKE"}
+  - {code: '511118', unit: 'LF', description: "CLEAN EXPANSION JOINT"}
+  - {code: '872135', unit: 'LS', description: "MODIFYING TRAFFIC MONITORING STATIONS"}
+  - {code: '600146', unit: 'EA', description: "REPLACE BEARING PAD"}
+  - {code: '840516', unit: 'SQFT', description: "THERMOPLASTIC PAVEMENT MARKING (ENHANCED WET NIGHT VISIBILITY)"}
+  - {code: '665018', unit: 'LF', description: "18' CORRUGATED STEEL PIPE (.109' THICK)"}
+  - {code: '710390', unit: 'LF', description: "36' CURED-IN-PLACE PIPELINER"}
+  - {code: '590120', unit: 'LS', description: "CLEAN AND PAINT STEEL SOLDIER PILING"}
+  - {code: '710100', unit: 'EA', description: "ABANDON CULVERT (EA)"}
+  - {code: '780446', unit: 'LS', description: "STAIN GALVANIZED SURFACES (LS)"}
+  - {code: '129161', unit: 'EA', description: "AUTOMATED FLAGGER ASSISTANCE DEVICE DAY"}
+  - {code: '650022', unit: 'LF', description: "30' REINFORCED CONCRETE PIPE"}
+  - {code: '839752', unit: 'LF', description: "REMOVE GUARDRAIL"}
+  - {code: '193003', unit: 'CY', description: "STRUCTURE BACKFILL (BRIDGE)"}
+  - {code: '210430', unit: 'SQFT', description: "HYDROSEED"}
+  - {code: '510090', unit: 'CY', description: "STRUCTURAL CONCRETE, BOX CULVERT"}
+  - {code: '394076', unit: 'LF', description: "PLACE HOT MIX ASPHALT DIKE (TYPE E)"}
+  - {code: '600029', unit: 'SQFT', description: "REMOVE ASPHALT CONCRETE SURFACING"}
+  - {code: '519088', unit: 'LF', description: "JOINT SEAL (MR 1')"}
+  - {code: '650014', unit: 'LF', description: "18' REINFORCED CONCRETE PIPE"}
