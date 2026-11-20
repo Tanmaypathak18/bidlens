@@ -120,7 +120,7 @@ priced only from bids before it):
             sec = f", section {r.section_number}" if r.section_number else ""
             card(contract, r, f"top{i}", f"{r.category_name} · {short_doc(r.document)}{sec}")
         st.caption(
-            f"Picked from {len(f)} findings read from the documents on this computer: money at "
+            f"Picked from {len(f)} findings read from the bid documents: money at "
             "stake or a hard stop, one per topic. Click a page to see it. Every finding is on "
             "the Package page."
         )

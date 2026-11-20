@@ -132,7 +132,13 @@ def header(title: str) -> str | None:
 
     setup(title)
     contract = pick_package()
-    st.sidebar.caption("No paid service is used. Bid documents stay on this computer.")
+    from design import hosted
+
+    st.sidebar.caption(
+        "Demo: the committed sample package only. No paid service is used."
+        if hosted()
+        else "No paid service is used. Bid documents stay on this computer."
+    )
     if contract:
         page_header(summary(contract), title)
     return contract

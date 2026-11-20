@@ -4,6 +4,7 @@ page chips that open the PDF page, and chart defaults."""
 from __future__ import annotations
 
 import html
+import os
 import re
 from datetime import date
 from pathlib import Path
@@ -68,6 +69,18 @@ CSS = f"""
 """
 
 
+def hosted() -> bool:
+    """True on a Hugging Face Space (the demo, D-072), which sets SPACE_ID."""
+    return bool(os.environ.get("SPACE_ID"))
+
+
+def precomputed(contract: str) -> bool:
+    """True when the findings come from the committed sample, not a run on this computer."""
+    from bidlens.sample import SAMPLE, docs_dir
+
+    return docs_dir(contract) == SAMPLE / contract
+
+
 def setup(title: str) -> None:
     st.set_page_config(page_title=f"BidLens · {title}", page_icon="📐", layout="wide")
     st.markdown(CSS, unsafe_allow_html=True)
@@ -88,22 +101,35 @@ def nice_date(d: str) -> str:
 def page_header(s: dict, page: str) -> None:
     """Contract, work, location, bid date and the runs-locally badge, on every page."""
     work = s.get("work") or s["type_of_work"].capitalize()
+    badge = (
+        "Demo on public sample data · no bid documents uploaded"
+        if hosted()
+        else "Runs locally · documents never leave this computer"
+    )
     where = f"{counties(s['county'])} · {s['routes']}" if s.get("routes") else counties(s["county"])
     st.markdown(
         f"""<div class="bl-head"><h1>{html.escape(page)} · Contract {s["contract"]}</h1>
 <div class="bl-sub"><b>{html.escape(work)}</b><br>{html.escape(where)} · District
 {s["district"]} · Bids open {nice_date(s["bid_open_date"])}
-<span class="bl-badge">Runs locally · documents never leave this computer</span></div></div>""",
+<span class="bl-badge">{badge}</span></div></div>""",
         unsafe_allow_html=True,
     )
+    notes = []
     if s.get("low_bid_cost"):
-        st.markdown(
-            f"""<div class="bl-sample"><b>Sample job, already bid.</b> Bids for
-{s["contract"]} opened on {nice_date(s["bid_open_date"])} and the results are public.
-BidLens priced it only from bids opened before that date; the actual low bid is shown
-to check BidLens against the real result, and never feeds the draft.</div>""",
-            unsafe_allow_html=True,
+        notes.append(
+            f"""<b>Sample job, already bid.</b> Bids for {s["contract"]} opened on
+{nice_date(s["bid_open_date"])} and the results are public. BidLens priced it only from bids
+opened before that date; the actual low bid is shown to check BidLens against the real
+result, and never feeds the draft."""
         )
+    if precomputed(s["contract"]):
+        notes.append(
+            """<b>Document findings were pre-computed on a laptop with local models</b>
+(qwen3:8b and llama3.1:8b through Ollama, plus plain pattern rules) and saved with this
+sample. This copy of the app shows those saved results; it does not run a model."""
+        )
+    if notes:
+        st.markdown(f'<div class="bl-sample">{"<br>".join(notes)}</div>', unsafe_allow_html=True)
 
 
 def tile(col, label: str, value: str, detail: str = "", status: str | None = None) -> None:
@@ -227,11 +253,11 @@ def top_watch(items: pd.DataFrame, n: int = 5, table: pd.DataFrame | None = None
 def page_image(contract: str, file: str, page: int) -> bytes | None:
     import io
 
-    import pypdfium2 as pdfium
-
     path = PACKAGES / contract / file
     if not path.exists():
         return None
+    import pypdfium2 as pdfium
+
     pdf = pdfium.PdfDocument(str(path))
     img = pdf[page - 1].render(scale=1.6).to_pil()
     buf = io.BytesIO()
@@ -245,7 +271,10 @@ def show_page(contract: str, file: str, page: int, quote: str, where: str) -> No
     st.markdown(f"> {quote}")
     png = page_image(contract, file, page)
     if png is None:
-        st.info("The bid package file is not on this computer, so the page can't be shown.")
+        st.info(
+            "The bid package PDF is not included here, so the page can't be shown. "
+            "The quote above is copied word for word from it."
+        )
     else:
         st.image(png, width=760)
 

@@ -44,3 +44,13 @@ def test_market_explains_the_two_low_bid_views():
     at = AppTest.from_file(str(ROOT / "app/pages/3_Market.py"), default_timeout=60).run()
     text = " ".join(m.value for m in at.markdown)
     assert "Two ways to estimate the low bid" in text and "$14.54M" in text
+
+
+def test_hosted_demo_does_not_claim_to_run_locally(monkeypatch):
+    from streamlit.testing.v1 import AppTest
+
+    monkeypatch.setenv("SPACE_ID", "user/bidlens")  # set by Hugging Face Spaces (D-072)
+    at = AppTest.from_file(str(ROOT / "app/Home.py"), default_timeout=60).run()
+    text = " ".join(m.value for m in at.markdown)
+    assert "Demo on public sample data" in text
+    assert "documents never leave this computer" not in text
