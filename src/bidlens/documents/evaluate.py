@@ -46,7 +46,9 @@ def blind(contract: str) -> Path:
     df = pd.DataFrame(rows)
     df.insert(0, "blind_id", [f"x{n:03d}" for n in range(len(df))])
     df[["blind_id", "run", "item"]].to_csv(CACHE / contract / "judging_key.csv", index=False)
-    sheet = df[["blind_id", "category", "statement", "value", "evidence", "document", "page"]]
+    from bidlens.documents.report import mask
+
+    sheet = mask(df[["blind_id", "category", "statement", "value", "evidence", "document", "page"]])
     sheet = sheet.assign(verdict="", fact_ids="", citation_ok="")
     OUT.mkdir(parents=True, exist_ok=True)
     path = OUT / "judging_sheet.csv"
@@ -152,7 +154,7 @@ and settings (D-054); no document left the machine and no paid service was used.
 - **Quotes rejected:** answers dropped automatically because the quoted text was not on
   the cited page.
 
-Recall by topic:
+Recall by topic (a gold fact counts as found whichever topic's answer found it):
 
 {chr(10).join(trows)}
 
@@ -162,8 +164,19 @@ The gold facts were written by **Claude, the AI assistant building BidLens, not 
 estimator**. They were labeled from the passages each topic retrieves (what the models
 see) and committed to git before either model's output was opened. Every finding from both
 models was then pooled, shuffled and judged with the model name hidden
-(`judging_sheet.csv`). A human estimator's review of `gold_facts.csv` is still open
-(listed for final review).
+(`judging_sheet.csv`). A human estimator's review of `gold_facts.csv` and of the
+judging is still open (listed for final review).
+
+Judging rules, applied to every finding the same way:
+
+- A finding is **correct** if its statement is true according to its cited page and it
+  belongs to its topic. Quotes are capped at 300 characters (D-058), so a quote can stop
+  before the words that back the statement; the page decides.
+- A true finding filed under the wrong topic is correct if it states a gold fact of
+  another topic (the fact was found), and wrong otherwise (off-topic noise, such as rows
+  copied from the list of other nearby contracts).
+- A statement that drops a condition or changes a number is wrong even if its quote is
+  real.
 
 Limits:
 

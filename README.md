@@ -220,6 +220,7 @@ tests/
 - v1 uses public Caltrans data for two districts. Prices for other regions, or for private work, will differ.
 - Historical prices reflect past market conditions. Escalation adjusts for broad trends, not for local shocks such as material shortages.
 - Document extraction is an aid to review, not a substitute for reading the contract.
+- The local document reader finds about half of the facts an estimator needs on a test package, and it cannot yet read lane closure hour charts, which lose their columns in the PDF text.
 - BidLens supports estimating judgment. It does not replace it.
 
 ## How this project is built
