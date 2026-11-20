@@ -6,7 +6,17 @@ from __future__ import annotations
 import altair as alt
 import pandas as pd
 import streamlit as st
-from common import comparables, estimate, header, history, money, pct, short_money, summary
+from common import (
+    comparables,
+    estimate,
+    header,
+    history,
+    millions,
+    money,
+    pct,
+    short_money,
+    summary,
+)
 from design import AMBER, GREEN, NAVY, SLATE, chart, how_to_read, tile
 
 contract = header("Prices")
@@ -21,7 +31,7 @@ if contract:
     est["label"] = est["item_no"] + " " + est["description"].str.slice(0, 38)
 
     a, b, c = st.columns(3)
-    tile(a, "Draft total (likely prices)", money(total), f"{len(est)} bid items")
+    tile(a, "Draft total (likely prices)", millions(total), f"{len(est)} bid items")
     top10 = est.head(10)["share"].sum()
     tile(b, "Top 10 items", f"{top10:.0%} of the total", "check these prices first", "watch")
     tile(

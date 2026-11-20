@@ -5,7 +5,7 @@ from __future__ import annotations
 import altair as alt
 import pandas as pd
 import streamlit as st
-from common import estimate, findings, header, money, pct, scored, summary, track_record
+from common import estimate, findings, header, millions, pct, scored, summary, track_record
 from design import GREEN, NAVY, SLATE, card, chart, how_to_read, short_doc, tile, top_watch
 
 contract = header("Home")
@@ -21,21 +21,21 @@ if contract:
         tile(
             a,
             "BidLens draft estimate",
-            money(draft),
+            millions(draft),
             f"{pct(gap)} vs the actual low bid",
             "good" if abs(gap) <= 0.10 else "watch",
         )
         tile(
             b,
             "Caltrans engineer's estimate",
-            money(ee),
+            millions(ee),
             f"{pct(egap)} vs the actual low bid",
             "good" if abs(egap) <= 0.10 else "watch",
         )
-        tile(c, "Actual low bid", money(low), f"{s['bidders']} bidders")
+        tile(c, "Actual low bid", millions(low), f"{s['bidders']} bidders")
     else:
-        tile(a, "BidLens draft estimate", money(draft), f"{pct(draft / ee - 1)} vs the estimate")
-        tile(b, "Caltrans engineer's estimate", money(ee))
+        tile(a, "BidLens draft estimate", millions(draft), f"{pct(draft / ee - 1)} vs the estimate")
+        tile(b, "Caltrans engineer's estimate", millions(ee))
         tile(c, "Actual low bid", "Not bid yet", "Shown here once bids open")
 
     st.write("")
@@ -62,7 +62,7 @@ if contract:
                 "millions:Q",
                 title="Contract total ($ millions)",
                 axis=alt.Axis(format="$,.0f", tickCount=6),
-                scale=alt.Scale(domainMax=float(df["millions"].max()) * 1.45),
+                scale=alt.Scale(domainMax=float(df["millions"].max()) * 1.8),
             ),
         )
         bars = base.mark_bar(cornerRadiusEnd=4).encode(color=alt.Color("color:N", scale=None))
@@ -74,6 +74,15 @@ if contract:
             "longer bars are higher totals; the percentage is each number's difference from "
             + ("the actual low bid." if low else "the engineer's estimate.")
         )
+        mk = s.get("market") or {}
+        if mk:
+            st.caption(
+                "The draft adds up a price for every bid item. The Market page gives a second, "
+                f"whole-job view: from jobs like this one, the low bid was expected near "
+                f"{millions(ee * (1 + mk['spread_kumo']))} (likely "
+                f"{millions(ee * (1 + mk['spread_low']))} to "
+                f"{millions(ee * (1 + mk['spread_high']))})."
+            )
 
     with right:
         st.subheader("How BidLens did on past bids")
@@ -90,7 +99,12 @@ priced only from bids before it):
 - Within 15% of the low bid on {tr["bidlens_within_15"]:.0%} of jobs, against
   {tr["ee_within_15"]:.0%}."""
             )
-        st.caption("Districts 4 and 5. A starting point for the estimator, not a bid.")
+        st.caption(
+            "Districts 4 and 5. Why 178: of the 208 jobs bid in 2024 to 2026 with an engineer's "
+            "estimate, 7 have no readable item list and 23 have more than 1 in 10 items never "
+            "bid before, too little history to price item by item. The Market page uses all 208."
+            " A starting point for the estimator, not a bid."
+        )
 
     # --- top 5 to watch
     st.subheader("Top 5 things to watch")

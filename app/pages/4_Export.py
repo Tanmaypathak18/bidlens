@@ -6,7 +6,7 @@ import io
 
 import pandas as pd
 import streamlit as st
-from common import ROOT, header, money, summary
+from common import ROOT, header, millions, money, summary
 from design import tile
 
 contract = header("Export")
@@ -41,7 +41,10 @@ if contract:
 
     a, b, c = st.columns(3)
     tile(
-        a, "Draft total in the workbook", money(est["Likely amount"].sum()), f"{len(est)} bid items"
+        a,
+        "Draft total in the workbook",
+        millions(est["Likely amount"].sum()),
+        f"{len(est)} bid items",
     )
     tile(b, "Risk register", f"{len(risk)} findings", "each with its document and page")
     tile(c, "Comparable bids", f"{len(comps)} rows", "each linked to its Caltrans page")

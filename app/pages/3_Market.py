@@ -7,7 +7,7 @@ import json
 import altair as alt
 import pandas as pd
 import streamlit as st
-from common import ROOT, header, pct, summary
+from common import ROOT, header, millions, pct, summary
 from design import GREEN, NAVY, SLATE, chart, how_to_read, tile
 
 contract = header("Market")
@@ -23,14 +23,14 @@ if contract:
     a, b, c = st.columns(3)
     tile(
         a,
-        "Expected low bid",
-        f"${mid / 1e6:,.1f}M",
+        "Expected low bid (whole-job view)",
+        millions(mid),
         f"{pct(mk['spread_kumo'])} vs the engineer's estimate",
     )
     tile(
         b,
         "Likely range for the low bid",
-        f"${lo / 1e6:,.1f}M to ${hi / 1e6:,.1f}M",
+        f"{millions(lo)} to {millions(hi)}",
         f"{pct(mk['spread_low'])} to {pct(mk['spread_high'])} vs the estimate",
     )
     tile(
@@ -41,6 +41,29 @@ if contract:
     )
 
     st.write("")
+    draft = s["estimate_total"]
+    inside = lo <= draft <= hi
+    st.markdown(
+        f"""**Two ways to estimate the low bid.** They answer the same question from different
+evidence, so they rarely match:
+
+- **Item by item, the BidLens draft: {millions(draft)}** (Home and Prices pages). Every bid item
+  is priced from earlier low bids for that item, at this job's quantities, and added up.
+- **Whole job, this page: {millions(mid)}, likely {millions(lo)} to {millions(hi)}.** It starts
+  from the engineer's estimate and applies how far low bids have landed from it on similar
+  jobs. It never looks at the bid items.
+
+"""
+        + (
+            "The item-by-item draft sits inside the whole-job range, so the two views are "
+            "consistent. "
+            if inside
+            else "The item-by-item draft sits outside the whole-job range: check the largest "
+            "items on the Prices page before relying on either number. "
+        )
+        + "Use the draft for pricing and the whole-job view as a cross-check."
+        + (f" On this sample job the actual low bid was {millions(low)}." if low else "")
+    )
     st.subheader("Where the low bid is likely to land")
     st.markdown(
         "Caltrans' engineer's estimate is the agency's own price for the job. On recent jobs "
@@ -148,8 +171,10 @@ if contract:
         r = json.loads(res.read_text())
         sp, bd = r["spread"], r["bidders"]
         st.caption(
-            f"Track record on {sp['contracts']} past jobs (each predicted only from jobs bid "
-            f"before it): the expected landing point was off by "
+            f"Track record on {sp['contracts']} past jobs (all jobs bid in 2024 to 2026 with an "
+            "engineer's estimate, each predicted only from jobs bid before it; the Home page's "
+            "item-by-item record uses 178 of them, those with enough item history): "
+            "the expected landing point was off by "
             f"{100 * sp['methods']['kumo']['mae']:.0f} percentage points on average and the "
             f"bidder count by {bd['methods']['kumo']['mae']:.1f} bidders; the ranges held the "
             f"actual result {sp['range_coverage']:.0%} and {bd['range_coverage']:.0%} of the time."

@@ -35,7 +35,32 @@ BidLens does not replace the estimator. It does the reading and the lookup work,
 
 ![The BidLens home page for a sample Caltrans bid package: the draft estimate, the engineer's estimate and the actual low bid side by side, BidLens's track record, and the top 5 things to watch, each linked to its page](outputs/21_app/screenshots/01_overview.png)
 
-*The home page for a sample package that has already been bid (contract 04-0W0504): the BidLens draft landed 3% above the actual low bid; the engineer's estimate was 61% above it. More pages (documents, prices, market, export) are in [`outputs/21_app/screenshots/`](outputs/21_app/screenshots/).*
+*The home page for the sample job, Caltrans contract 04-0W0504. It has already been bid, so BidLens can be checked against the real result: priced only from earlier bids, the draft landed 3% above the actual low bid; the engineer's estimate was 61% above it.*
+
+<details>
+<summary><b>The other pages</b>: documents, prices, market, export, and the home page on a phone</summary>
+
+**Package:** scope, risks and requirements from the bid documents, each with its page. A summary that doesn't match its quote closely is replaced by the document's own words.
+
+![The Package page: key dates, risk cards by topic with page links, a requirements checklist and the lane closure hours](outputs/21_app/screenshots/02_package.png)
+
+**Prices:** every bid item with its low / likely / high price, its price history and the comparable past bids behind it.
+
+![The Prices page: items by dollar impact, the price range and history of the selected item, and its comparable bids](outputs/21_app/screenshots/03_prices.png)
+
+**Market:** a second, whole-job view of the low bid, from the engineer's estimate and how low bids landed on similar jobs, side by side with the item-by-item draft, plus the expected number of bidders.
+
+![The Market page: two ways to estimate the low bid, where the low bid is likely to land against the engineer's estimate, and the expected number of bidders](outputs/21_app/screenshots/04_market.png)
+
+**Export:** a preview of the Excel workbook, then the download.
+
+![The Export page: the draft total, a preview of each workbook sheet and the download button](outputs/21_app/screenshots/05_export.png)
+
+**On a phone:**
+
+<img src="outputs/21_app/screenshots/06_overview_phone.png" alt="The home page at phone width" width="320">
+
+</details>
 
 ## Who it is for
 

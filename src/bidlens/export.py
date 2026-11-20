@@ -211,11 +211,13 @@ def workbook(contract: str, root: Path = Path(".")) -> bytes:
     )
     f = items[~items["category"].isin(TABLES)] if len(items) else items
     if len(f):
-        f = mask(f)
+        from bidlens.documents.review import tidy
+
+        f = tidy(mask(f))  # same check as the app (D-071)
     for i, r in enumerate(f.itertuples(), start=2):
         vals = [
             r.category_name,
-            r.statement,
+            f"As written: {r.statement}" if r.as_quoted else r.statement,
             r.value,
             r.document,
             int(r.page),

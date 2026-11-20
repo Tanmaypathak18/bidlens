@@ -75,10 +75,16 @@ def findings(contract: str) -> tuple[pd.DataFrame, str, str]:
         p = docs_dir(contract) / f"extraction_{run}.json"
         if p.exists():
             from bidlens.documents.report import mask
+            from bidlens.documents.review import tidy
 
             res = json.loads(p.read_text())
             # No phone numbers or email addresses on screen either (D-031).
-            return mask(pd.DataFrame(res["items"])), run, res.get("model", run)
+            items = mask(pd.DataFrame(res["items"]))
+            # Findings are checked against their quotes before they are shown (D-071).
+            table = items["category"].isin(TABLES)
+            items = pd.concat([tidy(items[~table]), items[table]], ignore_index=True)
+            items["as_quoted"] = items["as_quoted"].fillna(False).astype(bool)
+            return items, run, res.get("model", run)
     return pd.DataFrame(), "", ""
 
 
@@ -90,6 +96,11 @@ def money(x: float | None, cents: bool = False) -> str:
     if x is None or pd.isna(x):
         return "–"
     return f"${x:,.2f}" if cents else f"${x:,.0f}"
+
+
+def millions(x: float | None) -> str:
+    """$14.54M: for number tiles, which must not wrap on a phone. Tables keep full amounts."""
+    return "–" if x is None or pd.isna(x) else f"${x / 1e6:,.2f}M"
 
 
 def short_money(x: float | None) -> str:

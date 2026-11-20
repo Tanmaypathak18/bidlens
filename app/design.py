@@ -12,6 +12,8 @@ import altair as alt
 import pandas as pd
 import streamlit as st
 
+from bidlens.documents.review import support
+
 ROOT = Path(__file__).resolve().parents[1]
 PACKAGES = ROOT / "data" / "raw" / "bid_package"
 
@@ -51,7 +53,10 @@ CSS = f"""
   margin-left:.4rem; white-space:nowrap;}}
 .bl-tile {{border:1px solid {LIGHT}; border-radius:10px; padding:.9rem 1rem; height:100%;}}
 .bl-tile .k {{color:{SLATE}; font-size:.85rem;}}
-.bl-tile .v {{font-size:1.9rem; font-weight:700; color:{NAVY}; line-height:1.2;}}
+.bl-tile .v {{font-size:clamp(1.25rem, 2.6vw, 1.9rem); font-weight:700; color:{NAVY};
+  line-height:1.2; white-space:nowrap;}}
+.bl-sample {{background:#EEF2F7; border:1px solid {LIGHT}; border-radius:8px;
+  padding:.45rem .8rem; margin:-.4rem 0 1rem 0; font-size:.88rem; color:#1E293B;}}
 .bl-tile .d {{font-size:.85rem; margin-top:.2rem;}}
 .bl-card {{border-left:5px solid; border-radius:6px; padding:.55rem .8rem; margin:.15rem 0;}}
 .bl-card .t {{font-size:.95rem;}}
@@ -91,6 +96,14 @@ def page_header(s: dict, page: str) -> None:
 <span class="bl-badge">Runs locally · documents never leave this computer</span></div></div>""",
         unsafe_allow_html=True,
     )
+    if s.get("low_bid_cost"):
+        st.markdown(
+            f"""<div class="bl-sample"><b>Sample job, already bid.</b> Bids for
+{s["contract"]} opened on {nice_date(s["bid_open_date"])} and the results are public.
+BidLens priced it only from bids opened before that date; the actual low bid is shown
+to check BidLens against the real result, and never feeds the draft.</div>""",
+            unsafe_allow_html=True,
+        )
 
 
 def tile(col, label: str, value: str, detail: str = "", status: str | None = None) -> None:
@@ -124,6 +137,8 @@ WATCH_WORDS = re.compile(
     re.I,
 )
 MONEY = re.compile(r"\$\s?\d")
+# Money coming back (a withhold returned or released) is a date to watch, not a risk.
+RELIEF = re.compile(r"\b(?:returns?|releases?|refunds?)\b[^.]*\bwithh[oe]ld", re.I)
 CATEGORY_ORDER = [
     "time_damages",
     "traffic",
@@ -141,6 +156,8 @@ CATEGORY_ORDER = [
 def severity(statement: str, value: str = "", evidence: str = "") -> str:
     """risk / watch / info, by plain keyword rules (D-066), not by a model."""
     text = f"{statement} {value}"
+    if RELIEF.search(text):
+        return "watch"
     if RISK_WORDS.search(text) or (MONEY.search(text) and RISK_WORDS.search(evidence)):
         return "risk"
     if WATCH_WORDS.search(text):
@@ -154,42 +171,6 @@ def rate(items: pd.DataFrame) -> pd.DataFrame:
     return items.assign(
         severity=[severity(r.statement, r.value, r.evidence) for r in items.itertuples()]
     )
-
-
-def support(statement: str, evidence: str) -> float:
-    """Share of the statement's words that also appear in its own quote (0 to 1). A low
-    share means the statement says more than the quote shows."""
-    stop = set(
-        [
-            "the",
-            "a",
-            "an",
-            "of",
-            "to",
-            "and",
-            "or",
-            "for",
-            "in",
-            "on",
-            "is",
-            "are",
-            "be",
-            "must",
-            "by",
-            "with",
-            "at",
-            "as",
-            "that",
-            "this",
-            "it",
-            "any",
-            "each",
-            "all",
-        ]
-    )
-    w = {x for x in re.findall(r"[a-z0-9]+", statement.lower()) if x not in stop}
-    e = set(re.findall(r"[a-z0-9]+", evidence.lower()))
-    return len(w & e) / len(w) if w else 0.0
 
 
 def damages_summary(table: pd.DataFrame) -> pd.DataFrame:
@@ -208,12 +189,13 @@ def damages_summary(table: pd.DataFrame) -> pd.DataFrame:
                      f"${max(vals):,} in liquidated damages for every 10 minutes, depending on "
                      f"the route ({len(table)} routes in the table).",
         "value": "",
+        "as_quoted": False,
     }])  # fmt: skip
 
 
 def top_watch(items: pd.DataFrame, n: int = 5, table: pd.DataFrame | None = None) -> pd.DataFrame:
     """Risk findings, one per category, in category order: exact facts read by code first,
-    then statements that stay close to their own quote, then those with a value."""
+    then model statements that passed the quote check (D-071), then those with a value."""
     if table is not None and len(table):
         items = pd.concat([damages_summary(table), items], ignore_index=True)
     r = rate(items)
@@ -227,7 +209,8 @@ def top_watch(items: pd.DataFrame, n: int = 5, table: pd.DataFrame | None = None
     src = r["source"] if "source" in r else pd.Series("model", index=r.index)
     r["exact"] = (src.fillna("model") == "pattern").astype(int)
     r["support"] = [support(a, b) for a, b in zip(r["statement"], r["evidence"], strict=True)]
-    r = r[(r["exact"] == 1) | (r["support"] >= 0.75)]
+    quoted = r["as_quoted"] if "as_quoted" in r else pd.Series(False, index=r.index)
+    r = r[(r["exact"] == 1) | ~quoted.fillna(False).astype(bool)]
     r = r.sort_values(
         ["cat_rank", "exact", "support", "money", "has_value"],
         ascending=[True, False, False, False, False],
@@ -292,6 +275,9 @@ def card(contract: str, r, key: str, where: str) -> None:
     """One finding as a colored card with its page chip."""
     sev = getattr(r, "severity", "info")
     value = f" <b>({html.escape(str(r.value))})</b>" if shows_value(r.statement, r.value) else ""
+    if getattr(r, "as_quoted", False):
+        # The summary did not match its quote closely, so the document's words are shown.
+        where = f"Quoted as written · {where}"
     c1, c2 = st.columns([12, 1.6], vertical_alignment="center")
     c1.markdown(
         f"""<div class="bl-card" style="border-color:{COLOR[sev]}; background:{TINT[sev]}">
