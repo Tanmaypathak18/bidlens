@@ -36,6 +36,7 @@ NUM_CTX = 32768  # D-054
 NUM_PREDICT = 4096  # D-056: stop a looping model
 RETRIES, RETRY_WAIT = 6, 30
 MAX_QUOTE = 400
+MAX_ITEMS = 25  # D-058
 
 HOSTED_MODEL = os.environ.get("BIDLENS_HOSTED_MODEL", "claude-opus-5-5")
 LOCAL_MODEL = os.environ.get("BIDLENS_LOCAL_MODEL", "qwen3:8b")
@@ -130,13 +131,14 @@ SCHEMA = {
     "properties": {
         "items": {
             "type": "array",
+            "maxItems": MAX_ITEMS,  # D-058
             "items": {
                 "type": "object",
                 "properties": {
-                    "statement": {"type": "string"},
-                    "value": {"type": "string"},
-                    "evidence": {"type": "string"},
-                    "chunk_id": {"type": "string"},
+                    "statement": {"type": "string", "maxLength": 300},
+                    "value": {"type": "string", "maxLength": 120},
+                    "evidence": {"type": "string", "maxLength": 300},
+                    "chunk_id": {"type": "string", "maxLength": 40},
                 },
                 "required": ["statement", "value", "evidence", "chunk_id"],
                 "additionalProperties": False,
@@ -151,8 +153,8 @@ SYSTEM = """You read Caltrans highway construction bid documents for a contracto
 estimator. You are given numbered passages ("chunks") from one contract's Notice to \
 Bidders and Special Provisions, addenda and information handout, and one topic.
 
-Return every distinct fact in the passages that an estimator needs on that topic, as JSON \
-items. For each item:
+Return the distinct facts in the passages that an estimator needs on that topic, as JSON \
+items: at most 25, most important first, and never the same fact twice. For each item:
 - statement: one plain-English sentence an estimator would understand.
 - value: the key number or limit (an amount, a duration, hours, a date), or "" if none.
 - evidence: a short exact quote copied character for character from one chunk that \
