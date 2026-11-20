@@ -198,6 +198,31 @@ def test_fetcher_gives_up_and_records_http_error(tmp_path: Path) -> None:
     assert f.cache.entry("details.php", [("Num", "1")]).status == "http_error"
 
 
+def test_fetcher_reconnects_quickly_after_dropped_connection(tmp_path: Path) -> None:
+    calls = {"n": 0}
+
+    def handler(req: httpx.Request) -> httpx.Response:
+        calls["n"] += 1
+        if calls["n"] == 1:
+            raise httpx.RemoteProtocolError("Server disconnected", request=req)
+        return httpx.Response(200, text=fixture("contract_item_details.html"))
+
+    f, fc = make_fetcher(tmp_path, handler)
+    assert f.get("details.php", [("Num", "5014594")]) is not None
+    assert f.requests_made == 2
+    assert max(fc.sleeps) <= 2.0  # no 60 s backoff (D-020)
+
+
+def test_fetcher_backs_off_after_repeated_drops(tmp_path: Path) -> None:
+    def handler(req: httpx.Request) -> httpx.Response:
+        raise httpx.RemoteProtocolError("Server disconnected", request=req)
+
+    f, fc = make_fetcher(tmp_path, handler)
+    assert f.get("details.php", [("Num", "1")]) is None
+    assert f.requests_made == 5  # one quick retry + 4 backoff attempts
+    assert 60.0 in fc.sleeps
+
+
 def test_fetcher_no_retry_on_404(tmp_path: Path) -> None:
     f, _ = make_fetcher(tmp_path, lambda req: httpx.Response(404))
     assert f.get("nope.php", []) is None

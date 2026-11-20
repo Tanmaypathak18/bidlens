@@ -122,11 +122,20 @@ class Fetcher:
             return self.cache.read(entry) if entry.status == "ok" else None
 
         last_error = ""
-        for attempt in range(len(RETRY_WAITS) + 1):
+        quick_retry_used = False
+        attempt = 0
+        while attempt <= len(RETRY_WAITS):
             self._wait_turn()
             self.requests_made += 1
             try:
                 resp = self.client.get(endpoint, params=params)
+            except httpx.RemoteProtocolError as exc:
+                last_error, status = f"{type(exc).__name__}: {exc}", None
+                if not quick_retry_used:
+                    # D-020: a dropped keep-alive connection; reconnect after the normal gap.
+                    quick_retry_used = True
+                    log.info("connection dropped for %s; reconnecting", endpoint)
+                    continue
             except (httpx.TimeoutException, httpx.TransportError) as exc:
                 last_error, status = f"{type(exc).__name__}: {exc}", None
             else:
@@ -149,6 +158,7 @@ class Fetcher:
                 wait = RETRY_WAITS[attempt]
                 log.warning("%s for %s; retrying in %.0f s", last_error, endpoint, wait)
                 self.sleep(wait)
+            attempt += 1
         self.cache.record(
             endpoint, params, status="http_error", http_status=status, message=last_error
         )
