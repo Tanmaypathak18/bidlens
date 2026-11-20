@@ -135,7 +135,7 @@ Estimators are right to be skeptical of a number with no explanation. BidLens is
 
 ## Results
 
-**Follow the work step by step:** every stage writes its results to a numbered folder in [`outputs/`](outputs/README.md), from the source review and the 72,113 collected bid prices to the cross-checks and data quality reports. Each folder has a plain-language README. No file names a bidder.
+**Follow the work step by step:** the analysis is told in numbered [Jupyter notebooks](notebooks/README.md) that read directly on GitHub, starting with [01 Data overview](notebooks/01_data_overview.ipynb). Every stage also writes its results to a numbered folder in [`outputs/`](outputs/README.md), from the source review and the 72,113 collected bid prices to the cross-checks and data quality reports. Each folder has a plain-language README. No file names a bidder.
 
 Evaluation results will be published here and in `outputs/` as v1 is completed:
 

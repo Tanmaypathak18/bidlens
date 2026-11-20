@@ -1,0 +1,6 @@
+Applies to,Check,Flagged
+Bid price,price_outlier,773
+Bid price,non_positive_price,1
+Contract,low_bidder_disagrees,11
+Contract,bidder_count_mismatch,8
+Contract,missing_engineers_estimate,176
