@@ -44,8 +44,11 @@ class History:
             g = g.sort_values("d", kind="stable")
             self._groups[k] = (g["d"].values.astype("datetime64[D]"), g["p"].values)
 
-    def median(self, key: Hashable, on, window_days: int | None = None) -> tuple[float, int]:
-        """Median of prices strictly before `on`, escalated to `on`.
+    def median(
+        self, key: Hashable, on, window_days: int | None = None, escalated: bool = True
+    ) -> tuple[float, int]:
+        """Median of prices strictly before `on`, escalated to `on` (unless `escalated` is
+        False, for values that are not prices, such as quantities).
 
         With `window_days`, use only that many days before `on`, unless that leaves fewer
         than MIN_TRAILING prices; then use all earlier prices. Returns (median, count).
@@ -63,7 +66,7 @@ class History:
             w = int(np.searchsorted(dates, on - np.timedelta64(window_days, "D"), side="left"))
             if hi - w >= MIN_TRAILING:
                 lo = w
-        p = escalate(prices[lo:hi], dates[lo:hi], on)
+        p = escalate(prices[lo:hi], dates[lo:hi], on) if escalated else prices[lo:hi]
         return float(np.median(p)), hi - lo
 
 

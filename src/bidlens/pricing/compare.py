@@ -395,8 +395,12 @@ def main(argv: list[str] | None = None) -> int:
     use_cost_index(CostIndex.from_db(con))
     low = load_low_bids(con)
     contracts = load_contracts(con)
-    master = con.execute("SELECT item_code, unit, item_family FROM item_master").df()
-    raw_lines = con.execute(f"SELECT * FROM read_parquet('{ITEMS}')").df()
+    master = con.execute(
+        "SELECT item_code, unit, item_family FROM item_master ORDER BY item_code"
+    ).df()
+    raw_lines = con.execute(
+        f"SELECT * FROM read_parquet('{ITEMS}') ORDER BY contract_number, bid_open_date, item_no"
+    ).df()
     con.close()
 
     pred, scores = item_benchmark(low)

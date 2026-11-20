@@ -71,6 +71,7 @@ def load_low_bids(con: duckdb.DuckDBPyConnection) -> pd.DataFrame:
                        AND cf.flag = 'low_bidder_disagrees') AS low_bidder_disagrees
         FROM bid_normalized n JOIN contract c USING (contract_id)
         WHERE n.bid_rank = 1
+        ORDER BY n.bid_item_id  -- fixed row order: models depend on it
         """
     ).df()
     df["bid_open_date"] = pd.to_datetime(df["bid_open_date"])

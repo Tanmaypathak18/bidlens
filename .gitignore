@@ -26,3 +26,6 @@ data/raw/bid_summaries/
 .DS_Store
 .idea/
 .vscode/
+
+# Fitted models (rebuilt by the pricing scripts)
+data/models/

@@ -1,0 +1,90 @@
+{
+  "all_prices": {
+    "trailing_median": {
+      "mdape": 0.5467875048885658,
+      "within_15": 0.15819835810960728
+    },
+    "xgboost": {
+      "mdape": 0.4713133128565788,
+      "within_15": 0.1763922786776126
+    },
+    "lightgbm": {
+      "mdape": 0.4336525210811461,
+      "within_15": 0.1943643221655203
+    }
+  },
+  "without_outliers": {
+    "trailing_median": 0.5380485855621235,
+    "xgboost": 0.46449843934445145,
+    "lightgbm": 0.4279716407602069
+  },
+  "families_where_median_wins": [
+    "Bridge Rehabilitation and Removal",
+    "Other"
+  ],
+  "engineers_estimate_gain_share": {
+    "xgboost": 0.013266516747897614,
+    "lightgbm": 0.01292304651928662
+  },
+  "models": {
+    "xgboost": {
+      "params": {
+        "max_depth": 5,
+        "learning_rate": 0.07329154208516228,
+        "min_child_weight": 15.966805900132888,
+        "subsample": 0.956183643319872,
+        "colsample_bytree": 0.9591984289352984,
+        "reg_lambda": 0.23796567762099036
+      },
+      "trees": 130,
+      "val_mdape": 0.38123090909035906,
+      "val_mdape_single_seeds": [
+        0.38123090909035906,
+        0.3891558837890624,
+        0.38928791159925197,
+        0.37544974754497146,
+        0.3873111118171016,
+        0.38145680918421465
+      ],
+      "val_mdape_averaged": [
+        0.38394263519537936,
+        0.37891553754183516
+      ],
+      "tune_seconds": 16.2,
+      "fit_seconds": 0.52,
+      "predict_seconds": 0.0086,
+      "train_rows": 10091,
+      "test_rows": 4507
+    },
+    "lightgbm": {
+      "params": {
+        "num_leaves": 19,
+        "learning_rate": 0.09476963730145273,
+        "min_child_samples": 41,
+        "subsample": 0.8308710017984797,
+        "subsample_freq": 1,
+        "colsample_bytree": 0.7081353214962331,
+        "reg_lambda": 0.10083346867999449
+      },
+      "trees": 258,
+      "val_mdape": 0.3865046371885709,
+      "val_mdape_single_seeds": [
+        0.3865046371885709,
+        0.39728396263931315,
+        0.39869434840159634,
+        0.40533073118471136,
+        0.3950560399759773,
+        0.4031958172002126
+      ],
+      "val_mdape_averaged": [
+        0.38763042393854347,
+        0.39890925502189084
+      ],
+      "tune_seconds": 89.6,
+      "fit_seconds": 2.12,
+      "predict_seconds": 0.0249,
+      "train_rows": 10091,
+      "test_rows": 4507
+    }
+  }
+}
