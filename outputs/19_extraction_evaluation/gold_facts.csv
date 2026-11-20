@@ -10,7 +10,7 @@ T3,time_damages,"Job site activities may not start until the CPM baseline schedu
 T4,time_damages,Submit a notice 72 hours before starting job site activities (separate notice for each location),72 hours,sp p42
 T5,time_damages,"Late reopening of a lane or ramp closure: liquidated damages for each 10-minute interval past the pickup time, capped at 5% of the total bid per occurrence",5% of bid per occurrence,sp p58
 T6,time_damages,"Closure late-pickup damages vary by route and duration, e.g. ALA-92 westbound $4,000, $5,900 then $7,900 per 10 minutes; ALA-13 northbound $1,000 per 10 minutes",per 10 minutes,sp p59
-T7,time_damages,Tier 4 interim or final engines required for off-road diesel equipment; $2,000 penalty per noncompliant engine per day,"$2,000 per engine per day",sp p29; sp p37; sp p28; sp p3
+T7,time_damages,"Tier 4 interim or final engines required for off-road diesel equipment; $2,000 penalty per noncompliant engine per day","$2,000 per engine per day",sp p29; sp p37; sp p28; sp p3
 T8,time_damages,"Time-related overhead is bid per working day (600 WDAY) and paid by the working days on the weekly statement",600 WDAY,sp p15; sp p42
 T9,time_damages,Weekly statement of working days; dispute it with an RFI within 5 business days,5 business days,sp p42
 T10,time_damages,"Environmental product declarations for HMA and concrete: submit within 30 days of placement; $6,000 withhold per missing declaration","$6,000 per declaration",sp p36; sp p3; sp p35
