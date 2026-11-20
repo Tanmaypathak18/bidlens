@@ -27,17 +27,61 @@ _HEADER_FIELDS = {
     "engineers_estimate": r"Engineers Est:\s*\$?([\d,]+\.\d{2})",
     "pct_over_under": r"% Over/Under Est:\s*(-?[\d,.]+)%",
 }
-_REQUIRED = ("contract_number", "bid_open_date", "engineers_estimate", "n_bidders_reported")
+_REQUIRED = ("contract_number", "bid_open_date", "engineers_estimate")
 
 # "1 $6,368,565.50 VC..." or "1 Cost: $7,965,469.13 VC..." (rank missing on irregular bids)
 _BID_RE = re.compile(r"^(?:(\d{1,2})\s+)?(?:Cost:\s*|A\)\s*)?\$([\d,]+\.\d{2})\s+VC\w*", re.M)
 _TIME_RE = re.compile(r"^(?:Time:|B\))\s*([\d,]+)\s*Days\s*[x*]\s*\$?([\d,]+(?:\.\d{2})?)", re.M)
 _TOTAL_RE = re.compile(r"^(?:Total:|A\+B\))\s*\$([\d,]+\.\d{2})", re.M)
+# Caltrans units of measure (sv08data unit list plus units seen in bid summaries).
+KNOWN_UNITS = [
+    "ACRE",
+    "CDAY",
+    "CF",
+    "CY",
+    "DAY",
+    "EA",
+    "GAL",
+    "HA",
+    "HR",
+    "KG",
+    "KM",
+    "L",
+    "LB",
+    "LF",
+    "LNKM",
+    "LNMI",
+    "LS",
+    "M",
+    "M2",
+    "M3",
+    "MFBM",
+    "MI",
+    "MO",
+    "SQFT",
+    "SQYD",
+    "STA",
+    "STA(E)",
+    "STA(M)",
+    "TAB",
+    "TF",
+    "TON",
+    "TONN",
+    "WDAY",
+]
+_UNIT = "(?i:" + "|".join(re.escape(u) for u in sorted(KNOWN_UNITS, key=len, reverse=True)) + ")"
+# Unit may be missing (wrapped or lost in OCR); a flag may be joined to the code ("F208595").
 _ITEM_RE = re.compile(
-    r"^(\d{4})\s+(?:([A-Z]{1,2})\s+)?(\d{6})\s+(.+?)\s+(\S+)\s+"
-    r"(LUMP SUM|[\d,]+\.\d+)\s+([\d,]+\.\d+)\s+([\d,]+\.\d+)$"
+    rf"^(\d{{4}})\s*(?:([A-Z]{{1,2}})\s*)?(\d{{6}})\s*(.+?)\s+(?:({_UNIT})\s+)?"
+    r"(LUMP SUM|[\d,]+(?:\.\d+)?)\s+([\d,]+\.\d+)\s+([\d,]+\.\d+)$"
 )
-_ITEM_START_RE = re.compile(r"^\d{4}\s")
+_ITEM_START_RE = re.compile(r"^\d{4}(?:\s|[A-Z]\s?\d)")
+
+
+def _unit(unit: str | None, qty: str) -> str | None:
+    if unit:
+        return unit.upper()
+    return "LS" if qty == "LUMP SUM" else None
 
 
 class BidSummaryError(ValueError):
@@ -67,7 +111,7 @@ class ItemLine:
     flag: str | None  # "F" = final pay item
     item_code: str
     description: str
-    unit: str
+    unit: str | None  # None when the unit is missing from the line
     quantity: float | None  # None for LUMP SUM
     unit_price: float
     amount: float
@@ -85,7 +129,7 @@ class BidSummary:
     n_items: int | None
     proposals_issued: int | None
     working_days: int | None
-    n_bidders_reported: int
+    n_bidders_reported: int | None  # None when unreadable (OCR drops lone digits)
     engineers_estimate: float
     pct_over_under: float | None
     type_of_work: str | None
@@ -95,6 +139,7 @@ class BidSummary:
     unparsed_item_lines: list[str] = field(default_factory=list)
 
     duplicate_item_lines: int = 0
+    read_by_ocr: bool = False
 
     def __post_init__(self) -> None:
         """Drop item rows repeated verbatim (seen at some page breaks)."""
@@ -122,22 +167,47 @@ class BidSummary:
     def low_items_total(self) -> float:
         return round(sum(i.amount for i in self.low_items), 2)
 
-    def checks(self) -> list[str]:
-        """Consistency problems; an empty list means the file reads cleanly."""
+    def header_consistent(self) -> bool | None:
+        """EE x (1 + printed %) reproduces the low bid (cost or A+B total). None if unknown."""
+        low = self.low_bid
+        if low is None or self.pct_over_under is None:
+            return None
+        implied = self.engineers_estimate * (1 + self.pct_over_under / 100)
+        tolerance = max(self.engineers_estimate * 0.00006, 1.0)  # % is printed to 2 places
+        return any(abs(implied - amount) <= tolerance for amount in (low.cost, low.ranking_amount))
+
+    def item_problems(self) -> list[str]:
         problems = []
-        if self.low_bid is None:
-            problems.append("no ranked bids")
         if self.n_items is not None and len(self.low_items) != self.n_items:
             problems.append(f"item rows {len(self.low_items)} != Number of Items {self.n_items}")
         if self.low_bid and abs(self.low_items_total - self.low_bid.cost) > 0.01:
             problems.append(
                 f"item total {self.low_items_total:,.2f} != low bid cost {self.low_bid.cost:,.2f}"
             )
-        if len(self.bids) != self.n_bidders_reported:
+        if self.unparsed_item_lines:
+            problems.append(f"{len(self.unparsed_item_lines)} item lines not parsed")
+        return problems
+
+    def checks(self) -> list[str]:
+        """Consistency problems; an empty list means the file reads cleanly."""
+        problems = []
+        if self.low_bid is None:
+            problems.append("no ranked bids")
+        if self.header_consistent() is False:
+            problems.append("header: EE and % over/under do not reproduce the low bid")
+        problems += [p for p in self.item_problems() if "not parsed" not in p]
+        if self.n_bidders_reported is not None and len(self.bids) != self.n_bidders_reported:
             problems.append(f"bids listed {len(self.bids)} != reported {self.n_bidders_reported}")
         if self.unparsed_item_lines:
             problems.append(f"{len(self.unparsed_item_lines)} item lines not parsed")
         return problems
+
+    def contract_fields_ok(self) -> bool:
+        """Contract-level fields are trustworthy: low bid found and confirmed by either
+        the item lines or the EE x % header check."""
+        if self.low_bid is None:
+            return False
+        return not self.item_problems() or self.header_consistent() is True
 
     def contract_record(self) -> dict:
         low = self.low_bid
@@ -162,6 +232,9 @@ class BidSummary:
             "low_bid_total": low.ranking_amount if low else None,
             "second_bid_total": second.ranking_amount if second else None,
             "source_file": self.source_file,
+            "read_by_ocr": self.read_by_ocr,
+            "items_complete": not self.item_problems(),
+            "header_check": self.header_consistent(),
         }
 
     def as_dict(self) -> dict:
@@ -241,7 +314,7 @@ def parse_text(pages: list[str], source_file: str = "") -> BidSummary:
                         flag=flag,
                         item_code=code,
                         description=desc.strip(),
-                        unit=unit,
+                        unit=_unit(unit, qty),
                         quantity=None if qty == "LUMP SUM" else _num(qty),
                         unit_price=_num(price),
                         amount=_num(amount),
@@ -262,7 +335,9 @@ def parse_text(pages: list[str], source_file: str = "") -> BidSummary:
         n_items=int(found["n_items"]) if found["n_items"] else None,
         proposals_issued=int(found["proposals_issued"]) if found["proposals_issued"] else None,
         working_days=int(_num(found["working_days"])) if found["working_days"] else None,
-        n_bidders_reported=int(found["n_bidders_reported"]),
+        n_bidders_reported=(
+            int(found["n_bidders_reported"]) if found["n_bidders_reported"] else None
+        ),
         engineers_estimate=_num(found["engineers_estimate"]),
         pct_over_under=_num(found["pct_over_under"]) if found["pct_over_under"] else None,
         type_of_work=_type_of_work(page1),
@@ -293,9 +368,9 @@ _LEGACY_PCT = re.compile(r"PERCENT (OVER|UNDER) EST\s+([\d.]+)")
 _LEGACY_BID = re.compile(r"^(?:(\d{1,2})\s+)?(?:A\)\s*)?([\d,]+\.\d{2})\s+\d{1,3}\s+\S")
 _LEGACY_TIME = re.compile(r"^B\)\s*([\d,]+)\s*DAYS\s*X\s*([\d,.]+)")
 _LEGACY_TOTAL = re.compile(r"^A\+B\)\s*([\d,]+\.\d{2})")
-_LEGACY_ITEM_START = re.compile(r"^\d{1,4}\s+(?:\(?F\)?\s+)?\d{6}\s")
+_LEGACY_ITEM_START = re.compile(r"^\d{1,4}\s+(?:\(?F\)?\s*)?\d{6}\s")
 _LEGACY_ITEM = re.compile(
-    r"^(\d{1,4})\s+(?:\(?(F)\)?\s+)?(\d{6})\s+(.*?)\s+(\S+)\s+"
+    rf"^(\d{{1,4}})\s+(?:\(?(F)\)?\s*)?(\d{{6}})\s+(.*?)\s+(?:({_UNIT})\s+)?"
     r"(LUMP SUM|[\d,]*\.?\d+)\s+([\d,]*\.\d{2})\s+([\d,]*\.\d{2})(?:\s+(.*))?$"
 )
 _LEGACY_PAGE_HEADER = re.compile(
@@ -373,7 +448,7 @@ def parse_legacy_text(pages: list[str], source_file: str = "") -> BidSummary:
                     flag=flag,
                     item_code=code,
                     description=" ".join(f"{desc} {extra}".split()),
-                    unit=unit,
+                    unit=_unit(unit, qty),
                     quantity=None if qty == "LUMP SUM" else _legacy_num(qty),
                     unit_price=_legacy_num(price),
                     amount=_legacy_num(amount),
@@ -405,7 +480,9 @@ def parse_legacy_text(pages: list[str], source_file: str = "") -> BidSummary:
         n_items=int(found["n_items"]) if found["n_items"] else None,
         proposals_issued=int(found["proposals_issued"]) if found["proposals_issued"] else None,
         working_days=int(_num(found["working_days"])) if found["working_days"] else None,
-        n_bidders_reported=int(found["n_bidders_reported"]),
+        n_bidders_reported=(
+            int(found["n_bidders_reported"]) if found["n_bidders_reported"] else None
+        ),
         engineers_estimate=_num(found["engineers_estimate"]),
         pct_over_under=pct,
         type_of_work=None,  # wrapped into the project description; taken from sv08data instead
@@ -416,12 +493,29 @@ def parse_legacy_text(pages: list[str], source_file: str = "") -> BidSummary:
     )
 
 
-def read_bid_summary(path: Path) -> BidSummary:
-    """Read one bid summary PDF."""
+def _has_text_layer(pages: list[str]) -> bool:
+    return bool(pages) and ("Bid Summary" in pages[0] or _LEGACY_MARK in pages[0])
+
+
+def _past_low_bidder_items(pages: list[str]) -> bool:
+    """OCR stop rule: the low bidder's item pages have started and then ended."""
+    seen = any(LOW_BIDDER_MARK in p for p in pages)
+    return seen and LOW_BIDDER_MARK not in pages[-1]
+
+
+def read_bid_summary(path: Path, ocr_cache: Path | None = None) -> BidSummary:
+    """Read one bid summary PDF. With `ocr_cache`, fall back to OCR (D-025)."""
     path = Path(path)
     try:
         with pdfplumber.open(path) as pdf:
             pages = [p.extract_text() or "" for p in pdf.pages]
     except Exception as exc:  # pdfminer raises many types for broken files
         raise BidSummaryError(f"cannot open PDF: {exc}") from exc
-    return parse_text(pages, source_file=path.name)
+    if _has_text_layer(pages) or ocr_cache is None:
+        return parse_text(pages, source_file=path.name)
+    from bidlens.ingest.ocr import ocr_pages
+
+    ocr_text = ocr_pages(path, ocr_cache, stop=_past_low_bidder_items)
+    summary = parse_text(ocr_text, source_file=path.name)
+    summary.read_by_ocr = True
+    return summary

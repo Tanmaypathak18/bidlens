@@ -93,7 +93,7 @@ def build(interim: Path, db_path: Path) -> dict:
     """)
     summary_cols = """project_id, n_items, proposals_issued, working_days, n_bidders_reported,
            n_bidders_ranked, engineers_estimate, low_bid_cost, low_bid_total,
-           second_bid_total, is_a_plus_b, source_file"""
+           second_bid_total, is_a_plus_b, source_file, read_by_ocr"""
     con.execute(f"""
         INSERT INTO contract
         SELECT contract_number || '_' || strftime(bid_open_date, '%Y-%m-%d'),

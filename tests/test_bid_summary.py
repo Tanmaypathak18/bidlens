@@ -205,3 +205,34 @@ def test_repeated_item_row_dropped() -> None:
     s = parse_text([PAGE1_PLAIN, dup])
     assert s.duplicate_item_lines == 1
     assert s.checks() == []
+
+
+def test_ocr_tolerant_item_lines() -> None:
+    ocr_items = PAGE2_ITEMS.replace(
+        "0002 F 510053 STRUCTURAL CONCRETE, BRIDGE CY 2.0 1,500.00 3,000.00",
+        "0002 F510053 STRUCTURAL CONCRETE, BRIDGE 2.0 1,500.00 3,000.00",
+    ).replace("0003 999990 MOBILIZATION LS LUMP SUM", "0003 999990 MOBILIZATION LUMP SUM")
+    s = parse_text([PAGE1_PLAIN, ocr_items])
+    assert s.checks() == []
+    concrete, mob = s.low_items[1], s.low_items[2]
+    assert (concrete.flag, concrete.item_code, concrete.unit) == ("F", "510053", None)
+    assert concrete.description == "STRUCTURAL CONCRETE, BRIDGE"
+    assert mob.unit == "LS"
+
+
+def test_description_word_not_taken_as_unit() -> None:
+    items = PAGE2_ITEMS.replace(
+        "0001 090100 TIME-RELATED OVERHEAD (WDAY) WDAY 100.0",
+        "0001 090100 TREE PLANTING 100.0",
+    )
+    s = parse_text([PAGE1_PLAIN, items])
+    assert s.low_items[0].description == "TREE PLANTING"
+    assert s.low_items[0].unit is None
+
+
+def test_bidder_count_may_be_unreadable() -> None:
+    page1 = PAGE1_PLAIN.replace("Number of Bidders: 3 ", "Number of Bidders: ")
+    s = parse_text([page1, PAGE2_ITEMS])
+    assert s.n_bidders_reported is None
+    assert s.contract_record()["n_bidders_ranked"] == 3
+    assert s.checks() == []

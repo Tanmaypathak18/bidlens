@@ -26,6 +26,7 @@ CREATE TABLE contract (
     second_bid_total    DECIMAL(18, 2),
     is_a_plus_b         BOOLEAN,
     bid_summary_file    VARCHAR,
+    bid_summary_ocr     BOOLEAN,                  -- read by OCR (D-025)
     UNIQUE (contract_number, bid_open_date),
     CHECK (engineers_estimate IS NULL OR engineers_estimate > 0),
     CHECK (working_days IS NULL OR working_days > 0)

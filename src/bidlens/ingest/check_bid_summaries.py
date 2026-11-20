@@ -17,6 +17,7 @@ import re
 from collections import Counter
 from concurrent.futures import ProcessPoolExecutor
 from dataclasses import dataclass
+from functools import partial
 from pathlib import Path
 
 import duckdb
@@ -38,10 +39,10 @@ class FileResult:
     error: str | None
 
 
-def _read(path: Path) -> FileResult:
+def _read(path: Path, ocr_cache: Path | None = None) -> FileResult:
     sha1 = hashlib.sha1(path.read_bytes()).hexdigest()
     try:
-        return FileResult(path.name, sha1, read_bid_summary(path), None)
+        return FileResult(path.name, sha1, read_bid_summary(path, ocr_cache), None)
     except BidSummaryError as exc:
         return FileResult(path.name, sha1, None, str(exc))
 
@@ -69,12 +70,20 @@ def load_not_found(path: Path) -> set[tuple[str, str]]:
     return out
 
 
-def run(folder: Path, checklist: Path, not_found: Path, out: Path, workers: int = 6) -> dict:
+def run(
+    folder: Path,
+    checklist: Path,
+    not_found: Path,
+    out: Path,
+    workers: int = 6,
+    ocr: bool = True,
+) -> dict:
     expected = load_checklist(checklist)
     nf = load_not_found(not_found)
     pdfs = sorted(folder.glob("*.pdf"))
     with ProcessPoolExecutor(max_workers=workers) as ex:
-        results = list(ex.map(_read, pdfs, chunksize=4))
+        reader = partial(_read, ocr_cache=out / "ocr" if ocr else None)
+        results = list(ex.map(reader, pdfs, chunksize=4))
 
     by_key: dict[tuple[str, str], list[FileResult]] = {}
     file_rows = []
@@ -95,7 +104,10 @@ def run(folder: Path, checklist: Path, not_found: Path, out: Path, workers: int 
             if m and m["date"] and s.bid_open_date.isoformat() != m["date"]:
                 problems.append(f"bid date in file is {s.bid_open_date}")
             problems += s.checks()
-            by_key.setdefault((s.contract_number, s.bid_open_date.isoformat()), []).append(r)
+            if s.contract_fields_ok():
+                by_key.setdefault((s.contract_number, s.bid_open_date.isoformat()), []).append(r)
+            else:
+                problems.append("contract fields not confirmed")
         file_rows.append(
             {
                 "file": r.file,
@@ -130,7 +142,7 @@ def run(folder: Path, checklist: Path, not_found: Path, out: Path, workers: int 
         w.writeheader()
         w.writerows(exp_rows)
 
-    clean = [r.summary for r in results if r.summary is not None]
+    clean = [r.summary for r in results if r.summary is not None and r.summary.contract_fields_ok()]
     _write_tables(clean, out)
     return {
         "files": len(results),
@@ -147,6 +159,10 @@ def run(folder: Path, checklist: Path, not_found: Path, out: Path, workers: int 
         "not_found_listed": len(nf),
         "files_not_in_checklist": extra,
         "by_year": Counter(s.bid_open_date.year for s in clean),
+        "read_by_ocr": sum(1 for s in clean if s.read_by_ocr),
+        "usable": len(clean),
+        "usable_items_complete": sum(1 for s in clean if not s.item_problems()),
+        "usable_by_header_check_only": sum(1 for s in clean if s.item_problems()),
     }
 
 
@@ -170,6 +186,9 @@ _CONTRACT_SCHEMA = {
     "low_bid_total": "DOUBLE",
     "second_bid_total": "DOUBLE",
     "source_file": "VARCHAR",
+    "read_by_ocr": "BOOLEAN",
+    "items_complete": "BOOLEAN",
+    "header_check": "BOOLEAN",
     "problems": "VARCHAR",
 }
 _ITEM_SCHEMA = {
@@ -202,6 +221,7 @@ def _write_tables(summaries: list[BidSummary], out: Path) -> None:
             "amount": i.amount,
         }
         for s in summaries
+        if not s.item_problems()  # item lines only from files whose items reconcile
         for i in s.low_items
     ]
     con = duckdb.connect()
@@ -236,8 +256,9 @@ def main(argv: list[str] | None = None) -> int:
         "--not-found", type=Path, default=Path("data/raw/bid_summaries/not_found_list.txt")
     )
     ap.add_argument("--out", type=Path, default=Path("data/interim"))
+    ap.add_argument("--no-ocr", action="store_true", help="skip OCR for files without text")
     args = ap.parse_args(argv)
-    result = run(args.folder, args.checklist, args.not_found, args.out)
+    result = run(args.folder, args.checklist, args.not_found, args.out, ocr=not args.no_ocr)
     for k, v in result.items():
         print(f"{k}: {v}")
     return 0
