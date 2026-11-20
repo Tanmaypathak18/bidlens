@@ -172,10 +172,20 @@ uv sync
 uv run streamlit run app/Home.py
 ```
 
-To read bid documents, install Ollama and download the model once:
+To read bid documents, install Ollama and download the two models once (about 10 GB in all):
 
 ```bash
 ollama pull qwen3:8b
+```
+
+```bash
+ollama pull llama3.1:8b
+```
+
+Then read a bid package (about an hour on a Mac with 16 GB; the two models run one after the other):
+
+```bash
+uv run python -m bidlens.documents.extract 04-0W0504 --mode combined
 ```
 
 The app runs on the included sample data. To rebuild the full dataset from the public sources, run `make data`. This takes a while, because requests are deliberately rate-limited.
@@ -220,7 +230,7 @@ tests/
 - v1 uses public Caltrans data for two districts. Prices for other regions, or for private work, will differ.
 - Historical prices reflect past market conditions. Escalation adjusts for broad trends, not for local shocks such as material shortages.
 - Document extraction is an aid to review, not a substitute for reading the contract.
-- The local document reader finds about half of the facts an estimator needs on a test package, and it cannot yet read lane closure hour charts, which lose their columns in the PDF text.
+- On a test package, the document reader (two local models plus plain pattern rules) finds about three quarters of the facts an estimator needs, and about 1 in 4 of its findings needs correcting. Read the cited page before relying on a finding. Lane closure hour charts are read by plain code from the page layout, not by the model.
 - BidLens supports estimating judgment. It does not replace it.
 
 ## How this project is built

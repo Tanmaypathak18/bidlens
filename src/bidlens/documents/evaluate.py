@@ -208,13 +208,247 @@ Limits:
     write_index()
 
 
+# ----------------------------------------------------------------- round 2 (D-063)
+
+OUT2 = ROOT / "outputs" / "20_extraction_round2"
+ROUND2 = {
+    "local_qwen3-8b_v2": "qwen3:8b, checklist",
+    "local_llama3.1-8b_v2": "llama3.1:8b, checklist",
+    "patterns": "pattern rules only",
+    "qwen_patterns": "qwen3:8b checklist + patterns",
+    "combined": "combined: both models + patterns",
+}
+KEY = ["category", "statement", "evidence", "document", "page"]
+
+
+def _key(df: pd.DataFrame) -> pd.Series:
+    return df[KEY].astype(str).agg("\x1f".join, axis=1)
+
+
+def _scored(items: list[dict]) -> pd.DataFrame:
+    from bidlens.documents.extract import TABLES
+
+    return pd.DataFrame([i for i in items if i["category"] not in TABLES])
+
+
+def round2_runs(contract: str) -> dict[str, dict]:
+    from bidlens.documents.extract import load, merge
+
+    out = {name: load(contract, name) for name in ROUND2 if name not in ("qwen_patterns",)}
+    out["qwen_patterns"] = merge(
+        contract, [out["patterns"], out["local_qwen3-8b_v2"]], "qwen_patterns"
+    )
+    return out
+
+
+def round1_verdicts(contract: str) -> pd.DataFrame:
+    """Step 3.5 verdicts keyed by finding, for findings that come back unchanged."""
+    sheet = pd.read_csv(OUT / "judging_sheet.csv", dtype=str).fillna("")
+    return sheet.assign(key=_key(sheet))[["key", "verdict", "fact_ids", "citation_ok"]]
+
+
+def blind2(contract: str) -> Path:
+    from bidlens.documents.report import mask
+
+    runs = round2_runs(contract)
+    pool = pd.concat(
+        [
+            _scored(runs[n]["items"])
+            for n in ("local_qwen3-8b_v2", "local_llama3.1-8b_v2", "patterns")
+        ]
+    )
+    pool = mask(pool[[*KEY, "value"]]).assign(key=lambda d: _key(d)).drop_duplicates("key")
+    old = round1_verdicts(contract).drop_duplicates("key")
+    pool = pool.merge(old, on="key", how="left").fillna("")
+    pool["from_step_3_5"] = (pool["verdict"] != "").map({True: "yes", False: ""})
+    pool = pool.sample(frac=1, random_state=SEED).reset_index(drop=True)
+    pool.insert(0, "blind_id", [f"y{n:03d}" for n in range(len(pool))])
+    OUT2.mkdir(parents=True, exist_ok=True)
+    path = OUT2 / "judging_sheet.csv"
+    pool.drop(columns="key").to_csv(path, index=False)
+    return path
+
+
+def score2(contract: str) -> pd.DataFrame:
+    from bidlens.documents.report import mask
+
+    gold = pd.read_csv(OUT / "gold_facts.csv")
+    sheet = pd.read_csv(OUT2 / "judging_sheet.csv", dtype=str).fillna("")
+    if (sheet["verdict"] == "").any():
+        raise SystemExit("round 2 judging sheet is incomplete")
+    sheet = sheet.assign(key=_key(sheet)).set_index("key")
+    out = []
+    for name, res in round2_runs(contract).items():
+        d = mask(_scored(res["items"])[KEY])
+        d = d.assign(key=_key(d)).join(sheet[["verdict", "fact_ids", "citation_ok"]], on="key")
+        if d["verdict"].isna().any():
+            raise SystemExit(f"{name}: findings missing from the judging sheet")
+        correct = d[d["verdict"] == "correct"]
+        covered = {f for ids in correct["fact_ids"] for f in ids.split(";") if f}
+        unknown = covered - set(gold["fact_id"])
+        if unknown:
+            raise SystemExit(f"unknown fact ids: {sorted(unknown)}")
+        calls = pd.DataFrame(res["calls"])
+        answers = len(res["rejected"]) + int(calls["returned"].sum())
+        p, r = len(correct) / len(d), len(covered) / len(gold)
+        row = {
+            "run": name,
+            "model": ROUND2[name],
+            "items_kept": len(d),
+            "correct": len(correct),
+            "precision": p,
+            "gold_facts_found": len(covered),
+            "recall": r,
+            "f1": 2 * p * r / (p + r) if p + r else 0.0,
+            "citation_accuracy": (d["citation_ok"] == "1").mean(),
+            "answers_returned": answers,
+            "quote_rejected": len(res["rejected"]),
+            "quote_rejection_rate": len(res["rejected"]) / answers if answers else 0.0,
+            "minutes": calls["seconds"].sum() / 60,
+            "truncated_calls": int(
+                calls.get("truncated", pd.Series(dtype=bool)).fillna(False).sum()
+            ),
+            "covered": ";".join(sorted(covered)),
+        }
+        for topic, g in gold.groupby("topic"):
+            row[f"recall_{topic}"] = len(covered & set(g["fact_id"])) / len(g)
+        out.append(row)
+    return pd.DataFrame(out)
+
+
+def write_report2(contract: str, m: pd.DataFrame) -> None:
+    from bidlens.documents.report import mask
+
+    OUT2.mkdir(parents=True, exist_ok=True)
+    m.to_csv(OUT2 / "metrics.csv", index=False)
+    old = pd.read_csv(OUT / "metrics.csv")
+    gold = pd.read_csv(OUT / "gold_facts.csv")
+    sheet = pd.read_csv(OUT2 / "judging_sheet.csv", dtype=str).fillna("")
+    pct = lambda x: f"{100 * x:.1f}%"  # noqa: E731
+    head = (
+        "| Run | Findings | Precision | Gold facts found | Recall | F1 | Citation accuracy "
+        "| Minutes |\n| --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: |"
+    )
+    rows = [head]
+    for r in old.itertuples():
+        rows.append(
+            f"| Step 3.5: {r.model}, open list | {r.items_kept} | {pct(r.precision)} | "
+            f"{r.gold_facts_found} | {pct(r.recall)} | {pct(r.f1)} | "
+            f"{pct(r.citation_accuracy)} | {r.minutes:.1f} |"
+        )
+    for r in m.itertuples():
+        rows.append(
+            f"| **{r.model}** | {r.items_kept} | {pct(r.precision)} | {r.gold_facts_found} | "
+            f"{pct(r.recall)} | **{pct(r.f1)}** | {pct(r.citation_accuracy)} | {r.minutes:.1f} |"
+        )
+    topics = sorted(gold["topic"].unique())
+    trow = ["| Topic | Gold facts | Step 3.5 qwen3 | " + " | ".join(m["model"]) + " |"]
+    trow.append("| --- | ---: | ---: |" + " ---: |" * len(m))
+    q1 = old[old["model"] == "qwen3:8b"].iloc[0]
+    for t in topics:
+        vals = " | ".join(pct(v) for v in m[f"recall_{t}"])
+        trow.append(
+            f"| {t} | {int((gold['topic'] == t).sum())} | {pct(q1[f'recall_{t}'])} | {vals} |"
+        )
+    best = m.sort_values("f1", ascending=False).iloc[0]
+    qwen = m[m["run"] == "local_qwen3-8b_v2"].iloc[0]
+    reused = int((sheet["from_step_3_5"] == "yes").sum())
+    runs = round2_runs(contract)
+    for name, res in runs.items():
+        mask(_scored(res["items"])).to_csv(OUT2 / f"extracted_{name}.csv", index=False)
+    tab = pd.DataFrame(runs["patterns"]["items"])
+    hours = tab[tab["category"] == "closure_hours"]
+    dmg = tab[tab["category"] == "closure_damages"]
+    hours[["chunk_id", "page", "statement"]].to_csv(OUT2 / "closure_hours.csv", index=False)
+    dmg[["chunk_id", "page", "statement", "evidence"]].to_csv(
+        OUT2 / "closure_damages.csv", index=False
+    )
+    (OUT2 / "README.md").write_text(
+        f"""# 20 Extraction, round 2
+
+A second round of document extraction for contract {contract}, scored against the same
+{len(gold)} gold facts and judging rules as step 3.5 (stage 19), whose results are kept
+unchanged for comparison. Everything ran on this machine through Ollama; no document left
+it and no paid service was used. Decisions D-060 to D-063.
+
+## What changed
+
+1. **Closure charts read by code (D-060).** The 78 lane, ramp and connector closure charts
+   lose their empty cells in the PDF text, so the hour of each symbol was lost. BidLens now
+   puts every symbol back in its hour column from its position on the page (no model).
+   Two chart pages were checked against their images cell by cell. Result:
+   `closure_hours.csv`, one row per chart, and a one-line summary per chart for the model
+   in place of the broken grid.
+2. **A checklist of estimator questions per topic (D-061)** instead of "list the facts":
+   6 to 9 questions per topic, written to apply to any Caltrans contract.
+3. **Pattern rules for simple facts (D-062):** working days, start window, engineer's
+   estimate, bid opening, prebid meeting (the addendum's date wins), price-firm dates and
+   dollar amounts tied to a rate, penalty, withhold or limit. The late closure damages
+   table is read into `closure_damages.csv` ({len(dmg)} rows).
+4. **Combined mode (D-063):** both models plus the pattern rules, merged, with duplicates
+   removed (same quote in the same passage, or statements sharing 70% of their words).
+
+## Result
+
+{chr(10).join(rows)}
+
+Best F1: **{best["model"]}**, {pct(best["f1"])}. The qwen3:8b checklist alone scores
+{pct(qwen["f1"])}, against 61.5% in step 3.5.
+
+Recall by topic (a gold fact counts as found whichever topic's answer found it):
+
+{chr(10).join(trow)}
+
+The closure tables (hours and late damages) are read by code and are not in the scored
+pool, like the bid item quantities. They state gold fact T6 (late closure damages by route)
+exactly and give the hours behind R1 and R13.
+
+## How it was judged
+
+Same rules as step 3.5. Every finding new in this round was pooled across runs, shuffled
+and judged with the run hidden (`judging_sheet.csv`). {reused} findings came back word for
+word from step 3.5 and kept their verdict (`from_step_3_5`). The gold facts and the
+judging are by Claude, the AI assistant building BidLens, not a human estimator; so are
+the checklist questions, so the checklist's gain may be somewhat optimistic. A human
+review is still open.
+
+## Files
+
+- `metrics.csv`: every metric per run, including recall per topic and the gold facts found.
+- `judging_sheet.csv`: every round 2 finding with its verdict.
+- `extracted_<run>.csv`: the scored findings of each run.
+- `closure_hours.csv`, `closure_damages.csv`: the tables read by code.
+
+## How it was produced
+
+`uv run python -m bidlens.documents.charts {contract}`, then
+`uv run python -m bidlens.documents.extract {contract} --mode combined` (runs both models
+one at a time, then the patterns, then merges), then
+`uv run python -m bidlens.documents.evaluate {contract} blind2`, hand judging, and
+`... evaluate {contract} score2`. Generated {date.today().isoformat()}.
+""",
+        encoding="utf-8",
+    )
+    from bidlens.outputs import write_index
+
+    write_index()
+
+
 def main(argv: list[str] | None = None) -> int:
     ap = argparse.ArgumentParser(description=__doc__)
     ap.add_argument("contract")
-    ap.add_argument("action", choices=["blind", "score"])
+    ap.add_argument("action", choices=["blind", "score", "blind2", "score2"])
     args = ap.parse_args(argv)
     if args.action == "blind":
         print(blind(args.contract))
+        return 0
+    if args.action == "blind2":
+        print(blind2(args.contract))
+        return 0
+    if args.action == "score2":
+        m = score2(args.contract)
+        write_report2(args.contract, m)
+        print(m.drop(columns="covered").T.to_string())
         return 0
     m = score(args.contract)
     best = pick(m)

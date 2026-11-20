@@ -45,8 +45,8 @@ MAX_ITEMS = 25  # D-058
 
 HOSTED_MODEL = os.environ.get("BIDLENS_HOSTED_MODEL", "claude-opus-5-5")
 LOCAL_MODEL = os.environ.get("BIDLENS_LOCAL_MODEL", "qwen3:8b")
-# The run the app shows (D-059, D-063), then fallbacks if it has not been run.
-DEFAULT_RUN = "local_qwen3-8b_v2"
+# The run the app shows (D-067), then fallbacks if it has not been run.
+DEFAULT_RUN = "combined"
 RUN_FALLBACKS = ("combined", "local_qwen3-8b_v2", "local_qwen3-8b", "patterns")
 
 
