@@ -1,0 +1,26 @@
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+*.egg-info/
+build/
+dist/
+.pytest_cache/
+.ruff_cache/
+
+# Secrets
+.env
+
+# Data (never commit bulk scraped data; only data/sample/)
+data/raw/
+data/interim/
+*.duckdb
+*.duckdb.wal
+
+# Bid documents are not committed; only manifests
+*.pdf
+
+# OS / editors
+.DS_Store
+.idea/
+.vscode/
