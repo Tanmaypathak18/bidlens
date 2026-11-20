@@ -11,6 +11,7 @@ data:
 	uv run python -m bidlens.ingest.check_bid_summaries
 	uv run python -m bidlens.db.load
 	uv run python -m bidlens.db.checks
+	uv run python -m bidlens.pricing.escalate
 	uv run python -m bidlens.outputs
 
 test:

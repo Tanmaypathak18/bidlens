@@ -32,6 +32,7 @@ from bidlens.pricing.benchmarks import (
     prepare_lines,
     trailing_median,
 )
+from bidlens.pricing.escalate import CostIndex
 from bidlens.pricing.setup import (
     CUTOFF,
     MIN_FAMILY_TEST,
@@ -40,6 +41,7 @@ from bidlens.pricing.setup import (
     report_family,
     score,
     select_test,
+    use_cost_index,
 )
 
 ROOT = Path(".")
@@ -305,8 +307,11 @@ judged the same way, and we score two yardsticks that any model has to beat.
 - **Scores:** the median percentage miss (MdAPE: half of the predictions miss by less than
   this) and the share of predictions within 15% of the low bid. Item families with fewer
   than {MIN_FAMILY_TEST} test prices are grouped as "Other".
-- **Price levels:** prices are not yet adjusted for inflation. Step 2.2 adds the Caltrans
-  Construction Cost Index and these results will be rerun.
+- **Price levels:** every earlier price is brought to the bid date of the price being
+  predicted with Caltrans' cost index (4-quarter average, stage 09). In the test years the
+  index kept rising while prices for these items levelled off (see stage 09's check), so
+  escalated historical prices run high; the pricing models also see the bid date and can
+  correct for this.
 
 {chr(10).join(split_lines)}
 
@@ -387,6 +392,7 @@ No file names a bidder. Contracts are identified by their Caltrans contract numb
 def main(argv: list[str] | None = None) -> int:
     argparse.ArgumentParser(description=__doc__).parse_args(argv)
     con = duckdb.connect(str(DB), read_only=True)
+    use_cost_index(CostIndex.from_db(con))
     low = load_low_bids(con)
     contracts = load_contracts(con)
     master = con.execute("SELECT item_code, unit, item_family FROM item_master").df()

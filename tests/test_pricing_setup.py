@@ -25,7 +25,16 @@ from bidlens.pricing.setup import (
     report_family,
     score,
     select_test,
+    use_cost_index,
 )
+
+
+@pytest.fixture(autouse=True)
+def _no_escalation():
+    """These tests check the benchmarks on fixed prices, without a cost index."""
+    use_cost_index(None)
+    yield
+    use_cost_index(None)
 
 
 def _low(rows):

@@ -95,3 +95,12 @@ One bidder's price for one bid item. **No bidder names or IDs are stored.**
 ## item_master and cost_index
 
 These are created empty here. Step 1.4 fills the item master (current item list, unit normalization, item families) and step 2.2 fills the cost index (Caltrans Construction Cost Index).
+
+**cost_index (step 2.2, D-039, D-040).** Two series, keyed by (series, year, quarter):
+
+| Series | What it holds |
+| --- | --- |
+| `CHCCI_2020` | Caltrans highway construction cost index, 2020 = 100, one value per published quarter. Recovered from the adjusted prices on the cached sv08data result pages |
+| `CHCCI_2020_4Q` | The 4-quarter trailing mean of `CHCCI_2020`, used for escalation. Quarters not yet published carry forward the last value |
+
+**bid_escalated (view).** Every column of `bid_normalized` plus `bid_open_date`, `cost_index` (the bid quarter's `CHCCI_2020_4Q` value), `ref_year`, `ref_quarter`, `ref_index` (the latest quarter in the series) and `unit_price_escalated` = unit_price × ref_index / cost_index, the price in reference-quarter dollars. Models escalate to each bid's own date instead, through `bidlens.pricing.setup.escalate`.

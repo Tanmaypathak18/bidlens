@@ -93,8 +93,8 @@ _REQUIRED_HEADERS = (
 )
 
 
-def parse_results(html: str) -> list[BidRow]:
-    """Parse a results.php page into bid rows. An empty result returns []."""
+def _result_table(html: str) -> tuple[list[tuple[int, list[str]]], dict[str, int]]:
+    """The bid rows of a results.php page as (row id, cell texts), and the column map."""
     if (msg := site_error(html)) is not None:
         raise ParseError(f"site error page: {msg}")
     soup = BeautifulSoup(html, "html.parser")
@@ -109,21 +109,29 @@ def parse_results(html: str) -> list[BidRow]:
     missing = [h for h in _REQUIRED_HEADERS if h.replace(" ", "") not in col]
     if missing:
         raise ParseError(f"results table missing columns: {missing}")
+    rows = []
+    for tr in soup.find_all("tr"):
+        box = tr.find("input", attrs={"type": "checkbox"})
+        if box is None or not str(box.get("name", "")).isdigit():
+            continue
+        rows.append((int(box["name"]), [td.get_text(" ", strip=True) for td in tr.find_all("td")]))
+    return rows, col
+
+
+def parse_results(html: str) -> list[BidRow]:
+    """Parse a results.php page into bid rows. An empty result returns []."""
+    table, col = _result_table(html)
 
     def c(cells: list[str], name: str) -> str:
         return cells[col[name.replace(" ", "")]]
 
     rows: list[BidRow] = []
-    for tr in soup.find_all("tr"):
-        box = tr.find("input", attrs={"type": "checkbox"})
-        if box is None or not str(box.get("name", "")).isdigit():
-            continue
-        cells = [td.get_text(" ", strip=True) for td in tr.find_all("td")]
+    for row_id, cells in table:
         item = c(cells, "Item No. / Description")
         code, _, desc = item.partition(" - ")
         rows.append(
             BidRow(
-                row_id=int(box["name"]),
+                row_id=row_id,
                 item_code=code.strip(),
                 item_description=desc.strip(),
                 unit=c(cells, "Unit"),
@@ -137,6 +145,38 @@ def parse_results(html: str) -> list[BidRow]:
             )
         )
     return rows
+
+
+_INDEX_RE = re.compile(r"CURRENT 12-MO INDEX \(([^)]*\)?)\):\s*([\d.]+)")
+
+
+@dataclass(frozen=True)
+class AdjustedPrices:
+    """The cost index line and the original vs adjusted price of every row (D-039)."""
+
+    index_name: str  # e.g. "CHCCI (2020 Base)"
+    current_index: float  # I(c), the current 12-month index
+    rows: list[tuple[str, date, float, float]]  # contract, bid open date, unit price, adjusted
+
+
+def parse_adjusted(html: str) -> AdjustedPrices:
+    """Read the current index and the "Adj Price" column of a results.php page."""
+    m = _INDEX_RE.search(html)
+    if m is None:
+        raise ParseError("current 12-month index line not found")
+    table, col = _result_table(html)
+    if "AdjPrice" not in col:
+        raise ParseError("results table has no Adj Price column")
+    rows = [
+        (
+            cells[col["ContractNo."]],
+            _mdy(cells[col["BidOpenDate"]]),
+            _money(cells[col["UnitPrice"]]),
+            _money(cells[col["AdjPrice"]]),
+        )
+        for _, cells in table
+    ]
+    return AdjustedPrices(m.group(1), float(m.group(2)), rows)
 
 
 def _field(text: str, label: str) -> str:

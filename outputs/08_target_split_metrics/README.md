@@ -20,8 +20,11 @@ judged the same way, and we score two yardsticks that any model has to beat.
 - **Scores:** the median percentage miss (MdAPE: half of the predictions miss by less than
   this) and the share of predictions within 15% of the low bid. Item families with fewer
   than 20 test prices are grouped as "Other".
-- **Price levels:** prices are not yet adjusted for inflation. Step 2.2 adds the Caltrans
-  Construction Cost Index and these results will be rerun.
+- **Price levels:** every earlier price is brought to the bid date of the price being
+  predicted with Caltrans' cost index (4-quarter average, stage 09). In the test years the
+  index kept rising while prices for these items levelled off (see stage 09's check), so
+  escalated historical prices run high; the pricing models also see the bid date and can
+  correct for this.
 
 | Set | Prices | Contracts |
 | --- | ---: | ---: |
@@ -46,31 +49,31 @@ Contracts need a bid summary with its item lines: three test-period summaries we
 by OCR with their header only (decision D-026), so they have no lines to price.
 
 **The historical-median total landed closer to the low bid than the engineer's estimate on
-41.0% of headline contracts.**
+32.0% of headline contracts.**
 
 | Measure | Historical-median total | Engineer's estimate |
 | --- | ---: | ---: |
-| Median distance from the low bid | 27.5% | 21.2% |
-| Median over (+) or under (-) the low bid | 18.5% | 19.9% |
-| Within 15% of the low bid | 25.8% | 35.4% |
+| Median distance from the low bid | 41.9% | 21.2% |
+| Median over (+) or under (-) the low bid | 37.4% | 19.9% |
+| Within 15% of the low bid | 18.5% | 35.4% |
 
 All 201 test contracts with an engineer's estimate: closer on
-39.3%.
+31.8%.
 
 | Measure | Historical-median total | Engineer's estimate |
 | --- | ---: | ---: |
-| Median distance from the low bid | 27.5% | 20.4% |
-| Median over (+) or under (-) the low bid | 16.0% | 17.2% |
-| Within 15% of the low bid | 25.9% | 38.3% |
+| Median distance from the low bid | 40.0% | 20.4% |
+| Median over (+) or under (-) the low bid | 32.7% | 17.2% |
+| Within 15% of the low bid | 19.4% | 38.3% |
 
 How the lines of the headline contracts were priced:
 
 | Tier | How the line is priced | Share of lines | Share of BidLens dollars |
 | ---: | --- | ---: | ---: |
-| 1 | Top-100 item: trailing 12-month median | 27.6% | 70.7% |
-| 2 | Other standard item: median of earlier bids | 63.7% | 18.7% |
-| 3 | Special item: median of earlier bids with the same description | 4.4% | 9.1% |
-| 4 | Fallback: median for the same item family or unit | 4.3% | 1.6% |
+| 1 | Top-100 item: trailing 12-month median | 27.6% | 64.3% |
+| 2 | Other standard item: median of earlier bids | 63.7% | 22.8% |
+| 3 | Special item: median of earlier bids with the same description | 4.4% | 10.9% |
+| 4 | Fallback: median for the same item family or unit | 4.3% | 2.0% |
 | 5 | Unpriced: no earlier bid with the same unit | 0.0% | 0.0% |
 
 ## Item level: trailing 12-month median
@@ -88,58 +91,58 @@ All test prices:
 
 | Group | Prices | Coverage | MdAPE | Within 15% |
 | --- | ---: | ---: | ---: | ---: |
-| Traffic Control | 955 | 100.0% | 59.7% | 12.6% |
-| Asphalt Surfacing | 585 | 100.0% | 54.5% | 16.9% |
-| Water Pollution and Site Management | 506 | 100.0% | 69.4% | 14.6% |
-| General and Overhead | 427 | 100.0% | 63.6% | 9.8% |
-| Striping and Markings | 422 | 100.0% | 52.6% | 16.1% |
-| Earthwork and Clearing | 341 | 100.0% | 58.2% | 12.6% |
-| Fencing, Guardrail and Barriers | 221 | 100.0% | 36.1% | 23.1% |
-| Structural Concrete and Reinforcement | 219 | 100.0% | 35.0% | 23.7% |
-| Landscape and Erosion Control | 208 | 100.0% | 32.7% | 25.0% |
-| Electrical and Signals | 177 | 100.0% | 83.2% | 7.9% |
-| Bridge Rehabilitation and Removal | 121 | 100.0% | 28.5% | 31.4% |
-| Base and Subbase | 106 | 100.0% | 48.1% | 15.1% |
-| Minor Concrete and Miscellaneous | 70 | 100.0% | 38.1% | 25.7% |
-| Drainage | 55 | 100.0% | 33.8% | 27.3% |
-| Concrete Pavement | 45 | 100.0% | 44.2% | 20.0% |
-| Piling | 22 | 100.0% | 38.8% | 9.1% |
-| Steel Structures, Signs and Painting | 21 | 100.0% | 82.1% | 9.5% |
-| Other | 6 | 100.0% | 14.2% | 50.0% |
-| All | 4,507 | 100.0% | 52.9% | 15.9% |
+| Traffic Control | 955 | 100.0% | 60.0% | 14.0% |
+| Asphalt Surfacing | 585 | 100.0% | 55.1% | 15.7% |
+| Water Pollution and Site Management | 506 | 100.0% | 69.4% | 13.0% |
+| General and Overhead | 427 | 100.0% | 66.2% | 10.8% |
+| Striping and Markings | 422 | 100.0% | 54.7% | 15.2% |
+| Earthwork and Clearing | 341 | 100.0% | 59.9% | 12.0% |
+| Fencing, Guardrail and Barriers | 221 | 100.0% | 36.1% | 21.7% |
+| Structural Concrete and Reinforcement | 219 | 100.0% | 35.8% | 22.8% |
+| Landscape and Erosion Control | 208 | 100.0% | 32.3% | 24.5% |
+| Electrical and Signals | 177 | 100.0% | 83.5% | 7.9% |
+| Bridge Rehabilitation and Removal | 121 | 100.0% | 27.6% | 33.1% |
+| Base and Subbase | 106 | 100.0% | 48.3% | 16.0% |
+| Minor Concrete and Miscellaneous | 70 | 100.0% | 37.7% | 27.1% |
+| Drainage | 55 | 100.0% | 35.6% | 27.3% |
+| Concrete Pavement | 45 | 100.0% | 39.0% | 28.9% |
+| Piling | 22 | 100.0% | 51.5% | 4.5% |
+| Steel Structures, Signs and Painting | 21 | 100.0% | 81.6% | 9.5% |
+| Other | 6 | 100.0% | 58.0% | 16.7% |
+| All | 4,507 | 100.0% | 54.7% | 15.8% |
 
 Without flagged outliers:
 
 | Group | Prices | Coverage | MdAPE | Within 15% |
 | --- | ---: | ---: | ---: | ---: |
-| Traffic Control | 944 | 100.0% | 58.5% | 12.7% |
-| Asphalt Surfacing | 577 | 100.0% | 54.2% | 17.2% |
-| Water Pollution and Site Management | 503 | 100.0% | 69.2% | 14.7% |
-| General and Overhead | 425 | 100.0% | 63.4% | 9.9% |
-| Striping and Markings | 414 | 100.0% | 52.0% | 16.4% |
-| Earthwork and Clearing | 335 | 100.0% | 56.2% | 12.8% |
-| Fencing, Guardrail and Barriers | 219 | 100.0% | 36.0% | 23.3% |
-| Structural Concrete and Reinforcement | 212 | 100.0% | 34.5% | 24.5% |
-| Landscape and Erosion Control | 207 | 100.0% | 32.7% | 25.1% |
-| Electrical and Signals | 177 | 100.0% | 83.2% | 7.9% |
-| Bridge Rehabilitation and Removal | 118 | 100.0% | 27.5% | 32.2% |
-| Base and Subbase | 106 | 100.0% | 48.1% | 15.1% |
-| Minor Concrete and Miscellaneous | 69 | 100.0% | 38.0% | 26.1% |
-| Drainage | 55 | 100.0% | 33.8% | 27.3% |
-| Concrete Pavement | 42 | 100.0% | 39.3% | 21.4% |
-| Piling | 22 | 100.0% | 38.8% | 9.1% |
-| Steel Structures, Signs and Painting | 18 | 100.0% | 84.5% | 11.1% |
-| Other | 6 | 100.0% | 14.2% | 50.0% |
-| All | 4,449 | 100.0% | 52.4% | 16.1% |
+| Traffic Control | 944 | 100.0% | 59.3% | 14.2% |
+| Asphalt Surfacing | 577 | 100.0% | 54.4% | 15.9% |
+| Water Pollution and Site Management | 503 | 100.0% | 68.9% | 13.1% |
+| General and Overhead | 425 | 100.0% | 65.9% | 10.8% |
+| Striping and Markings | 414 | 100.0% | 53.4% | 15.5% |
+| Earthwork and Clearing | 335 | 100.0% | 59.2% | 12.2% |
+| Fencing, Guardrail and Barriers | 219 | 100.0% | 35.1% | 21.9% |
+| Structural Concrete and Reinforcement | 212 | 100.0% | 34.9% | 23.6% |
+| Landscape and Erosion Control | 207 | 100.0% | 31.9% | 24.6% |
+| Electrical and Signals | 177 | 100.0% | 83.5% | 7.9% |
+| Bridge Rehabilitation and Removal | 118 | 100.0% | 27.4% | 33.9% |
+| Base and Subbase | 106 | 100.0% | 48.3% | 16.0% |
+| Minor Concrete and Miscellaneous | 69 | 100.0% | 36.8% | 27.5% |
+| Drainage | 55 | 100.0% | 35.6% | 27.3% |
+| Concrete Pavement | 42 | 100.0% | 35.2% | 31.0% |
+| Piling | 22 | 100.0% | 51.5% | 4.5% |
+| Steel Structures, Signs and Painting | 18 | 100.0% | 88.8% | 11.1% |
+| Other | 6 | 100.0% | 58.0% | 16.7% |
+| All | 4,449 | 100.0% | 53.8% | 16.0% |
 
 By bid year (all test prices):
 
 | Group | Prices | Coverage | MdAPE | Within 15% |
 | --- | ---: | ---: | ---: | ---: |
-| 2024 | 1,758 | 100.0% | 51.7% | 15.9% |
-| 2025 | 1,748 | 100.0% | 52.2% | 16.9% |
-| 2026 | 1,001 | 100.0% | 57.1% | 14.3% |
-| All | 4,507 | 100.0% | 52.9% | 15.9% |
+| 2024 | 1,758 | 100.0% | 54.7% | 14.8% |
+| 2025 | 1,748 | 100.0% | 53.5% | 16.9% |
+| 2026 | 1,001 | 100.0% | 56.1% | 15.8% |
+| All | 4,507 | 100.0% | 54.7% | 15.8% |
 
 ## Files
 

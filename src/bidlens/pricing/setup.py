@@ -1,7 +1,7 @@
 """Step 2.1: target, time split and metrics (decision D-034).
 
-- Target: log of the escalated low-bid (rank 1) unit price. Models predict the log; the
-  metrics below are computed on prices.
+- Target: log of the escalated low-bid (rank 1) unit price (escalation: D-040, step 2.2).
+  Models predict the log; the metrics below are computed on prices.
 - Split: train on bids opened before CUTOFF, test on CUTOFF to TEST_END.
 - The test set drops contracts flagged `low_bidder_disagrees` and prices that are zero or
   negative (a percentage error is undefined). Flagged price outliers stay in; results are
@@ -26,13 +26,30 @@ MIN_FAMILY_TEST = 20
 OTHER = "Other"
 
 
-def escalate(prices, from_dates, to_date) -> np.ndarray:
-    """Bring prices from their bid dates to `to_date` dollars.
+_UNSET = object()
+_cost_index = _UNSET
 
-    Identity until step 2.2 adds the Caltrans Construction Cost Index. Every price that
-    crosses dates goes through here, so 2.2 only has to change this function.
+
+def use_cost_index(index) -> None:
+    """Set the cost index used by `escalate` (a `CostIndex`), or None for no escalation.
+
+    Scripts call `use_cost_index(CostIndex.from_db(con))`; tests may pass None.
     """
-    return np.asarray(prices, dtype=float)
+    global _cost_index
+    _cost_index = index
+
+
+def escalate(prices, from_dates, to_date) -> np.ndarray:
+    """Bring prices from their bid dates to `to_date` dollars (decision D-040).
+
+    Every price that crosses dates goes through here. Raises if no index was set, so
+    unescalated prices can't slip through by accident.
+    """
+    if _cost_index is _UNSET:
+        raise RuntimeError("no cost index set: call use_cost_index() first")
+    if _cost_index is None:
+        return np.asarray(prices, dtype=float)
+    return _cost_index.escalate(prices, from_dates, to_date)
 
 
 def target(unit_price) -> np.ndarray:
