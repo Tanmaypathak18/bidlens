@@ -251,13 +251,22 @@ def _location_parts(location: str | None) -> tuple[str | None, str | None]:
 
 
 def _type_of_work(page1: str) -> str | None:
-    """The free-text line after 'Location: ... Number of Items:' on page 1."""
+    """The contract description: the first mixed-case text between 'Location:' and
+    'Proposals Issued' (project location lines are all capitals)."""
     lines = page1.splitlines()
-    for i, line in enumerate(lines):
-        if line.startswith("Location:") and i + 1 < len(lines):
-            nxt = lines[i + 1].strip()
-            if not re.match(r"^(NO GOAL|DBE|SBE|DVBE|Federal Aid|Proposals Issued)", nxt):
-                return nxt
+    start = next((i for i, line in enumerate(lines) if line.startswith("Location:")), None)
+    if start is None:
+        return None
+    for line in lines[start : start + 8]:
+        if line.startswith("Proposals Issued"):
+            break
+        text = re.sub(r"Number of Items:\s*\d+", "", line)
+        text = re.split(r"\s+(?:Federal Aid|NO GOAL|DVBE|DBE|SBE)\b", text)[0]
+        text = re.sub(r"^Location:\s*", "", text)
+        # A sentence start: a capitalized word followed by a lowercase word.
+        m = re.search(r"(?<![\w-])[A-Z][a-z]*\s+[a-z&][^\n]*", text)
+        if m:
+            return m.group(0).strip()
     return None
 
 

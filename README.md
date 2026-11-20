@@ -135,7 +135,9 @@ Estimators are right to be skeptical of a number with no explanation. BidLens is
 
 ## Results
 
-Evaluation results will be published here and in `docs/results/` as v1 is completed:
+**Follow the work step by step:** every stage writes its results to a numbered folder in [`outputs/`](outputs/README.md), from the source review and the 72,113 collected bid prices to the cross-checks and data quality reports. Each folder has a plain-language README. No file names a bidder.
+
+Evaluation results will be published here and in `outputs/` as v1 is completed:
 
 - **Pricing accuracy** by item family: median error, and the share of items within 15% of the winning unit price, against the engineer's estimate.
 - **Model comparison:** XGBoost, LightGBM and NVIDIA Kumo Tabular, covering accuracy, speed and license.

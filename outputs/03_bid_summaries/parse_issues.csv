@@ -1,0 +1,9 @@
+file,contract_number_in_pdf,bid_open_date_in_pdf,parse_status,problem
+04-0P1104_2021-05-20.pdf,04-0P1104,2019-05-01,usable,bid date in file is 2019-05-01
+04-0W0604.pdf,04-0W0604,2026-09-01,"usable, contract fields only","item rows 54 != Number of Items 56; item total 2,248,650.00 != low bid cost 2,270,250.00"
+04-1A6614.pdf,,,not usable,unreadable: missing header fields (older layout): ['engineers_estimate']
+04-1Q4604.pdf,04-1Q4604,2024-03-14,"usable, contract fields only","item rows 117 != Number of Items 119; item total 20,786,936.90 != low bid cost 20,793,388.40; 2 item lines not parsed"
+04-4J9704_2022-04-21.pdf,04-4J9704,2021-10-14,usable,bid date in file is 2021-10-14
+05-0T9914_2023-03-29.pdf,05-0T9914,2022-07-27,usable,bid date in file is 2022-07-27
+05-1K4604.pdf,05-1K4604,2023-06-13,"usable, contract fields only","item rows 112 != Number of Items 113; item total 8,777,086.50 != low bid cost 8,785,309.00; 1 item lines not parsed"
+05-1R7704.pdf,05-1R7704,2026-05-07,"usable, contract fields only","item total 4,042,875.00 != low bid cost 4,049,375.00; 1 item lines not parsed"
