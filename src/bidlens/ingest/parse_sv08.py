@@ -146,6 +146,14 @@ def _field(text: str, label: str) -> str:
     return m.group(1).strip()
 
 
+def _county(location: str) -> str:
+    """County code from 'SON-101-22.8' or '04-SON-101-22.8' (some rows lead with the district)."""
+    parts = location.split("-")
+    if len(parts) > 1 and parts[0].isdigit():
+        parts = parts[1:]
+    return parts[0].strip().upper()
+
+
 def parse_details(html: str) -> ContractDetail:
     """Parse a details.php page (one bid row) into its contract-level fields."""
     if (msg := site_error(html)) is not None:
@@ -161,6 +169,6 @@ def parse_details(html: str) -> ContractDetail:
         contract_number=contract,
         bid_open_date=_mdy(_field(text, "Bid Opening Date (mm-dd-yyyy):")),
         location=location,
-        county=location.split("-", 1)[0].upper(),
+        county=_county(location),
         type_of_work=_field(text, "Type of work:"),
     )

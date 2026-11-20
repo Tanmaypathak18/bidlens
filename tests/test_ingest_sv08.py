@@ -259,3 +259,11 @@ def test_write_parquet_dedupes(tmp_path: Path) -> None:
     n = con.execute(f"SELECT count(DISTINCT contract_number) FROM '{out}'").fetchone()[0]
     con.close()
     assert n > 1
+
+
+def test_county_with_district_prefix() -> None:
+    from bidlens.ingest.parse_sv08 import _county
+
+    assert _county("SON-101-22.8/32.8") == "SON"
+    assert _county("04-ALA-880-20.9/20.9") == "ALA"
+    assert _county("05-SB-101,217-Var") == "SB"
