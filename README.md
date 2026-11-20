@@ -91,7 +91,7 @@ flowchart TB
         A2["Excel estimate export"]
     end
 
-    G["Governance: local-only mode for confidential bids (v1);<br/>role-based access and AI audit log (Roadmap)"]
+    G["Governance: runs fully on your machine, no paid services (v1);<br/>role-based access and AI audit log (Roadmap)"]
 
     S1 --> P1
     S2 --> M3
@@ -118,7 +118,7 @@ flowchart TB
 - **Data platform.** Collects public bid history at a polite rate and caches everything so runs can be repeated. It cleans the data into one standard model and runs quality checks: missing values, impossible prices, duplicates and outliers.
 - **Pricing.** Predicts unit prices by item, location, quantity and date, after adjusting history to today's dollars with the Caltrans Construction Cost Index. Two kinds of model are compared side by side on the same test: gradient-boosted trees (XGBoost, LightGBM) and NVIDIA Kumo Tabular, a foundation model for tables. The agency's own engineer's estimate is the benchmark both must beat. The best model is chosen per item family, based on the results.
 - **Market context.** Learns from past bid openings how many bidders a project like this attracts, and how the winning bid usually compares with the engineer's estimate.
-- **Document analyst.** Turns bid documents into structured, cited findings using a large language model. A local mode runs entirely on the user's machine, so confidential documents never leave it.
+- **Document analyst.** Turns bid documents into structured, cited findings using an open-weight language model that runs on your own computer through [Ollama](https://ollama.com). Bid documents never leave the machine, and nothing is sent to a paid service. Every finding must quote the page it came from, and BidLens checks that the quote is really there.
 - **Estimator app.** A simple web app that follows the estimator's own order of work and ends in an Excel export.
 
 ---
@@ -130,7 +130,7 @@ Estimators are right to be skeptical of a number with no explanation. BidLens is
 - **Every number shows its evidence.** Prices come with the past bids behind them. Extracted findings come with page and section references.
 - **Honest testing.** Models are trained on older bids and tested only on newer ones, the same way they would be used in practice. Results are reported item family by item family, including where a model loses.
 - **A real benchmark.** Each model is measured against the agency's engineer's estimate, not just against other models.
-- **Confidential mode.** Sensitive bid documents can be processed entirely on the local machine.
+- **Runs locally, at no cost.** Everything, including the document reading, runs on your own computer with free, open models. Bid documents never leave the machine, and there is no subscription or API bill.
 - **Market-level analysis.** The app looks at market behavior, not at individual contractors.
 
 ## Results
@@ -164,12 +164,18 @@ v1 covers Caltrans Districts 4 and 5, bid years 2018 to 2026, and the 100 highes
 
 ## Getting started
 
-Requirements: Python 3.11 or newer, and [uv](https://docs.astral.sh/uv/).
+Requirements: Python 3.11 or newer, [uv](https://docs.astral.sh/uv/), and, for reading bid documents, [Ollama](https://ollama.com) with one local model (about 5 GB; a Mac with 16 GB of memory runs it). Everything is free and runs on your machine.
 
 ```bash
 git clone <repo-url> && cd bidlens
 uv sync
 uv run streamlit run app/Home.py
+```
+
+To read bid documents, install Ollama and download the model once:
+
+```bash
+ollama pull qwen3:8b
 ```
 
 The app runs on the included sample data. To rebuild the full dataset from the public sources, run `make data`. This takes a while, because requests are deliberately rate-limited.
@@ -180,6 +186,8 @@ Other commands:
 make test    # run the test suite
 make lint    # lint with ruff
 ```
+
+**Optional: hosted model.** BidLens never needs a paid service. If you have your own Anthropic API key and prefer a hosted model for document reading, set `ANTHROPIC_API_KEY` and run the extraction with `--mode hosted`. This is off by default; it sends the relevant document passages to the Claude API and is billed to your key.
 
 ## Project structure
 
