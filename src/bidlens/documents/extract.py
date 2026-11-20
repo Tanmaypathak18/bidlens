@@ -1,8 +1,13 @@
 """Step 3.3: extract scope, risks and requirements with page citations (decision D-052).
 
 Usage (local is the default; documents never leave this machine, no paid service):
-    uv run python -m bidlens.documents.extract 04-0W0504 --model qwen3:8b
+    uv run python -m bidlens.documents.extract 04-0W0504                  # qwen3:8b
     uv run python -m bidlens.documents.extract 04-0W0504 --model llama3.1:8b
+    uv run python -m bidlens.documents.extract 04-0W0504 --mode combined  # both + patterns
+    uv run python -m bidlens.documents.extract 04-0W0504 --mode patterns  # rules only
+
+The default is the second round (D-060 to D-063): rebuilt closure charts, a question
+checklist per topic, and the closure tables; `--round1` reproduces step 3.5's settings.
 
 Optional, for users with their own Anthropic API key (sends the document passages to the
 Claude API, which is a paid service): set ANTHROPIC_API_KEY and add `--mode hosted`.
@@ -40,6 +45,9 @@ MAX_ITEMS = 25  # D-058
 
 HOSTED_MODEL = os.environ.get("BIDLENS_HOSTED_MODEL", "claude-opus-5-5")
 LOCAL_MODEL = os.environ.get("BIDLENS_LOCAL_MODEL", "qwen3:8b")
+# The run the app shows (D-059, D-063), then fallbacks if it has not been run.
+DEFAULT_RUN = "local_qwen3-8b_v2"
+RUN_FALLBACKS = ("combined", "local_qwen3-8b_v2", "local_qwen3-8b", "patterns")
 
 
 @dataclass(frozen=True)
@@ -126,6 +134,106 @@ CATEGORIES = [
     ),
 ]
 
+# D-061: specific questions an estimator asks on each topic, written for any Caltrans
+# contract (not for the sample one).
+CHECKLIST: dict[str, list[str]] = {
+    "scope": [
+        "What is the general work description?",
+        "Which counties, routes and locations does the work cover?",
+        "What are the main types of work (the largest parts of the job)?",
+        "What is the engineer's estimated cost?",
+        "Do the addenda add, delete or change bid items or work?",
+        "Is any work to be done by others, or excluded from the contract?",
+    ],
+    "time_damages": [
+        "How many working days are allowed to complete the work?",
+        "When may or must job site activities start, and what must be done first?",
+        "What are the liquidated damages per day for late completion?",
+        "What damages apply for reopening a lane or ramp closure late?",
+        "Are there interim milestones, or separate time limits for parts of the work?",
+        "How is time-related overhead bid and paid?",
+        "What notices are required before starting work?",
+        "What other penalties or withholds are tied to time or performance?",
+    ],
+    "traffic": [
+        "During which hours are lane, ramp or connector closures allowed?",
+        "How many lanes must be kept open, and where?",
+        "What limits apply to the length, number or spacing of closures?",
+        "When must all lanes be open (holidays, special days)?",
+        "Are moving closures or one-way traffic control allowed, and with what limits?",
+        "What protective devices are required (attenuator vehicles, mobile barriers, signs)?",
+        "Is a work zone speed limit reduction required?",
+        "Which closures depend on others (ramps that can't close at the same time)?",
+        "What traffic plans or contingency plans must be submitted?",
+    ],
+    "environmental": [
+        "Which protected species or habitats are in or near the project?",
+        "What seasonal work restrictions apply (for example bird nesting season)?",
+        "What surveys, biologist work or training are required before work, and when?",
+        "What buffers or stop-work distances apply if wildlife or nests are found?",
+        "What materials or practices are prohibited?",
+        "What permits or approvals are needed, including for areas outside the job site?",
+        "What daily site protection is required (covering holes, inspections)?",
+    ],
+    "hazardous": [
+        "What hazardous or regulated materials are present (for example aerially deposited lead)?",
+        "What lead concentrations or classifications are reported, and at what depths?",
+        "How must regulated material be handled, stockpiled, transported and disposed of?",
+        "Which quantities or bid items cover hazardous material?",
+        "What plans and documentation are required, and when are they due?",
+        "Who pays for extra sampling, testing or disposal costs?",
+        "What rules apply to local or imported material?",
+    ],
+    "geotechnical": [
+        "What soil, rock or groundwater conditions are reported?",
+        "How do site conditions affect excavation, posts or foundations?",
+        "How are changes in excavation, embankment or borrow quantities paid?",
+        "Are there excavation limits or methods required at specific locations?",
+        "What site investigation reports or test results are in the information handout?",
+        "Are there other site conditions that affect methods or cost?",
+    ],
+    "utilities": [
+        "Which utilities must be protected, relocated or worked around?",
+        "Which other contracts or agencies work at or near the job site, and what "
+        "coordination is required?",
+        "Is a railroad within or next to the project, and what applies?",
+        "What notice is needed before working on existing electrical or utility systems?",
+        "Who performs utility work, and when?",
+        "Are there third-party permits or agreements the contractor must follow?",
+    ],
+    "bid_requirements": [
+        "When do bids open, and how are they submitted?",
+        "Is there a prebid meeting, is it mandatory, and when is it?",
+        "What bidder's security is required?",
+        "What contractor license is required?",
+        "What small business, DVBE or DBE goals or reporting apply?",
+        "What wage requirements apply (prevailing and federal minimum wages)?",
+        "Is the project federal-aid, and what federal requirements follow (training, Buy America)?",
+        "What do the addenda change for bidders?",
+        "What supplemental information is provided for bidding?",
+    ],
+    "submittals": [
+        "What safety submittals are required, and when?",
+        "What submittals are required for traffic safety devices (crash cushions, "
+        "barriers, terminals), and when?",
+        "What equipment or emissions submittals are required, and when?",
+        "What material test results or mix designs must be submitted, and when?",
+        "What payroll, payment or labor reports must be submitted, and how often?",
+        "What requests or notices must be submitted before storing materials or starting work?",
+        "What test results must be submitted after testing, and how soon?",
+    ],
+    "payment": [
+        "Are there quoted prices or rental costs given for any equipment or material?",
+        "How are major or unusual items measured and paid (by day, month, length)?",
+        "When must subcontractors and suppliers be paid?",
+        "What are the dispute resolution rates the contractor shares?",
+        "What thresholds apply to payment for materials on hand?",
+        "What withholds or penalties can reduce payment?",
+        "Which items are paid as change order work rather than bid items?",
+        "Are there payment terms for mobilization, move-in or move-out?",
+    ],
+}
+
 SCHEMA = {
     "type": "object",
     "properties": {
@@ -166,6 +274,32 @@ Use only the passages. If an addendum changes something, report the addendum's v
 If the passages say nothing on the topic, return an empty list."""
 
 
+CHECKLIST_SCHEMA = json.loads(json.dumps(SCHEMA))
+_props = CHECKLIST_SCHEMA["properties"]["items"]["items"]
+_props["properties"] = {"question": {"type": "string", "maxLength": 10}, **_props["properties"]}
+_props["required"] = ["question", *_props["required"]]
+
+CHECKLIST_SYSTEM = """You read Caltrans highway construction bid documents for a contractor's \
+estimator. You are given numbered passages ("chunks") from one contract's Notice to \
+Bidders and Special Provisions, addenda and information handout, one topic and a \
+checklist of questions on that topic.
+
+Answer the checklist from the passages, as JSON items, at most 25 in all. For each \
+question the passages answer, give one item per distinct fact (usually one); skip \
+questions the passages do not answer, and never state the same fact twice. After the \
+questions, add at most 5 other facts on the topic that an estimator must price or plan \
+around, with question "other". For each item:
+- question: the question id (q1, q2, ...) or "other".
+- statement: one plain-English sentence that answers it, with its conditions.
+- value: the key number or limit (an amount, a duration, hours, a date), or "" if none.
+- evidence: a short exact quote copied character for character from one chunk that \
+supports the statement (at most 300 characters; do not paraphrase or join text from \
+different chunks).
+- chunk_id: the id of that chunk.
+
+Use only the passages. If an addendum changes something, report the addendum's version."""
+
+
 # ----------------------------------------------------------------- retrieval
 
 
@@ -201,23 +335,37 @@ class BM25:
         return out
 
 
-def retrieve(chunks: pd.DataFrame, cat: Category, k: int = TOP_K) -> pd.DataFrame:
-    """The top-k chunks for a category, plus every addendum chunk."""
+RAW_GRID = re.compile(r"Hour 00 01 02 03")
+
+
+def retrieve(
+    chunks: pd.DataFrame, cat: Category, k: int = TOP_K, charts: pd.DataFrame | None = None
+) -> pd.DataFrame:
+    """The top-k chunks for a category, plus every addendum chunk. With `charts` (D-060),
+    the traffic topic gets one rebuilt line per closure chart in place of the raw grids."""
     pool = chunks if cat.handout else chunks[chunks["kind"] != "information_handout"]
     pool = pool.reset_index(drop=True)
     s = BM25(pool["text"].tolist()).scores(cat.terms + " " + cat.ask)
     top = pool.assign(score=s).sort_values("score", ascending=False).head(k)
     add = chunks[chunks["kind"] == "addendum"]
-    return pd.concat([top, add[~add["chunk_id"].isin(top["chunk_id"])]], ignore_index=True)
+    ctx = pd.concat([top, add[~add["chunk_id"].isin(top["chunk_id"])]], ignore_index=True)
+    if charts is not None and len(charts) and cat.key == "traffic":
+        ctx = ctx[~ctx["text"].str.contains(RAW_GRID)]
+        ctx = pd.concat([ctx, charts], ignore_index=True)
+    return ctx
 
 
-def prompt(cat: Category, ctx: pd.DataFrame) -> str:
+def prompt(cat: Category, ctx: pd.DataFrame, checklist: bool = False) -> str:
     parts = [
         f'<chunk id="{r.chunk_id}" document="{r.title}" page="{r.page}" '
         f'section="{r.section}">\n{r.text}\n</chunk>'
         for r in ctx.itertuples()
     ]
-    return "\n\n".join(parts) + f"\n\nTopic: {cat.name}. {cat.ask}"
+    tail = f"\n\nTopic: {cat.name}. {cat.ask}"
+    if checklist:
+        qs = "\n".join(f"q{i}. {q}" for i, q in enumerate(CHECKLIST[cat.key], start=1))
+        tail += f"\n\nChecklist:\n{qs}"
+    return "\n\n".join(parts) + tail
 
 
 # ----------------------------------------------------------------- backends
@@ -407,6 +555,8 @@ def cite(items: list[dict], ctx: pd.DataFrame, cat: Category) -> tuple[list[dict
             {
                 "category": cat.key,
                 "category_name": cat.name,
+                "question": it.get("question", ""),
+                "source": it.get("source", "model"),
                 "statement": it["statement"].strip(),
                 "value": it.get("value", "").strip(),
                 "evidence": quote.strip(),
@@ -454,17 +604,31 @@ def quantities(contract: str) -> list[dict]:
     return out
 
 
-def run(contract: str, backend, categories=CATEGORIES, partial: Path | None = None) -> dict:
+TABLES = ("quantities", "closure_hours", "closure_damages")  # read by code, not scored
+
+
+def run(
+    contract: str,
+    backend,
+    categories=CATEGORIES,
+    partial: Path | None = None,
+    v2: bool = False,
+) -> dict:
     """Extract every category. With `partial`, finished categories are saved after each
-    call and skipped on a rerun, so an interrupted run resumes where it stopped."""
+    call and skipped on a rerun, so an interrupted run resumes where it stopped. `v2`
+    is the second round: rebuilt closure charts (D-060) and the checklist (D-061)."""
+    from bidlens.documents.charts import chart_chunks
+
     chunks = pd.read_parquet(CACHE / contract / "chunks.parquet")
+    charts = chart_chunks(contract) if v2 else None
+    system, schema = (CHECKLIST_SYSTEM, CHECKLIST_SCHEMA) if v2 else (SYSTEM, SCHEMA)
     done = json.loads(partial.read_text()) if partial and partial.exists() else {}
     for cat in categories:
         if cat.key in done:
             continue
-        ctx = retrieve(chunks, cat)
+        ctx = retrieve(chunks, cat, charts=charts)
         t0 = time.perf_counter()
-        raw = backend.complete(SYSTEM, prompt(cat, ctx), SCHEMA).get("items", [])
+        raw = backend.complete(system, prompt(cat, ctx, checklist=v2), schema).get("items", [])
         kept, rej = cite(raw, ctx, cat)
         done[cat.key] = {
             "items": kept,
@@ -484,11 +648,115 @@ def run(contract: str, backend, categories=CATEGORIES, partial: Path | None = No
     keys = [c.key for c in categories]
     return {
         "contract": contract,
-        "mode": backend.name,
+        "mode": backend.name + ("_v2" if v2 else ""),
         "model": getattr(backend, "model", ""),
-        "items": quantities(contract) + [i for k in keys for i in done[k]["items"]],
+        "items": quantities(contract)
+        + (tables(contract) if v2 else [])
+        + [i for k in keys for i in done[k]["items"]],
         "rejected": [i for k in keys for i in done[k]["rejected"]],
         "calls": [done[k]["call"] for k in keys],
+    }
+
+
+def tables(contract: str) -> list[dict]:
+    """Closure hours (D-060) and late closure damages (D-062), read by code."""
+    from bidlens.documents import patterns as pt
+
+    out = []
+    path = CACHE / contract / "charts.parquet"
+    cs = pd.read_parquet(path) if path.exists() else pd.DataFrame()
+    for r in cs.itertuples():
+        out.append(
+            {
+                "category": "closure_hours",
+                "category_name": "Closure hours (closure charts)",
+                "question": "",
+                "source": "table",
+                "statement": r.text,
+                "value": r.compact.split(": ", 1)[-1],
+                "evidence": f"Chart No. {r.chart}",
+                "chunk_id": f"{r.file}:p{r.page}:{r.chart}",
+                "document": "Special Provisions",
+                "file": r.file,
+                "page": int(r.page),
+                "printed_page": "",
+                "section": "12-4.02C(3) Closure charts",
+                "section_number": "12-4.02C(3)",
+            }
+        )
+    chunks = pd.read_parquet(CACHE / contract / "chunks.parquet")
+    rows = [f for f in pt.match(chunks) if f["rule"] in pt.TABLE_RULES]
+    kept, _ = cite(rows, chunks, _cat("time_damages"))
+    for k in kept:
+        k.update(category="closure_damages", category_name="Late closure damages", source="table")
+    return out + kept
+
+
+def _cat(key: str) -> Category:
+    return next(c for c in CATEGORIES if c.key == key)
+
+
+def pattern_run(contract: str) -> dict:
+    """The pattern rules alone (D-062), checked and cited like model findings."""
+    from bidlens.documents import patterns as pt
+
+    chunks = pd.read_parquet(CACHE / contract / "chunks.parquet")
+    t0 = time.perf_counter()
+    raw = [f for f in pt.match(chunks) if f["rule"] not in pt.TABLE_RULES]
+    items, rejected = [], []
+    for cat in CATEGORIES:
+        mine = [
+            {**f, "source": "pattern", "question": f["rule"]} for f in raw if f["topic"] == cat.key
+        ]
+        kept, rej = cite(mine, chunks, cat)
+        items += kept
+        rejected += rej
+    return {
+        "contract": contract,
+        "mode": "patterns",
+        "model": "pattern rules (no model)",
+        "items": quantities(contract) + tables(contract) + items,
+        "rejected": rejected,
+        "calls": [
+            {
+                "category": "all",
+                "returned": len(raw),
+                "kept": len(items),
+                "seconds": round(time.perf_counter() - t0, 1),
+            }
+        ],
+    }
+
+
+def _overlap(a: dict, b: dict) -> bool:
+    """D-063: the same fact twice, by quote containment in one chunk or statement words."""
+    if a["category"] != b["category"]:
+        return False
+    if a["chunk_id"] == b["chunk_id"]:
+        qa, qb = words(a["evidence"]), words(b["evidence"])
+        if qa in qb or qb in qa:
+            return True
+    wa, wb = set(tokens(a["statement"])), set(tokens(b["statement"]))
+    return bool(wa and wb) and len(wa & wb) / len(wa | wb) >= 0.7
+
+
+def merge(contract: str, runs: list[dict], name: str) -> dict:
+    """Merge kept findings in priority order (first run wins), dropping duplicates."""
+    kept: list[dict] = []
+    for res in runs:
+        for it in res["items"]:
+            if it["category"] in TABLES:
+                continue
+            if not any(_overlap(it, k) for k in kept):
+                kept.append({**it, "run": res["mode"]})
+    return {
+        "contract": contract,
+        "mode": name,
+        "model": " + ".join(r.get("model", r["mode"]) for r in runs),
+        "items": quantities(contract) + tables(contract) + kept,
+        "rejected": [i for r in runs for i in r["rejected"]],
+        "calls": [c for r in runs for c in r["calls"]],
+        "merged_from": [r["mode"] for r in runs],
     }
 
 
@@ -498,28 +766,58 @@ def save(result: dict) -> Path:
     return path
 
 
-def main(argv: list[str] | None = None) -> int:
-    ap = argparse.ArgumentParser(description=__doc__)
-    ap.add_argument("contract")
-    ap.add_argument("--mode", choices=["local", "hosted"], default="local")
-    ap.add_argument("--model", help=f"Ollama model for local mode (default {LOCAL_MODEL})")
-    args = ap.parse_args(argv)
-    if args.mode == "hosted":
-        backend = HostedBackend(args.model or HOSTED_MODEL)
-    else:
-        backend = LocalBackend(args.model or LOCAL_MODEL)
-    partial = CACHE / args.contract / f"extraction_{backend.name}.partial.json"
+def load(contract: str, mode: str) -> dict:
+    return json.loads((CACHE / contract / f"extraction_{mode}.json").read_text())
+
+
+def model_run(contract: str, mode: str, model: str, v2: bool) -> dict:
+    backend = HostedBackend(model or HOSTED_MODEL) if mode == "hosted" else LocalBackend(model)
+    name = backend.name + ("_v2" if v2 else "")
+    partial = CACHE / contract / f"extraction_{name}.partial.json"
     try:
-        result = run(args.contract, backend, partial=partial)
+        result = run(contract, backend, partial=partial, v2=v2)
     finally:
         if hasattr(backend, "close"):
             backend.close()
-    path = save(result)
+    save(result)
     partial.unlink(missing_ok=True)
-    from bidlens.documents.report import write_extraction_report
-
-    write_extraction_report(args.contract)
     print(json.dumps(result["calls"], indent=2))
+    return result
+
+
+COMBINED_MODELS = ("qwen3:8b", "llama3.1:8b")  # priority order (D-063)
+
+
+def main(argv: list[str] | None = None) -> int:
+    ap = argparse.ArgumentParser(description=__doc__)
+    ap.add_argument("contract")
+    ap.add_argument("--mode", choices=["local", "hosted", "combined", "patterns"], default="local")
+    ap.add_argument("--model", help=f"Ollama model for local mode (default {LOCAL_MODEL})")
+    ap.add_argument(
+        "--round1",
+        action="store_true",
+        help="step 3.5 settings: open lists, raw chart text, no tables (for comparison)",
+    )
+    ap.add_argument(
+        "--reuse", action="store_true", help="combined: merge saved runs instead of rerunning"
+    )
+    args = ap.parse_args(argv)
+    c, v2 = args.contract, not args.round1
+    if args.mode == "patterns":
+        result = pattern_run(c)
+    elif args.mode == "combined":
+        runs = []
+        for m in COMBINED_MODELS:
+            name = f"local_{slug(m)}_v2"
+            have = (CACHE / c / f"extraction_{name}.json").exists()
+            runs.append(load(c, name) if args.reuse and have else model_run(c, "local", m, True))
+        pat = pattern_run(c)
+        save(pat)
+        result = merge(c, [pat, *runs], "combined")
+    else:
+        model = args.model or (LOCAL_MODEL if args.mode == "local" else "")
+        result = model_run(c, args.mode, model, v2)
+    path = save(result)
     print(f"{len(result['items'])} items, {len(result['rejected'])} rejected -> {path}")
     return 0
 
