@@ -7,6 +7,7 @@ description = "AI estimating copilot for heavy civil bids, built on public Caltr
 readme = "README.md"
 requires-python = ">=3.11"
 dependencies = [
+    "anthropic>=2.11.0",
     "beautifulsoup4>=4.15.0",
     "duckdb>=2.0.0",
     "httpx>=0.28.1",
