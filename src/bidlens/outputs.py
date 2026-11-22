@@ -80,11 +80,7 @@ def _move_report(src: Path, dst: Path) -> None:
 def stage_01() -> dict:
     d = OUT / "01_source_review"
     _move_report(ROOT / "docs/results/source_review.md", d / "source_review.md")
-    samples = d / "endpoint_samples"
-    samples.mkdir(parents=True, exist_ok=True)
     names = sorted(p.name for p in FIXTURES.glob("*.html"))
-    for name in names:
-        shutil.copy2(FIXTURES / name, samples / name)
     _readme(
         d,
         "01 Source review",
@@ -92,7 +88,7 @@ def stage_01() -> dict:
 {STAGES["01_source_review"]}
 
 - `source_review.md` is the review itself. It covers the Caltrans Contract Cost Data site, the HQ bid summary site and the item list, with their conditions of use and what each one contains.
-- `endpoint_samples/` holds one saved page per endpoint used ({len(names)} files), exactly as the site returned it on 2026-11-19. The same files are the test fixtures in `tests/fixtures/caltrans/`.
+- One saved page per endpoint used ({len(names)} files, no bidder names) is kept only as test fixtures in `tests/fixtures/caltrans/`, so the parsers are tested on the site's real layout.
 
 How it was produced: by hand in step 1.1, with plain web requests at least 2 seconds apart. The HQ bid summary site's robots.txt disallows automated access, so no script ever requests it.
 """,
