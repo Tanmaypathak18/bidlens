@@ -38,7 +38,7 @@ Recall by topic (a gold fact counts as found whichever topic's answer found it):
 
 ## Who labeled, and how
 
-The gold facts were written by **Claude, the AI assistant building BidLens, not by a human
+The gold facts were written **with an AI assistant, not a human
 estimator**. They were labeled from the passages each topic retrieves (what the models
 see) and committed to git before either model's output was opened. Every finding from both
 models was then pooled, shuffled and judged with the model name hidden

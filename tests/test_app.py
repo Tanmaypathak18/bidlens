@@ -54,3 +54,5 @@ def test_hosted_demo_does_not_claim_to_run_locally(monkeypatch):
     text = " ".join(m.value for m in at.markdown)
     assert "Demo on public sample data" in text
     assert "documents never leave this computer" not in text
+    links = " ".join(m.value for m in at.sidebar.markdown)
+    assert "github.com/Tanmaypathak18/bidlens" in links  # the demo links back to the code

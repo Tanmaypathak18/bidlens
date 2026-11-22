@@ -65,6 +65,8 @@ bid, so the draft can be checked against the real result.
   llama3.1:8b through Ollama, plus plain pattern rules). This Space shows the saved
   results; it does not run a model, and no bid documents are uploaded.
 - No bidder is named anywhere: bids are identified by rank only.
+
+Source code, method and results: https://github.com/Tanmaypathak18/bidlens
 """
 
 

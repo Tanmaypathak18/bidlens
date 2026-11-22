@@ -73,7 +73,7 @@ BidLens prices the bid items of a Caltrans heavy civil contract from past low bi
 - **Items outside the 100 modeled ones** are priced from medians of earlier bids, with no range; contract-specific items with no history fall back to family medians.
 - **Escalation** follows a statewide index; local shocks (a material shortage, a single large project) are not captured.
 - **Document reading is an aid, not a substitute.** About 1 finding in 4 needs correcting, and about a quarter of the facts an estimator needs were missed on the test package. The app always shows the quote and page so a finding can be checked in seconds. Only one bid package was evaluated.
-- **Who labelled the evaluation.** The 89 gold facts, the judging and the checklist questions were written by Claude, the AI assistant that built BidLens, not by a human estimator. A human review is still open, and the improvement from the checklist may be somewhat optimistic.
+- **Who labelled the evaluation.** The 89 gold facts, the judging and the checklist questions were done with an AI assistant, not a human estimator. A human review is still open, and the improvement from the checklist may be somewhat optimistic.
 - **Leakage controls.** Models see only what is known before bids open; the cost index uses only quarters published before the bid; the actual bids of a package are shown in the app only as a labelled check and never feed the draft.
 
 ## Ethical considerations

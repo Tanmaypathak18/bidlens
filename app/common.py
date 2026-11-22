@@ -126,6 +126,9 @@ def cite(r) -> str:
     return f"{r.document}, PDF page {r.page}{printed}{sec}"
 
 
+REPO_URL = "https://github.com/Tanmaypathak18/bidlens"
+
+
 def header(title: str) -> str | None:
     """Page setup, the package picker and the shared page header."""
     from design import page_header, setup
@@ -139,6 +142,7 @@ def header(title: str) -> str | None:
         if hosted()
         else "No paid service is used. Bid documents stay on this computer."
     )
+    st.sidebar.markdown(f"[Source code and method on GitHub]({REPO_URL})")
     if contract:
         page_header(summary(contract), title)
     return contract

@@ -4,7 +4,7 @@
 
 BidLens helps an estimator move from "here is a new bid package" to "here is a defensible draft estimate" faster. It reads the bid documents, prices every bid item from years of real public bid results, shows what the market is likely to do, and exports a draft estimate the estimator can review and adjust.
 
-> Status: v1 is built and tested on public Caltrans data (Districts 4 and 5); a public demo is next. Sections marked *Roadmap* are planned for after v1.
+> **Status: v1.0.0 is released.** [Try the live demo](https://huggingface.co/spaces/tanmaypathak4/bidlens) on a real Caltrans bid package (no sign-in needed). Built and tested on public Caltrans data (Districts 4 and 5). Sections marked *Roadmap* are planned for after v1.
 >
 > **Headline:** on 178 Caltrans contracts bid in 2024 to 2026, which BidLens never saw while learning, its contract total landed closer to the winning bid than Caltrans' own engineer's estimate on **57.9%** of contracts (typical miss 18.4% against 21.2%). [Details below](#results).
 
@@ -215,7 +215,7 @@ On a real Caltrans bid package (contract 04-0W0504, 6 PDFs), scored against 89 f
 | qwen3:8b alone, first attempt | 55.1% | 69.7% | 80.6% | 59 min |
 | **Default: qwen3:8b + llama3.1:8b + pattern rules** | **74.2%** | **76.9%** | 86.4% | 60 min |
 
-The bid item list read from the documents matched Caltrans' bid summary exactly (118 items). The gold facts and the judging were done by Claude, the AI assistant that built BidLens, not by a human estimator; a human review is still open.
+The bid item list read from the documents matched Caltrans' bid summary exactly (118 items). The gold facts and the judging were done with an AI assistant, not a human estimator; a human review is still open.
 
 ### End to end on the sample package
 

@@ -61,7 +61,7 @@ exactly and give the hours behind R1 and R13.
 Same rules as step 3.5. Every finding new in this round was pooled across runs, shuffled
 and judged with the run hidden (`judging_sheet.csv`). 13 findings came back word for
 word from step 3.5 and kept their verdict (`from_step_3_5`). The gold facts and the
-judging are by Claude, the AI assistant building BidLens, not a human estimator; so are
+judging were done with an AI assistant, not a human estimator; so were
 the checklist questions, so the checklist's gain may be somewhat optimistic. A human
 review is still open.
 
