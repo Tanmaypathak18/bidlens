@@ -4,7 +4,7 @@
 
 BidLens helps an estimator move from "here is a new bid package" to "here is a defensible draft estimate" faster. It reads the bid documents, prices every bid item from years of real public bid results, shows what the market is likely to do, and exports a draft estimate the estimator can review and adjust.
 
-> **Status: v1.0.0 is released.** [Try the live demo](https://huggingface.co/spaces/tanmaypathak4/bidlens) on a real Caltrans bid package (no sign-in needed). Built and tested on public Caltrans data (Districts 4 and 5). Sections marked *Roadmap* are planned for after v1.
+> **Status: v1.0.0 is released** ([what's in it](CHANGELOG.md)). [Try the live demo](https://huggingface.co/spaces/tanmaypathak4/bidlens) on a real Caltrans bid package (no sign-in needed). Built and tested on public Caltrans data (Districts 4 and 5). Sections marked *Roadmap* are planned for after v1.
 >
 > **Headline:** on 178 Caltrans contracts bid in 2024 to 2026, which BidLens never saw while learning, its contract total landed closer to the winning bid than Caltrans' own engineer's estimate on **57.9%** of contracts (typical miss 18.4% against 21.2%). [Details below](#results).
 
