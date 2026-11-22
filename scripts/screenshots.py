@@ -1,4 +1,4 @@
-"""Screenshot every app page with headless Chromium (D-066).
+"""Screenshot every app page with headless Chromium.
 
 Usage:
     uv run python scripts/screenshots.py            # starts the app on port 8599

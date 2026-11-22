@@ -1,4 +1,4 @@
-"""Look and feel shared by every page (decision D-066): colors, header, risk ratings,
+"""Look and feel shared by every page: colors, header, risk ratings,
 page chips that open the PDF page, and chart defaults."""
 
 from __future__ import annotations
@@ -70,7 +70,7 @@ CSS = f"""
 
 
 def hosted() -> bool:
-    """True on a Hugging Face Space (the demo, D-072), which sets SPACE_ID."""
+    """True on a Hugging Face Space (the demo), which sets SPACE_ID."""
     return bool(os.environ.get("SPACE_ID"))
 
 
@@ -180,7 +180,7 @@ CATEGORY_ORDER = [
 
 
 def severity(statement: str, value: str = "", evidence: str = "") -> str:
-    """risk / watch / info, by plain keyword rules (D-066), not by a model."""
+    """risk / watch / info, by plain keyword rules, not by a model."""
     text = f"{statement} {value}"
     if RELIEF.search(text):
         return "watch"
@@ -221,7 +221,7 @@ def damages_summary(table: pd.DataFrame) -> pd.DataFrame:
 
 def top_watch(items: pd.DataFrame, n: int = 5, table: pd.DataFrame | None = None) -> pd.DataFrame:
     """Risk findings, one per category, in category order: exact facts read by code first,
-    then model statements that passed the quote check (D-071), then those with a value."""
+    then model statements that passed the quote check, then those with a value."""
     if table is not None and len(table):
         items = pd.concat([damages_summary(table), items], ignore_index=True)
     r = rate(items)

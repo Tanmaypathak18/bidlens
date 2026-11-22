@@ -1,4 +1,4 @@
-"""Step 2.1 benchmarks (decisions D-034, D-037, D-038).
+"""Step 2.1 benchmarks.
 
 1. Item level: the median escalated low-bid unit price for the same item and unit over the
    12 months before the bid date (all earlier history when fewer than 3 prices).
@@ -124,7 +124,7 @@ def prepare_lines(lines: pd.DataFrame, master: pd.DataFrame) -> pd.DataFrame:
 
 
 class LinePricer:
-    """Prices bid summary lines by the D-038 tiers, using only earlier contracts."""
+    """Prices bid summary lines by the history tiers, using only earlier contracts."""
 
     def __init__(self, low: pd.DataFrame, lines: pd.DataFrame, scope: set[tuple[str, str]]) -> None:
         self.scope = scope
@@ -177,7 +177,7 @@ def contract_totals(
 
     `contracts` has contract_number, bid_open_date, engineers_estimate, low_bid_cost.
     `in_headline` marks contracts where at least `min_item_level` of lines have item-level
-    history (D-037); that is known before bid, so it is not a peek at the result.
+    history; that is known before bid, so it is not a peek at the result.
     """
     g = priced.assign(
         item_level=priced["tier"].isin(ITEM_LEVEL_TIERS),

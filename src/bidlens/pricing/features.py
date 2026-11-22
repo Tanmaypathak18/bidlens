@@ -1,4 +1,4 @@
-"""Model features for item unit prices (step 2.3, decision D-041).
+"""Model features for item unit prices (step 2.3).
 
 Every feature is known before bids open. History features use only strictly earlier bids.
 """
@@ -159,7 +159,7 @@ def prepare(con: duckdb.DuckDBPyConnection):
 
 
 def contract_lines(con: duckdb.DuckDBPyConnection, rows: pd.DataFrame, cats: dict):
-    """Bid-list lines of the test contracts, priced by the D-038 tiers (`base`), plus the
+    """Bid-list lines of the test contracts, priced by the history tiers (`base`), plus the
     model features of the top-100 lines (`X_lines`, indexed like `base`)."""
     from bidlens.pricing.benchmarks import LinePricer, prepare_lines
     from bidlens.pricing.compare import ITEMS, load_contracts, load_scope

@@ -265,9 +265,9 @@ make test
 
 These steps rebuild everything the sample was made from. They take longer, and two of them need files downloaded by hand.
 
-1. **Bid history.** Download the Caltrans bid summary PDFs by hand into `data/raw/bid_summaries/`, following [`the download list`](the download list). Then `make data` collects item prices from the Caltrans cost database (deliberately slow: one request every 2 seconds, about 2 hours the first time, cached afterwards) and builds the database.
+1. **Bid history.** Download the Caltrans bid summary PDFs by hand into `data/raw/bid_summaries/`, one PDF per contract, named by contract number (for example `04-0A0204.pdf`). The contracts and their Caltrans source pages are listed in [`outputs/03_bid_summaries/pdf_manifest.csv`](outputs/03_bid_summaries/pdf_manifest.csv). Then `make data` collects item prices from the Caltrans cost database (deliberately slow: one request every 2 seconds, about 2 hours the first time, cached afterwards) and builds the database.
 2. **Pricing models.** `make pricing` (about 12 minutes) fits and scores every model. The first run downloads NVIDIA Kumo Tabular's small model (about 114 MB) from Hugging Face.
-3. **A bid package.** Download contract 04-0W0504's documents by hand into `data/raw/bid_package/04-0W0504/`, following [`the download list`](the download list). Install [Ollama](https://ollama.com) and the two local models once (about 10 GB in all; a Mac with 16 GB of memory runs them):
+3. **A bid package.** Download contract 04-0W0504's documents by hand into `data/raw/bid_package/04-0W0504/`, keeping the original file names. The files are listed, with their sizes and checksums, in [`outputs/16_bid_package/manifest.csv`](outputs/16_bid_package/manifest.csv). Install [Ollama](https://ollama.com) and the two local models once (about 10 GB in all; a Mac with 16 GB of memory runs them):
 
    ```bash
    ollama pull qwen3:8b
@@ -314,7 +314,7 @@ app/           Streamlit estimator app
 notebooks/     the analysis, step by step
 outputs/       every stage's results, numbered, each with a README
 data/sample/   the committed sample (all other data is rebuilt, not committed)
-docs/          build plan, data dictionary, model card, download checklists
+docs/          data dictionary, model card
 tests/
 ```
 
@@ -340,9 +340,9 @@ tests/
 - On a test package, the document reader (two local models plus plain pattern rules) finds about three quarters of the facts an estimator needs, and about 1 in 4 of its findings needs correcting. Read the cited page before relying on a finding. Lane closure hour charts are read by plain code from the page layout, not by the model.
 - BidLens supports estimating judgment. It does not replace it.
 
-## How this project is built
+## How this project was built
 
-Development follows `the build notes`. Every technical decision, with the options considered and the reasoning, is recorded in the Decision log in `the project notes`, so the history of why the project looks the way it does stays in the repository.
+BidLens is a working prototype built on public Caltrans data. Every number can be traced: each stage's collected data, checks and results are in [`outputs/`](outputs/README.md), and the analysis is explained step by step in [`notebooks/`](notebooks/README.md). Models were always tested on bids they had never seen, and the results report where BidLens works well and where it doesn't.
 
 ## License
 

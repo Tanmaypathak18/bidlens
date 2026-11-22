@@ -8,7 +8,7 @@ baselines (step 2.4).
 Kumo Tabular is not trained on our data. It is given a table of known prices (every
 cleaned training bid before 01 January 2024: 10,091 rows, with the same
 22 facts per bid as the baselines) and predicts each test price from it in one pass. It
-runs on this Mac's processor with NVIDIA's small model (decision D-043), downloaded once
+runs on this Mac's processor with NVIDIA's small model, downloaded once
 from Hugging Face (`nvidia/Kumo-Tabular`, version v1.0.1).
 
 Settings were chosen on 2023 bids before looking at the test: one shared table of known

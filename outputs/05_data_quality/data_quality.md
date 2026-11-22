@@ -1,6 +1,6 @@
 # Data quality report (step 1.6)
 
-Generated 2026-11-19 from `data/bidlens.duckdb` by `uv run python -m bidlens.db.checks` (part of `make data`). Rules: decision D-033. Nothing is deleted. Flags sit in the database tables `bid_flag` and `contract_flag` and in the CSV files next to this report.
+Generated 2026-11-19 from `data/bidlens.duckdb` by `uv run python -m bidlens.db.checks` (part of `make data`). Nothing is deleted. Flags sit in the database tables `bid_flag` and `contract_flag` and in the CSV files next to this report.
 
 ## Bid price checks
 

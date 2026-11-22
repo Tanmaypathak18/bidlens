@@ -1,4 +1,4 @@
-"""Step 3.1: manifest of the sample bid package (decision D-050).
+"""Step 3.1: manifest of the sample bid package.
 
 Usage:
     uv run python -m bidlens.documents.manifest 04-0W0504
@@ -76,7 +76,7 @@ def build(contract: str) -> list[dict]:
                 "pages": pages(f),
                 "sha256": sha256(f),
                 "source": SOURCE.format(contract=contract),
-                "obtained": "Downloaded by hand by the maintainer (D-050); not scripted (D-013)",
+                "obtained": "Downloaded by hand by the maintainer; not scripted",
             }
         )
     return rows
@@ -114,7 +114,7 @@ def write_outputs(rows: list[dict]) -> None:
     body = f"""
 The sample bid package BidLens reads in Phase 3: Caltrans contract {c} (step 3.1).
 
-## Which project and why (decision D-050)
+## Which project and why
 
 Contract {c}: highway work in Alameda and Contra Costa counties (trash capture devices,
 maintenance vehicle pullouts, guardrail, erosion control and lighting), engineer's estimate

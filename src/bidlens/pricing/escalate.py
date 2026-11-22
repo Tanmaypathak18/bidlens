@@ -1,4 +1,4 @@
-"""Step 2.2: price escalation with the Caltrans cost index (decisions D-039, D-040).
+"""Step 2.2: price escalation with the Caltrans cost index.
 
 Usage:
     uv run python -m bidlens.pricing.escalate
@@ -9,7 +9,7 @@ The quarterly index (CHCCI, 2020 base) is recovered from the sv08data results pa
 raw cache: each page prints the current 12-month index I(c) and every row's original and
 adjusted unit price, where adjusted = original x I(c) / I(quarter). No new requests are
 made. Escalation uses the 4-quarter trailing mean as known before each bid-opening quarter
-(D-044: through the previous quarter); quarters not yet
+(the four quarters before it); quarters not yet
 published carry forward the last published value.
 """
 
@@ -30,7 +30,7 @@ import pandas as pd
 from bidlens.ingest.parse_sv08 import ParseError, parse_adjusted
 
 RAW_SERIES = "CHCCI_2020"
-SERIES = "CHCCI_2020_KNOWN"  # 4-quarter mean through the previous quarter (D-044)
+SERIES = "CHCCI_2020_KNOWN"  # 4-quarter mean through the previous quarter
 MIN_PRICE = 100.0  # rows priced lower lose precision to the cent rounding of adjusted prices
 MAX_SPREAD = 0.001  # implied index values within a quarter must agree to 0.1%
 WINDOW = 4
@@ -93,7 +93,7 @@ def read_cache(cache: Path = CACHE):
 
 
 def smooth(quarterly: pd.DataFrame, through: date | None = None) -> pd.DataFrame:
-    """The index as known before each quarter's bids open (D-040, lagged by D-044): for
+    """The index as known before each quarter's bids open (4-quarter mean, lagged one quarter): for
     quarter Q, the mean of the published values of the 4 quarters before Q. Caltrans
     computes quarter Q's own value from the bids opened in Q, so it is never used for Q.
     Carried forward to `through` (default: the last quarter in `quarterly`). The first
@@ -174,7 +174,7 @@ class CostIndex:
 
 def store(con: duckdb.DuckDBPyConnection, quarterly: pd.DataFrame, series: pd.DataFrame) -> None:
     """Write both series to cost_index and (re)create the bid_escalated view."""
-    # CHCCI_2020_4Q is the unlagged series used before D-044.
+    # CHCCI_2020_4Q is the unlagged series used before the one-quarter lag was added.
     con.execute(
         "DELETE FROM cost_index WHERE series IN (?, ?, 'CHCCI_2020_4Q')", [RAW_SERIES, SERIES]
     )
@@ -335,7 +335,7 @@ A price bid in 2019 is not a fair comparison for a bid in 2025: construction cos
 sharply after 2021. Before comparing prices across years, each one is adjusted by how much
 Caltrans' highway construction cost index moved between the two bid dates.
 
-## Where the index comes from (decision D-039)
+## Where the index comes from
 
 Caltrans publishes a quarterly California highway construction cost index (CHCCI, 2020 =
 100). Its table sits on a Caltrans site that does not allow automated access, so it is not
@@ -346,7 +346,7 @@ index for the quarter the bid opened. All {int(quarterly["n_contracts"].sum()):,
 give the same value within each quarter (largest disagreement
 {quarterly["spread"].max():.4%}), so the recovered numbers are Caltrans' own.
 
-## Which version of the index is used (decisions D-040, D-044)
+## Which version of the index is used
 
 The quarterly index jumps around (it rests on the few contracts bid each quarter), so
 prices are adjusted with its **4-quarter average**, the same idea as Caltrans' own

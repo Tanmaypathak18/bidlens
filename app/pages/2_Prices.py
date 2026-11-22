@@ -1,5 +1,5 @@
 """Prices: every bid item by dollar impact, its range, comparable bids and price history
-(step 4.1, D-064, D-066)."""
+(step 4.1)."""
 
 from __future__ import annotations
 

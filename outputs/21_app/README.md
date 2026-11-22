@@ -1,7 +1,7 @@
 # 21 App
 
 The draft estimate the BidLens app shows for the sample bid package 04-0W0504
-(steps 4.1 and 4.2, decisions D-064 and D-065), and the workbook it exports.
+(steps 4.1 and 4.2), and the workbook it exports.
 
 ## The draft
 

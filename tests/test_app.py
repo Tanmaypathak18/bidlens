@@ -24,7 +24,7 @@ def test_page_renders(page):
 
     at = AppTest.from_file(str(ROOT / page), default_timeout=60).run()
     assert not at.exception, at.exception
-    # Every page opens with the shared header naming the contract (D-066).
+    # Every page opens with the shared header naming the contract.
     assert any("Contract 04-0W0504" in m.value for m in at.markdown)
 
 
@@ -34,7 +34,7 @@ def test_home_labels_the_sample_and_keeps_tiles_short():
     at = AppTest.from_file(str(ROOT / "app/Home.py"), default_timeout=60).run()
     text = " ".join(m.value for m in at.markdown)
     assert "Sample job, already bid" in text
-    assert "$14.54M" in text and "$14,539,427" not in text  # short amounts in tiles (D-071)
+    assert "$14.54M" in text and "$14,539,427" not in text  # short amounts in tiles
     assert "Why 178" in " ".join(c.value for c in at.caption)
 
 
@@ -49,7 +49,7 @@ def test_market_explains_the_two_low_bid_views():
 def test_hosted_demo_does_not_claim_to_run_locally(monkeypatch):
     from streamlit.testing.v1 import AppTest
 
-    monkeypatch.setenv("SPACE_ID", "user/bidlens")  # set by Hugging Face Spaces (D-072)
+    monkeypatch.setenv("SPACE_ID", "user/bidlens")  # set by Hugging Face Spaces
     at = AppTest.from_file(str(ROOT / "app/Home.py"), default_timeout=60).run()
     text = " ".join(m.value for m in at.markdown)
     assert "Demo on public sample data" in text

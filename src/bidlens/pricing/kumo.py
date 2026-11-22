@@ -1,4 +1,4 @@
-"""Step 2.4: NVIDIA Kumo Tabular on the step 2.1 split (decision D-043).
+"""Step 2.4: NVIDIA Kumo Tabular on the step 2.1 split.
 
 Usage:
     uv run python -m bidlens.pricing.kumo     # writes outputs/11_kumo_tabular
@@ -56,7 +56,7 @@ class KumoPricer:
         self, X_ctx: pd.DataFrame, y_ctx, X_query: pd.DataFrame, with_range: bool = False
     ) -> np.ndarray:
         """Median predicted log price for each query row. With `with_range`, an array of
-        three columns: the median, 10th and 90th percentile (D-047)."""
+        three columns: the median, 10th and 90th percentile."""
         df = pd.concat(
             [
                 self._frame(X_ctx).assign(target=np.asarray(y_ctx, dtype=float)),
@@ -187,7 +187,7 @@ baselines (step 2.4).
 Kumo Tabular is not trained on our data. It is given a table of known prices (every
 cleaned training bid before {CUTOFF:%d %B %Y}: {res["context_rows"]:,} rows, with the same
 22 facts per bid as the baselines) and predicts each test price from it in one pass. It
-runs on this Mac's processor with NVIDIA's small model (decision D-043), downloaded once
+runs on this Mac's processor with NVIDIA's small model, downloaded once
 from Hugging Face (`nvidia/Kumo-Tabular`, version {REVISION}).
 
 Settings were chosen on 2023 bids before looking at the test: one shared table of known

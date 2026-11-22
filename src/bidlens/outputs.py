@@ -1,4 +1,4 @@
-"""Write the numbered, self-explaining output folders (decision D-031).
+"""Write the numbered, self-explaining output folders.
 
 Usage:
     uv run python -m bidlens.outputs            # regenerates outputs/01..06
@@ -94,7 +94,7 @@ def stage_01() -> dict:
 - `source_review.md` is the review itself. It covers the Caltrans Contract Cost Data site, the HQ bid summary site and the item list, with their conditions of use and what each one contains.
 - `endpoint_samples/` holds one saved page per endpoint used ({len(names)} files), exactly as the site returned it on 2026-11-19. The same files are the test fixtures in `tests/fixtures/caltrans/`.
 
-How it was produced: by hand in step 1.1, with plain web requests at least 2 seconds apart (decisions D-012 and D-013). The HQ bid summary site's robots.txt disallows automated access, so no script ever requests it.
+How it was produced: by hand in step 1.1, with plain web requests at least 2 seconds apart. The HQ bid summary site's robots.txt disallows automated access, so no script ever requests it.
 """,
     )
     return {"samples": len(names)}
@@ -172,9 +172,9 @@ def stage_02(con: duckdb.DuckDBPyConnection) -> dict:
 | `request_log.csv` | {n_log:,} | One row per page requested from sv08data.dot.ca.gov: time, page, full URL, outcome, HTTP status, rows read from the page, and size |
 | `bid_prices.csv` | {n_prices:,} | Every bid price collected: contract, bid date, district, county, item, family, unit, quantity, unit price, total, bid rank (1 = low bidder) and a link to the price on the Caltrans site |
 
-**Requests:** {dict(pages)}. Outcomes: {dict(status)}. A dropped connection that recovered on retry (decisions D-018 and D-020) is logged once, with its final outcome.
+**Requests:** {dict(pages)}. Outcomes: {dict(status)}. A dropped connection that recovered on retry is logged once, with its final outcome.
 
-**How it was produced:** `uv run python -m bidlens.ingest.caltrans all` (step 1.2), with one request at a time, at least 2 seconds apart. First, 8 searches listed the contracts for Districts 4 and 5, 2018 to 2026, through four items nearly every contract has (D-015). Then 827 contract pages gave county and type of work, and 1,800 searches (100 items × 2 districts × 9 years) gave the prices. The scope is set in `config/scope.yaml`.
+**How it was produced:** `uv run python -m bidlens.ingest.caltrans all` (step 1.2), with one request at a time, at least 2 seconds apart. First, 8 searches listed the contracts for Districts 4 and 5, 2018 to 2026, through four items nearly every contract has. Then 827 contract pages gave county and type of work, and 1,800 searches (100 items × 2 districts × 9 years) gave the prices. The scope is set in `config/scope.yaml`.
 
 **Notes:**
 - Prices are in the units Caltrans published. No conversion was needed (see `06_item_master`).
@@ -302,8 +302,8 @@ def stage_03(con: duckdb.DuckDBPyConnection) -> dict:
 **Parse status:** {dict(status)}. Read by: {dict(by)}.
 
 **How it was produced:**
-1. The maintainer downloaded the PDFs by hand from the Caltrans bid summary site (decision D-014). Its robots.txt bars scripts.
-2. `uv run python -m bidlens.ingest.check_bid_summaries` read each file (decisions D-021, D-025 and D-026). It handles two report layouts. Files that Caltrans serves with broken fonts are read with OCR.
+1. The maintainer downloaded the PDFs by hand from the Caltrans bid summary site. Its robots.txt bars scripts.
+2. `uv run python -m bidlens.ingest.check_bid_summaries` read each file. It handles two report layouts. Files that Caltrans serves with broken fonts are read with OCR.
 
 **Checks:**
 - **Exact sum:** the low bidder's items must add up exactly to the low bid.
@@ -441,7 +441,7 @@ def stage_05(con: duckdb.DuckDBPyConnection) -> dict:
 | --- | --- | --- |
 | `missing_data.csv` | {n:,} | Every contract opening missing a contract-level field, which fields, and why |
 | `missing_data.md` | | The same, as a report with totals (step 1.5) |
-| `data_quality.md` | | Checks on prices and contracts (step 1.6, decision D-033): what was checked, how many failed, and what it means |
+| `data_quality.md` | | Checks on prices and contracts (step 1.6): what was checked, how many failed, and what it means |
 | `bid_flags.csv` | | Every flagged bid price, with its flag, detail and source link |
 | `contract_flags.csv` | | Every flagged contract |
 
@@ -493,7 +493,7 @@ def stage_06(con: duckdb.DuckDBPyConnection) -> dict:
 | `item_mapping.csv` | {n_map} | The 100 in-scope items: family, whether the code is current, and how many bid rows and contracts use it |
 | `item_master_report.md` | | Mapping rate, the unmapped code, and family totals |
 
-**How it was produced:** step 1.4 read the Caltrans 2026 Bid Items list (numerical XLSX, revised 10-19-26) from https://dot.ca.gov/programs/design/2026-ccs-standard-plans-and-standard-specifications (decision D-027). Rules: units D-028, retired codes D-029, families D-030.
+**How it was produced:** step 1.4 read the Caltrans 2026 Bid Items list (numerical XLSX, revised 10-19-26) from https://dot.ca.gov/programs/design/2026-ccs-standard-plans-and-standard-specifications. Units follow each code's 2026 pay unit, retired codes are kept and flagged, and families follow the 2026 Standard Specifications sections.
 """,
     )
     return {"item_master": n_master, "families": n_fam, "mapping": n_map}
@@ -504,7 +504,7 @@ def write_index() -> None:
         "# Outputs",
         "",
         "Every stage of BidLens writes its results to a numbered folder here, so anyone can follow "
-        "and check the work in order (decision D-031). Each folder has a README that says what "
+        "and check the work in order. Each folder has a README that says what "
         "is inside and how it was produced. No file names a bidder: bids are identified by "
         "rank. The bid summary PDFs are not included; `03_bid_summaries/pdf_manifest.csv` says "
         "where to find each one.",

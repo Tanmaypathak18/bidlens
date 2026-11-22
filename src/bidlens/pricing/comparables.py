@@ -1,4 +1,4 @@
-"""Step 2.6: comparable past bids for a priced item (decision D-048).
+"""Step 2.6: comparable past bids for a priced item.
 
 For an item to be priced, the 10 earlier low bids for the same item code and unit,
 ranked by distance = |log quantity difference| + 0.5 x years apart + 0.5 if another

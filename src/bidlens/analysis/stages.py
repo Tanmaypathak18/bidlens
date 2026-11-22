@@ -1,4 +1,4 @@
-"""Tables and charts for notebooks 02 to 07, read from the committed stage outputs (D-070).
+"""Tables and charts for notebooks 02 to 07, read from the committed stage outputs.
 
 Nothing here reruns a model: every function reads a stage's CSV or JSON files in `outputs/`
 and returns a small pandas table or a matplotlib figure. No bidder identities: rank only.

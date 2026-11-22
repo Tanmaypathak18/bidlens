@@ -1,4 +1,4 @@
-"""D-069: the committed app sample, and the fallback that lets a fresh clone use it."""
+"""The committed app sample, and the fallback that lets a fresh clone use it."""
 
 from __future__ import annotations
 

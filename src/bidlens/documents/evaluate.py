@@ -1,4 +1,4 @@
-"""Step 3.5: score the local extraction runs against the hand-labeled gold facts (D-055).
+"""Step 3.5: score the local extraction runs against the hand-labeled gold facts.
 
 Usage:
     uv run python -m bidlens.documents.evaluate 04-0W0504 blind   # write the blind judging sheet
@@ -102,7 +102,7 @@ def score(contract: str) -> pd.DataFrame:
 
 
 def pick(m: pd.DataFrame) -> pd.Series:
-    """D-055: higher F1; within 2 points, higher citation accuracy, then faster."""
+    """Pick the default: higher F1; within 2 points, higher citation accuracy, then faster."""
     m = m.sort_values("f1", ascending=False).reset_index(drop=True)
     if len(m) > 1 and m.at[0, "f1"] - m.at[1, "f1"] < 0.02:
         a, b = m.iloc[0], m.iloc[1]
@@ -136,20 +136,20 @@ def write_report(contract: str, m: pd.DataFrame, best: pd.Series) -> None:
     (OUT / "README.md").write_text(
         f"""# 19 Extraction evaluation
 
-How well each local model reads the bid documents for contract {contract} (step 3.5,
-decision D-055). Both models ran on this machine through Ollama with the same prompts
-and settings (D-054); no document left the machine and no paid service was used.
+How well each local model reads the bid documents for contract {contract} (step 3.5).
+Both models ran on this machine through Ollama with the same prompts
+and settings; no document left the machine and no paid service was used.
 
 ## Result
 
-**Default model: {best["model"]}** (highest F1; rule in D-055).
+**Default model: {best["model"]}** (highest F1, the rule set before judging).
 
 {chr(10).join(rows)}
 
 - **Precision:** share of the model's findings that are true and on topic.
 - **Recall:** share of the {len(gold)} gold facts found by at least one correct finding.
 - **Citation accuracy:** share of findings whose cited page actually supports them. Every
-  kept finding already quotes text that exists on its page (D-052); this checks that
+  kept finding already quotes text that exists on its page; this checks that
   the quote backs up the statement.
 - **Quotes rejected:** answers dropped automatically because the quoted text was not on
   the cited page.
@@ -170,7 +170,7 @@ judging is still open (listed for final review).
 Judging rules, applied to every finding the same way:
 
 - A finding is **correct** if its statement is true according to its cited page and it
-  belongs to its topic. Quotes are capped at 300 characters (D-058), so a quote can stop
+  belongs to its topic. Quotes are capped at 300 characters, so a quote can stop
   before the words that back the statement; the page decides.
 - A true finding filed under the wrong topic is correct if it states a gold fact of
   another topic (the fact was found), and wrong otherwise (off-topic noise, such as rows
@@ -208,7 +208,7 @@ Limits:
     write_index()
 
 
-# ----------------------------------------------------------------- round 2 (D-063)
+# ----------------------------------------------------------------- round 2
 
 OUT2 = ROOT / "outputs" / "20_extraction_round2"
 ROUND2 = {
@@ -369,23 +369,23 @@ def write_report2(contract: str, m: pd.DataFrame) -> None:
 A second round of document extraction for contract {contract}, scored against the same
 {len(gold)} gold facts and judging rules as step 3.5 (stage 19), whose results are kept
 unchanged for comparison. Everything ran on this machine through Ollama; no document left
-it and no paid service was used. Decisions D-060 to D-063.
+it and no paid service was used.
 
 ## What changed
 
-1. **Closure charts read by code (D-060).** The 78 lane, ramp and connector closure charts
+1. **Closure charts read by code.** The 78 lane, ramp and connector closure charts
    lose their empty cells in the PDF text, so the hour of each symbol was lost. BidLens now
    puts every symbol back in its hour column from its position on the page (no model).
    Two chart pages were checked against their images cell by cell. Result:
    `closure_hours.csv`, one row per chart, and a one-line summary per chart for the model
    in place of the broken grid.
-2. **A checklist of estimator questions per topic (D-061)** instead of "list the facts":
+2. **A checklist of estimator questions per topic** instead of "list the facts":
    6 to 9 questions per topic, written to apply to any Caltrans contract.
-3. **Pattern rules for simple facts (D-062):** working days, start window, engineer's
+3. **Pattern rules for simple facts:** working days, start window, engineer's
    estimate, bid opening, prebid meeting (the addendum's date wins), price-firm dates and
    dollar amounts tied to a rate, penalty, withhold or limit. The late closure damages
    table is read into `closure_damages.csv` ({len(dmg)} rows).
-4. **Combined mode (D-063):** both models plus the pattern rules, merged, with duplicates
+4. **Combined mode:** both models plus the pattern rules, merged, with duplicates
    removed (same quote in the same passage, or statements sharing 70% of their words).
 
 ## Result

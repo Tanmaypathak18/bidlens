@@ -1,5 +1,5 @@
 """Package: what the bid documents require, each finding one click from its page
-(step 4.1, D-064, D-066)."""
+(step 4.1)."""
 
 from __future__ import annotations
 

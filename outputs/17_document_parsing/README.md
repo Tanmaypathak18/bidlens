@@ -2,7 +2,7 @@
 
 The bid package turned into text BidLens can search and cite (step 3.2).
 
-## What we did (decision D-051)
+## What we did
 
 Each document of contract 04-0W0504 that BidLens reads was turned into text page by page.
 The special provisions were split into their numbered sections (for example "8 Prosecution

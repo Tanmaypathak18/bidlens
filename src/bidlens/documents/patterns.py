@@ -1,4 +1,4 @@
-"""Plain pattern matching for simple facts: working days, dates and dollar amounts (D-062).
+"""Plain pattern matching for simple facts: working days, dates and dollar amounts.
 
 No language model. Each rule is a regular expression over the sentences of the special
 provisions and addenda (the information handout is left out: its dates and amounts are

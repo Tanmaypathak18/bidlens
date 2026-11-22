@@ -6,7 +6,7 @@ Missing values and data quality checks on the combined database.
 | --- | --- | --- |
 | `missing_data.csv` | 180 | Every contract opening missing a contract-level field, which fields, and why |
 | `missing_data.md` | | The same, as a report with totals (step 1.5) |
-| `data_quality.md` | | Checks on prices and contracts (step 1.6, decision D-033): what was checked, how many failed, and what it means |
+| `data_quality.md` | | Checks on prices and contracts (step 1.6): what was checked, how many failed, and what it means |
 | `bid_flags.csv` | | Every flagged bid price, with its flag, detail and source link |
 | `contract_flags.csv` | | Every flagged contract |
 

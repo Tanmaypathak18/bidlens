@@ -1,4 +1,4 @@
-"""Deploy the demo to a private Hugging Face Space (step 4.4, decision D-072).
+"""Deploy the demo to a private Hugging Face Space (step 4.4).
 
 Usage:
     uv run python scripts/deploy_space.py --dry-run   # build build/space/ only

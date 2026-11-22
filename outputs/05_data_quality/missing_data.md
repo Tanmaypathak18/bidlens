@@ -1,6 +1,6 @@
 # Contract-level data: missing-data report (step 1.5)
 
-Generated from `data/bidlens.duckdb`. There are 848 contract openings: the 827 in the D-015 list, plus 14 seen only in item bids and 7 earlier openings found in bid summaries.
+Generated from `data/bidlens.duckdb`. There are 848 contract openings: the 827 in the contract list, plus 14 seen only in item bids and 7 earlier openings found in bid summaries.
 
 | Field | Missing | Where it comes from |
 | --- | --- | --- |
@@ -12,7 +12,7 @@ Generated from `data/bidlens.duckdb`. There are 848 contract openings: the 827 i
 | low bid total | 176 | bid summary |
 
 **Why fields are missing:**
-- **No bid summary:** 151 openings are not on the Caltrans site, 11 have the wrong PDF attached (D-026), and 14 openings appear only in item bids.
+- **No bid summary:** 151 openings are not on the Caltrans site, 11 have the wrong PDF attached, and 14 openings appear only in item bids.
 - **OCR misses:** 4 OCR-read summaries lost the working-days value.
 
 **Cross-checks between sources:**

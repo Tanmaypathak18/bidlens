@@ -1,4 +1,4 @@
-"""Rebuild the lane and ramp closure charts from PDF word positions (decision D-060).
+"""Rebuild the lane and ramp closure charts from PDF word positions.
 
 The special provisions print each closure chart as a grid: one column per hour (00 to 24)
 and one row per day group (Mon-Thu, Fri, Sat, Sun). Empty cells have no text, so the PDF

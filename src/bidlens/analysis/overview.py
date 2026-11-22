@@ -1,4 +1,4 @@
-"""Data overview for notebooks/01_data_overview.ipynb (decision D-032).
+"""Data overview for notebooks/01_data_overview.ipynb.
 
 Each function returns a small pandas table or a matplotlib figure. No bidder identities are
 read: bids are identified by rank only.

@@ -1,4 +1,4 @@
-"""D-071: findings are checked against their own quotes before they are shown."""
+"""Findings are checked against their own quotes before they are shown."""
 
 from __future__ import annotations
 

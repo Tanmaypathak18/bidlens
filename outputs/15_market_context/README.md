@@ -7,7 +7,7 @@ engineer's estimate, and how many contractors will bid (step 2.7).
 
 Each contract with a bid summary and an engineer's estimate is one row
 (464 before January 2024, 208 after). The models see only what is known
-before bids open (decision D-049): the engineer's estimate, working days, number of items,
+before bids open: the engineer's estimate, working days, number of items,
 location, time of year, the type of work, the number of plan holders (contractors who
 took out the plans), and how the market behaved over the previous 12 months. As in stage
 13, each method is refreshed every quarter with all earlier contracts. Three methods are

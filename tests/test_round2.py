@@ -1,5 +1,5 @@
-"""Extraction round 2 tests: closure charts from word positions (D-060), pattern rules
-(D-062) and the combined merge (D-063). Synthetic text only."""
+"""Extraction round 2 tests: closure charts from word positions, pattern
+rules and the combined merge. Synthetic text only."""
 
 from __future__ import annotations
 

@@ -1,6 +1,6 @@
 # Outputs
 
-Every stage of BidLens writes its results to a numbered folder here, so anyone can follow and check the work in order (decision D-031). Each folder has a README that says what is inside and how it was produced. No file names a bidder: bids are identified by rank. The bid summary PDFs are not included; `03_bid_summaries/pdf_manifest.csv` says where to find each one.
+Every stage of BidLens writes its results to a numbered folder here, so anyone can follow and check the work in order. Each folder has a README that says what is inside and how it was produced. No file names a bidder: bids are identified by rank. The bid summary PDFs are not included; `03_bid_summaries/pdf_manifest.csv` says where to find each one.
 
 | Stage | Folder | What it shows |
 | --- | --- | --- |

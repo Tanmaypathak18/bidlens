@@ -1,4 +1,4 @@
-"""Score pricing benchmarks on the step 2.1 test set (decisions D-034, D-037, D-038).
+"""Score pricing benchmarks on the step 2.1 test set.
 
 Usage:
     uv run python -m bidlens.pricing.compare     # writes outputs/08_target_split_metrics
@@ -294,7 +294,7 @@ How BidLens will be tested, and how well two simple yardsticks do on that test (
 Before building pricing models, we fix the rules of the test so every later model is
 judged the same way, and we score two yardsticks that any model has to beat.
 
-## The test (decision D-034)
+## The test
 
 - **What is predicted:** the low bidder's unit price for each bid item (models work on its
   logarithm, because prices span several orders of magnitude).
@@ -312,7 +312,7 @@ judged the same way, and we score two yardsticks that any model has to beat.
 
 {chr(10).join(split_lines)}
 
-## Headline: whole-contract totals (decisions D-037, D-038)
+## Headline: whole-contract totals
 
 The estimator's real question: would BidLens's total have been closer to the winning bid
 than Caltrans' own engineer's estimate? Until the pricing model exists, BidLens's total here
@@ -323,7 +323,7 @@ contract being priced is used except its item list and quantities.
 The headline uses the {h["contracts"]} test contracts where at least 90% of lines have
 price history for that exact item (all {a["contracts"]} contracts are shown below too).
 Contracts need a bid summary with its item lines: three test-period summaries were read
-by OCR with their header only (decision D-026), so they have no lines to price.
+by OCR with their header only, so they have no lines to price.
 
 **The historical-median total landed closer to the low bid than the engineer's estimate on
 {_pct(h["bidlens_closer_share"])} of headline contracts.**

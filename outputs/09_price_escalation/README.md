@@ -8,7 +8,7 @@ A price bid in 2019 is not a fair comparison for a bid in 2025: construction cos
 sharply after 2021. Before comparing prices across years, each one is adjusted by how much
 Caltrans' highway construction cost index moved between the two bid dates.
 
-## Where the index comes from (decision D-039)
+## Where the index comes from
 
 Caltrans publishes a quarterly California highway construction cost index (CHCCI, 2020 =
 100). Its table sits on a Caltrans site that does not allow automated access, so it is not
@@ -19,7 +19,7 @@ index for the quarter the bid opened. All 841 contracts
 give the same value within each quarter (largest disagreement
 0.0125%), so the recovered numbers are Caltrans' own.
 
-## Which version of the index is used (decisions D-040, D-044)
+## Which version of the index is used
 
 The quarterly index jumps around (it rests on the few contracts bid each quarter), so
 prices are adjusted with its **4-quarter average**, the same idea as Caltrans' own

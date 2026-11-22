@@ -1,4 +1,4 @@
-"""The committed app sample, so a fresh clone runs the app (decision D-069).
+"""The committed app sample, so a fresh clone runs the app.
 
 Usage:
     uv run python -m bidlens.sample 04-0W0504   # writes data/sample/app/<contract>/

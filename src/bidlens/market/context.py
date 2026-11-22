@@ -1,4 +1,4 @@
-"""Step 2.7: market context for a contract (decision D-049).
+"""Step 2.7: market context for a contract.
 
 Usage:
     uv run python -m bidlens.market.context    # writes outputs/15_market_context
@@ -8,7 +8,7 @@ Two questions an estimator asks before bidding:
 - bidders: how many contractors are likely to bid?
 
 Methods: Kumo Tabular (with an 80% range), a linear model and the trailing 12-month median,
-each refreshed every quarter on the contracts opened before it (D-045). PyTorch loads only
+each refreshed every quarter on the contracts opened before it. PyTorch loads only
 when Kumo runs, and this module never imports XGBoost or LightGBM (see pricing/features.py).
 """
 
@@ -344,7 +344,7 @@ engineer's estimate, and how many contractors will bid (step 2.7).
 
 Each contract with a bid summary and an engineer's estimate is one row
 ({n_train} before {CUTOFF:%B %Y}, {s["contracts"]} after). The models see only what is known
-before bids open (decision D-049): the engineer's estimate, working days, number of items,
+before bids open: the engineer's estimate, working days, number of items,
 location, time of year, the type of work, the number of plan holders (contractors who
 took out the plans), and how the market behaved over the previous 12 months. As in stage
 13, each method is refreshed every quarter with all earlier contracts. Three methods are

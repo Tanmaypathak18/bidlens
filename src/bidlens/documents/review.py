@@ -1,4 +1,4 @@
-"""Findings checked before they are shown to an estimator (decision D-071).
+"""Findings checked before they are shown to an estimator.
 
 Plain rules, no model:
 - A model summary is shown only if it stays close to its own quote: at least 75% of its

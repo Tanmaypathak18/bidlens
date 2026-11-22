@@ -1,4 +1,4 @@
-"""Step 2.5 test: the D-046 selection rule."""
+"""Step 2.5 test: the model selection rule."""
 
 from __future__ import annotations
 

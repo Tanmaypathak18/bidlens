@@ -1,6 +1,6 @@
 # Data dictionary
 
-BidLens keeps its data in one DuckDB file, `data/bidlens.duckdb`, which is rebuilt from the cached sources. Keys are set by decision D-023 and price storage by D-024. The schema is in `src/bidlens/db/schema.sql`.
+BidLens keeps its data in one DuckDB file, `data/bidlens.duckdb`, which is rebuilt from the cached sources. Keys are readable natural keys (contract number plus bid date, then item code), so every price traces back to its source page; prices are stored as exact decimals in the original Caltrans unit. The schema is in `src/bidlens/db/schema.sql`.
 
 ```mermaid
 erDiagram
@@ -57,9 +57,9 @@ One row per **bid opening**. A contract that was re-advertised has one row for e
 | district | Caltrans district, taken from the first two digits of the contract number | derived |
 | county, location | County code and County-Route-Postmile as published | sv08data `details.php` |
 | type_of_work | Contract description | sv08data `details.php` |
-| in_contract_list | Found by the D-015 contract list | derived |
+| in_contract_list | Found by the contract list (contracts bidding any of four near-universal items) | derived |
 | n_bidders_sv08 | Highest bid rank seen in the item bids | sv08data |
-| has_bid_summary | A usable bid summary PDF exists (D-022) | bid summary |
+| has_bid_summary | A usable bid summary PDF exists | bid summary |
 | engineers_estimate | Agency's pre-bid estimate for the whole contract ($) | bid summary |
 | working_days | Contract time allowed | bid summary |
 | n_bidders | Ranked (regular) bidders | bid summary |
@@ -96,11 +96,11 @@ One bidder's price for one bid item. **No bidder names or IDs are stored.**
 
 These are created empty here. Step 1.4 fills the item master (current item list, unit normalization, item families) and step 2.2 fills the cost index (Caltrans Construction Cost Index).
 
-**cost_index (step 2.2, D-039, D-040, D-044).** Two series, keyed by (series, year, quarter):
+**cost_index (step 2.2).** Two series, keyed by (series, year, quarter):
 
 | Series | What it holds |
 | --- | --- |
 | `CHCCI_2020` | Caltrans highway construction cost index, 2020 = 100, one value per published quarter. Recovered from the adjusted prices on the cached sv08data result pages |
-| `CHCCI_2020_KNOWN` | The index as known before each quarter's bids open: the mean of `CHCCI_2020` over the 4 previous quarters (D-044). Used for escalation. Quarters not yet published carry forward the last value |
+| `CHCCI_2020_KNOWN` | The index as known before each quarter's bids open: the mean of `CHCCI_2020` over the 4 previous quarters. Used for escalation. Quarters not yet published carry forward the last value |
 
 **bid_escalated (view).** Every column of `bid_normalized` plus `bid_open_date`, `cost_index` (the bid quarter's `CHCCI_2020_KNOWN` value), `ref_year`, `ref_quarter`, `ref_index` (the latest quarter in the series) and `unit_price_escalated` = unit_price × ref_index / cost_index, the price in reference-quarter dollars. Models escalate to each bid's own date instead, through `bidlens.pricing.setup.escalate`.

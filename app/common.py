@@ -1,4 +1,4 @@
-"""Shared loading and formatting for the BidLens app pages (decision D-064)."""
+"""Shared loading and formatting for the BidLens app pages."""
 
 from __future__ import annotations
 
@@ -33,7 +33,7 @@ TOPIC_ORDER = [
 
 
 def packages() -> list[str]:
-    # Packages built on this computer, plus the committed sample (D-069).
+    # Packages built on this computer, plus the committed sample.
     found = {p.name for d in (APP, SAMPLE) for p in d.glob("*") if (p / "summary.json").exists()}
     return sorted(found)
 
@@ -78,9 +78,9 @@ def findings(contract: str) -> tuple[pd.DataFrame, str, str]:
             from bidlens.documents.review import tidy
 
             res = json.loads(p.read_text())
-            # No phone numbers or email addresses on screen either (D-031).
+            # No phone numbers or email addresses on screen either.
             items = mask(pd.DataFrame(res["items"]))
-            # Findings are checked against their quotes before they are shown (D-071).
+            # Findings are checked against their quotes before they are shown.
             table = items["category"].isin(TABLES)
             items = pd.concat([tidy(items[~table]), items[table]], ignore_index=True)
             items["as_quoted"] = items["as_quoted"].fillna(False).astype(bool)
@@ -127,7 +127,7 @@ def cite(r) -> str:
 
 
 def header(title: str) -> str | None:
-    """Page setup, the package picker and the shared page header (D-066)."""
+    """Page setup, the package picker and the shared page header."""
     from design import page_header, setup
 
     setup(title)

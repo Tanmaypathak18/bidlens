@@ -1,4 +1,4 @@
-"""Step 3.2: parse the bid package into pages, sections, chunks and the bid item list (D-051).
+"""Step 3.2: parse the bid package into pages, sections, chunks and the bid item list.
 
 Usage:
     uv run python -m bidlens.documents.parse 04-0W0504   # writes outputs/17_document_parsing
@@ -392,7 +392,7 @@ def write_outputs(contract, pages, chunks, items, changes, check) -> None:
     body = f"""
 The bid package turned into text BidLens can search and cite (step 3.2).
 
-## What we did (decision D-051)
+## What we did
 
 Each document of contract {contract} that BidLens reads was turned into text page by page.
 The special provisions were split into their numbered sections (for example "8 Prosecution

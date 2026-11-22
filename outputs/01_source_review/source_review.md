@@ -6,15 +6,15 @@ Reviewed 2026-11-19. This review covers where BidLens gets its Caltrans bid hist
 
 | Need | Source | Status |
 | --- | --- | --- |
-| Item-level bids: item, unit, quantity, unit price, bid rank, date, district, contract | Contract Cost Data (`sv08data.dot.ca.gov`) | Available. Collection follows D-012 and D-013 |
+| Item-level bids: item, unit, quantity, unit price, bid rank, date, district, contract | Contract Cost Data (`sv08data.dot.ca.gov`) | Available. Collected with plain page requests, one at a time, 2 seconds apart |
 | County, route and type of work per contract | Contract Cost Data, `details.php` | Available |
 | Bidder count | Derived: the highest bid rank seen for a contract | Available, with a caveat (see below) |
 | Item code list and descriptions | Contract Cost Data, `codes.php` | Available |
-| Engineer's estimate, contract total | Bid Summary PDFs, downloaded by hand (D-014) | Available |
+| Engineer's estimate, contract total | Bid Summary PDFs, downloaded by hand | Available |
 | Engineer's estimate, item level | Not found in any public source | **Not available.** Affects the step 2.1 benchmark |
 | Working days | Bid Summary PDFs | Available |
 | Every bid total, low bid and bidder count | Bid Summary PDFs (cross-checked against sv08data bid ranks) | Available |
-| Contract list for the slice | sv08data, four near-universal items (D-015) | 827 bid openings, 815 contract numbers |
+| Contract list for the slice | sv08data, four near-universal items | 827 bid openings, 815 contract numbers |
 
 ## Source 1: Contract Cost Data (sv08data.dot.ca.gov)
 
@@ -68,7 +68,7 @@ Example: `results.php?item=390132&ob=0&DISTRICT[]=05&Year[]=y2025&unit=none&star
 Fixture: `tests/fixtures/caltrans/contract_item_details.html`
 
 - Shows the EA, item code and description, bid opening date, District-County-Route-Postmile (e.g. `SON-101-22.8/32.8`), quantity, unit price, total price and **type of work** (the contract description).
-- It is per bid row, but the county, route and type of work are per contract, so one call per contract is enough (D-012).
+- It is per bid row, but the county, route and type of work are per contract, so one call per contract is enough.
 
 #### `codes.php`: item code search
 Fixture: `tests/fixtures/caltrans/code_search.html` (`Item=hot mix asphalt`, `R1=StdItems`)
@@ -89,10 +89,10 @@ The highest bid rank seen for a contract gives its number of regular bidders. In
 
 - **What it is:** the Caltrans Office Engineer pages of bids opened and contracts awarded (`https://ppmoe.dot.ca.gov/cc?id=cc_bid_summary`). The Contract Cost Data is built from these documents. This is the only public place found that has the **engineer's estimate**, **working days**, and the full bid totals per contract.
 - **Technology:** a ServiceNow portal, rendered by JavaScript.
-- **Automated access is not allowed.** `https://ppmoe.dot.ca.gov/robots.txt` says `User-agent: *` / `Disallow: /`. One request was made to the landing page during this review, before the `robots.txt` was checked. BidLens makes no further automated requests to this host (D-013).
+- **Automated access is not allowed.** `https://ppmoe.dot.ca.gov/robots.txt` says `User-agent: *` / `Disallow: /`. One request was made to the landing page during this review, before the `robots.txt` was checked. BidLens makes no further automated requests to this host.
 - **Open data:** a search of data.ca.gov found no dataset of Caltrans bid results, engineer's estimates or working days.
 
-The maintainer downloads Bid Summary PDFs from this site by hand (D-014). The list to download is in `the download list`.
+The maintainer downloads Bid Summary PDFs from this site by hand.
 
 ## Source 3: Bid Summary PDFs (manual download)
 
@@ -125,7 +125,7 @@ Pilot: 10 contracts from 2025 (5 in District 4, 5 in District 5), saved as `data
 - **One bidder.** 05-1R7504 had a single bid, 10% over the estimate. Bidder counts in the pilot range from 1 to 12.
 - Single-bidder and two-bidder contracts have no separate bid-list page.
 
-## Contract list (D-015)
+## Contract list
 
 Searches on sv08data need at least 3 contiguous letters or digits, so no single search lists every contract. The site also returned HTTP 500 for the code pattern `390___`. The contract list is built from the union of awarded-only (`ob=1`) searches, one per district covering all years, for four items nearly every contract has:
 
@@ -136,7 +136,7 @@ Searches on sv08data need at least 3 contiguous letters or digits, so no single 
 
 Mobilization alone missed 2 of the 10 pilot contracts. The union found all 10.
 
-Result for D-007:
+Result for the BidLens slice (Districts 4 and 5, 2018 to 2026):
 
 | District | 2018 | 2019 | 2020 | 2021 | 2022 | 2023 | 2024 | 2025 | 2026 (to Nov 3) |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
@@ -147,8 +147,8 @@ That's 827 bid openings under 815 contract numbers. Twelve openings re-use a con
 
 With `ob=1`, the Bid column holds the awarded bidder's rank, not the bid-open quarter that the help page describes. Fixture: `tests/fixtures/caltrans/results_awarded_contract_list.html`.
 
-## Collection plan for the D-007 slice
+## Collection plan for the BidLens slice
 
-- **Queries:** about 100 items × 2 districts × 9 years = up to 1,800 `results.php` calls, plus one `details.php` call per contract (827). That is about 2,600 requests, roughly 1.5 hours at the D-013 rate.
-- **Picking the top 100 items:** from bid summary dollar totals (D-016). The list is provisional until Tier 1 of the checklist is downloaded.
+- **Queries:** about 100 items × 2 districts × 9 years = up to 1,800 `results.php` calls, plus one `details.php` call per contract (827). That is about 2,600 requests, roughly 1.5 hours at one request every 2 seconds.
+- **Picking the top 100 items:** from bid summary dollar totals. The list is provisional until Tier 1 of the checklist is downloaded.
 - **Cache:** raw HTML keyed by URL (format chosen in step 1.2).

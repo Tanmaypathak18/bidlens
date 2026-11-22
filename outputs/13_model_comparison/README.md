@@ -10,7 +10,7 @@ Four ways of pricing a bid item have been built: the historical median of recent
 should BidLens use, and is a BidLens total closer to the winning bid than the engineer's
 estimate?
 
-## Two ways of running the models (decision D-045)
+## Two ways of running the models
 
 Stages 10 and 11 froze the models at the end of 2023 and tested them on almost three
 years of later bids. The sanity check (stage 12) showed they drift high as time passes.
@@ -18,7 +18,7 @@ In real use BidLens always has the latest bids, so each model is also run **refr
 each quarter**: before pricing a quarter's bids it sees every bid opened before that
 quarter. It still never sees the bids it is pricing.
 
-## The choice (decision D-046)
+## The choice
 
 The choice was made on 2023 bids (everything before 2023 as history), not on the test
 years, so the test results below are an honest check of it:

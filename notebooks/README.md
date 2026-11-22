@@ -1,6 +1,6 @@
 # Notebooks
 
-The BidLens analysis, step by step, in order (decision D-032). Each notebook opens with a plain-language summary (the question, what we did, what we found) and explains every chart before showing it. They are committed with their charts saved, so they read directly on GitHub. The code they call lives in `src/bidlens/`. Each one saves its results to a numbered folder in [`outputs/`](../outputs/README.md). No notebook names a bidder.
+The BidLens analysis, step by step, in order. Each notebook opens with a plain-language summary (the question, what we did, what we found) and explains every chart before showing it. They are committed with their charts saved, so they read directly on GitHub. The code they call lives in `src/bidlens/`. Each one saves its results to a numbered folder in [`outputs/`](../outputs/README.md). No notebook names a bidder.
 
 | Notebook | What it covers | Results in |
 | --- | --- | --- |
@@ -12,6 +12,6 @@ The BidLens analysis, step by step, in order (decision D-032). Each notebook ope
 | [06_market_context](06_market_context.ipynb) | Where the low bid lands against the engineer's estimate, and how many contractors bid (step 2.7) | `outputs/15_market_context/` |
 | [07_document_extraction](07_document_extraction.ipynb) | Reading a real bid package with local models, scored against 89 gold facts; the draft estimate checked against the real result (Phase 3, steps 4.1, 4.2) | `outputs/17_` to `21_app/` |
 
-**To rerun one:** notebooks 02 to 07 read the results each stage already saved in `outputs/` (decision D-070), so they run in seconds on a fresh clone:
+**To rerun one:** notebooks 02 to 07 read the results each stage already saved in `outputs/`, so they run in seconds on a fresh clone:
 `uv run jupyter nbconvert --execute --to notebook --inplace notebooks/<name>.ipynb`.
 Notebook 01 reads the database, so it needs `make data` first. Each notebook ends with the command that recomputes its stage from scratch.

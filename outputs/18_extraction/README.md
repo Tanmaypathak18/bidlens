@@ -3,7 +3,7 @@
 What BidLens reads out of the bid documents for contract 04-0W0504, with the page each
 finding comes from (steps 3.3 and 3.4).
 
-## How it works (decision D-052)
+## How it works
 
 For each topic an estimator cares about (scope, time and damages, lane closures,
 environmental limits, hazardous materials, site conditions, utilities, bid requirements,
@@ -110,7 +110,7 @@ Examples (two per topic):
 ## How it was produced
 
 `uv run python -m bidlens.documents.extract 04-0W0504 --model <ollama model>`, once per
-local model, one model loaded at a time (D-053, D-054). Everything runs on this machine at
+local model, one model loaded at a time. Everything runs on this machine at
 no cost; the documents never leave it. The optional `--mode hosted` (Claude API, needs the
 user's own key) is not used here. File names use the run's name, e.g. `local_qwen3-8b`.
 Code in `src/bidlens/documents/extract.py`. Generated 2026-11-20.

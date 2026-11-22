@@ -1,4 +1,4 @@
-"""Export: preview the draft estimate workbook, then download it (steps 4.1, 4.2, D-066)."""
+"""Export: preview the draft estimate workbook, then download it (steps 4.1, 4.2)."""
 
 from __future__ import annotations
 

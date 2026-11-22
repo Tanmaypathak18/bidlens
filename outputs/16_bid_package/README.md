@@ -2,7 +2,7 @@
 
 The sample bid package BidLens reads in Phase 3: Caltrans contract 04-0W0504 (step 3.1).
 
-## Which project and why (decision D-050)
+## Which project and why
 
 Contract 04-0W0504: highway work in Alameda and Contra Costa counties (trash capture devices,
 maintenance vehicle pullouts, guardrail, erosion control and lighting), engineer's estimate

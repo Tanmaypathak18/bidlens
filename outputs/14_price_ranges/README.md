@@ -9,7 +9,7 @@ built so that the winning bidder's unit price falls between low and high on abou
 80.0% of items, below low on about 10% and above high on about 10%. Likely is
 the model's middle estimate (stage 13).
 
-## How it is built (decision D-047)
+## How it is built
 
 Kumo Tabular gives a full spread of possible prices, not just one number. Its own
 10th-to-90th percentile range is the starting point. Each quarter, BidLens checks how
@@ -58,7 +58,7 @@ how noisy single low-bid prices are (stage 12).
 | Steel Structures, Signs and Painting | 21 | 71.4% | 71.4% | 21.4x |
 | Other | 6 | 100.0% | 100.0% | 3.5x |
 
-## Comparable bids (decision D-048)
+## Comparable bids
 
 Every price comes with the 10 most similar earlier low bids for the same item: closest in
 quantity first, then recent, same district and similar contract size. Each links to its

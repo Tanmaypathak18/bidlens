@@ -5,7 +5,7 @@ Usage:
 
 Inputs (all in data/interim/):
     sv08_bids.parquet           item bids from sv08data (step 1.2)
-    sv08_contracts.parquet      contract details for the D-015 contract list (step 1.2)
+    sv08_contracts.parquet      contract details for the contract list (step 1.2)
     bid_summaries.parquet       contract fields from bid summary PDFs (step 1.5, optional)
 """
 
@@ -39,7 +39,7 @@ def build(interim: Path, db_path: Path, item_list: Path | None = None) -> dict:
     con = duckdb.connect(str(tmp))
     con.execute(SCHEMA)
 
-    # Staging: number repeated item codes within an opening (D-023).
+    # Staging: number repeated item codes within an opening.
     con.execute(f"""
         CREATE TEMP TABLE stg_bid AS
         WITH b AS (

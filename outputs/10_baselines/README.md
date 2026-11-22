@@ -6,8 +6,8 @@ Two machine-learning models that price bid items, scored on the step 2.1 test (s
 
 Both models (XGBoost and LightGBM, two widely used decision-tree methods) learn the low
 bidder's unit price from bids opened before 01 January 2024, then price every test item
-from January 2024 on. They see only what an estimator knows before bids open (decision
-D-041): the item and its family, the quantity (and how it compares with the item's usual
+from January 2024 on. They see only what an estimator knows before bids open:
+the item and its family, the quantity (and how it compares with the item's usual
 quantity), district and county, the time of year and the date, the contract's size
 (engineer's estimate, working days, number of items), the type of work from the contract
 description, and the item's recent median price. Prices are in constant dollars (stage
@@ -15,7 +15,7 @@ description, and the item's recent median price. Prices are in constant dollars 
 
 Settings were chosen on the training years only: fit on bids before 2023 and pick the
 best of 30 random settings on 2023 bids. Each final model averages three fits with
-different random seeds (decision D-042), because a single fit's score moved by about two
+different random seeds, because a single fit's score moved by about two
 points from seed to seed.
 
 ## Results
@@ -75,7 +75,7 @@ log_trailing_median 53.1%; log_quantity 23.4%; item_code 12.3%; unit 4.5%; item_
 | --- | ---: | ---: |
 | Validation MdAPE (2023 bids) | 39.6% | 40.8% |
 | Same setting, six single seeds | 39.6% to 40.9% | 40.8% to 43.4% |
-| Three-seed average, two seed sets (used, D-042) | 40.1%, 40.1% | 41.2%, 42.7% |
+| Three-seed average, two seed sets (used) | 40.1%, 40.1% | 41.2%, 42.7% |
 | Trees | 457 | 212 |
 | Tuning time (30 trials) | 16 s | 89 s |
 | Final fit time (three fits) | 1.4 s | 10.7 s |

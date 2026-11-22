@@ -1,17 +1,17 @@
-# BidLens data scope (decision D-007).
+# BidLens data scope.
 # Read by src/bidlens/ingest/caltrans.py.
 
 districts: [4, 5]
 years: [2018, 2019, 2020, 2021, 2022, 2023, 2024, 2025, 2026]
 
-# Seconds between requests to sv08data.dot.ca.gov (D-013). Never below 1.
+# Seconds between requests to sv08data.dot.ca.gov. Never below 1.
 min_interval_s: 2.0
 
-# Items nearly every contract has. Their union lists the contracts in scope (D-015).
+# Items nearly every contract has. Their union lists the contracts in scope.
 contract_list_items: ['999990', '120090', '120100', '130100']
 
-# Top 100 items by total low-bid dollars (D-016), from the bid summaries with complete item lines
-# (631 at first; unchanged when rechecked with 668 under D-026), bids opened 2019-2026. One-time-use codes (starting 01-04) are excluded.
+# Top 100 items by total low-bid dollars, from the bid summaries with complete item lines
+# (631 at first; unchanged when rechecked with all 668), bids opened 2019-2026. One-time-use codes (starting 01-04) are excluded.
 items_source: bid_summaries_631
 items:
   - {code: '999990', unit: 'LS', description: "MOBILIZATION", low_bid_dollars: 438203095, contracts: 539}

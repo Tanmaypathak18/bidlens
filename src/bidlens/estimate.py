@@ -1,4 +1,4 @@
-"""Step 4.1: build the draft estimate the app shows for one bid package (decision D-064).
+"""Step 4.1: build the draft estimate the app shows for one bid package.
 
 Usage:
     uv run python -m bidlens.estimate 04-0W0504     # about 30 s; writes data/interim/app/
@@ -7,11 +7,11 @@ Every number uses only what was known before bids opened:
 - Bid items and quantities come from the package's bid item list (step 3.2), not the bid
   results.
 - Top-100 items are priced by the production model (Kumo Tabular, refreshed each quarter
-  on every earlier bid, D-045) with its calibrated 80% range (D-047). Other items use the
-  D-038 history tiers and have no modeled range.
-- Comparable bids are the 10 nearest earlier low bids (D-048).
+  on every earlier bid) with its calibrated 80% range. Other items use the
+  history tiers (same item, same description, then family) and have no modeled range.
+- Comparable bids are the 10 nearest earlier low bids.
 - Market context (expected spread to the engineer's estimate and bidder count) is the
-  quarterly-refreshed step 2.7 prediction (D-049).
+  quarterly-refreshed step 2.7 prediction.
 
 The actual bid results are added separately, for the check panel only.
 """
@@ -287,7 +287,7 @@ def build(contract: str) -> dict:
 
 
 def quarter_adjustment(ref: pd.DataFrame, rows: pd.DataFrame, on: pd.Timestamp) -> dict:
-    """The D-047 CQR widening for the bid's quarter, from earlier priced bids only."""
+    """The calibrated (CQR) widening for the bid's quarter, from earlier priced bids only."""
     df = ref[ref["kind"].isin(["validation", "test"])].merge(
         rows[["bid_item_id", "unit_price", "unit"]], left_on="key", right_on="bid_item_id"
     )
@@ -321,7 +321,7 @@ def write_outputs(contract: str, s: dict, seconds: float) -> None:
         f"""# 21 App
 
 The draft estimate the BidLens app shows for the sample bid package {contract}
-(steps 4.1 and 4.2, decisions D-064 and D-065), and the workbook it exports.
+(steps 4.1 and 4.2), and the workbook it exports.
 
 ## The draft
 

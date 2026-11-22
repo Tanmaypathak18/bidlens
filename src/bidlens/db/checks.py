@@ -1,4 +1,4 @@
-"""Data quality checks (step 1.6, decision D-033).
+"""Data quality checks (step 1.6).
 
 Usage:
     uv run python -m bidlens.db.checks    # updates the database and outputs/05_data_quality
@@ -185,7 +185,7 @@ def write_report(con: duckdb.DuckDBPyConnection, result: dict, out: Path) -> Non
         "# Data quality report (step 1.6)",
         "",
         f"Generated {date.today().isoformat()} from `data/bidlens.duckdb` by "
-        "`uv run python -m bidlens.db.checks` (part of `make data`). Rules: decision D-033. "
+        "`uv run python -m bidlens.db.checks` (part of `make data`). "
         "Nothing is deleted. Flags sit in the database tables `bid_flag` and `contract_flag` "
         "and in the CSV files next to this report.",
         "",

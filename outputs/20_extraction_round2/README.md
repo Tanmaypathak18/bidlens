@@ -3,23 +3,23 @@
 A second round of document extraction for contract 04-0W0504, scored against the same
 89 gold facts and judging rules as step 3.5 (stage 19), whose results are kept
 unchanged for comparison. Everything ran on this machine through Ollama; no document left
-it and no paid service was used. Decisions D-060 to D-063.
+it and no paid service was used.
 
 ## What changed
 
-1. **Closure charts read by code (D-060).** The 78 lane, ramp and connector closure charts
+1. **Closure charts read by code.** The 78 lane, ramp and connector closure charts
    lose their empty cells in the PDF text, so the hour of each symbol was lost. BidLens now
    puts every symbol back in its hour column from its position on the page (no model).
    Two chart pages were checked against their images cell by cell. Result:
    `closure_hours.csv`, one row per chart, and a one-line summary per chart for the model
    in place of the broken grid.
-2. **A checklist of estimator questions per topic (D-061)** instead of "list the facts":
+2. **A checklist of estimator questions per topic** instead of "list the facts":
    6 to 9 questions per topic, written to apply to any Caltrans contract.
-3. **Pattern rules for simple facts (D-062):** working days, start window, engineer's
+3. **Pattern rules for simple facts:** working days, start window, engineer's
    estimate, bid opening, prebid meeting (the addendum's date wins), price-firm dates and
    dollar amounts tied to a rate, penalty, withhold or limit. The late closure damages
    table is read into `closure_damages.csv` (31 rows).
-4. **Combined mode (D-063):** both models plus the pattern rules, merged, with duplicates
+4. **Combined mode:** both models plus the pattern rules, merged, with duplicates
    removed (same quote in the same passage, or statements sharing 70% of their words).
 
 ## Result

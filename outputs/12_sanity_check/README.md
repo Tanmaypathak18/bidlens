@@ -109,7 +109,7 @@ The trained models learned prices up to the end of 2023 and carry them forward w
 Caltrans' statewide cost index. That index rose about 29% from late 2023 to early 2026,
 while low bids for these items in Districts 4 and 5 rose much less, so the models drift
 high. The historical median sees the latest bids and drifts much less. A first fix was
-made (decision D-044): the index used for a bid is now the one known before that bid
+made: the index used for a bid is now the one known before that bid
 opened, which removed a small look-ahead leak; it did not remove the drift. The real fix
 is to let the models see recent bids (refreshing Kumo's table of known prices costs
 nothing; the other models would be retrained), which step 2.5 decides.

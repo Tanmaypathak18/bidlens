@@ -13,8 +13,8 @@ The bid summary PDFs: what was downloaded, what was read, and any problems.
 **Parse status:** {'usable': 668, 'usable, contract fields only': 4, 'not usable': 1}. Read by: {'text': 631, 'OCR': 41, '': 1}.
 
 **How it was produced:**
-1. The maintainer downloaded the PDFs by hand from the Caltrans bid summary site (decision D-014). Its robots.txt bars scripts.
-2. `uv run python -m bidlens.ingest.check_bid_summaries` read each file (decisions D-021, D-025 and D-026). It handles two report layouts. Files that Caltrans serves with broken fonts are read with OCR.
+1. The maintainer downloaded the PDFs by hand from the Caltrans bid summary site. Its robots.txt bars scripts.
+2. `uv run python -m bidlens.ingest.check_bid_summaries` read each file. It handles two report layouts. Files that Caltrans serves with broken fonts are read with OCR.
 
 **Checks:**
 - **Exact sum:** the low bidder's items must add up exactly to the low bid.

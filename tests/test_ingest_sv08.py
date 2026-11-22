@@ -210,7 +210,7 @@ def test_fetcher_reconnects_quickly_after_dropped_connection(tmp_path: Path) -> 
     f, fc = make_fetcher(tmp_path, handler)
     assert f.get("details.php", [("Num", "5014594")]) is not None
     assert f.requests_made == 2
-    assert max(fc.sleeps) <= 2.0  # no 60 s backoff (D-020)
+    assert max(fc.sleeps) <= 2.0  # no 60 s backoff
 
 
 def test_fetcher_backs_off_after_repeated_drops(tmp_path: Path) -> None:

@@ -1,4 +1,4 @@
-"""OCR for bid summaries that have no usable text layer (decision D-025).
+"""OCR for bid summaries that have no usable text layer.
 
 Pages are rendered with pypdfium2 and read with Apple Vision (macOS only). Recognized
 words are regrouped into lines by vertical position so the regular parser can read them.

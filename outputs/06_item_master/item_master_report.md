@@ -1,6 +1,6 @@
 # Item master and unit normalization (step 1.4)
 
-**Source:** Caltrans 2026 Bid Items list, numerical XLSX, revised 10-19-26, with 2,633 codes (D-027). Retired codes seen in the data are kept and flagged (D-029). Families follow the 2026 Standard Specifications sections (D-030).
+**Source:** Caltrans 2026 Bid Items list, numerical XLSX, revised 10-19-26, with 2,633 codes. Retired codes seen in the data are kept and flagged. Families follow the 2026 Standard Specifications sections.
 
 ## Mapping
 
@@ -12,13 +12,13 @@
 
 The target was at least 95%.
 
-**Units:** every in-scope row already uses its code's 2026 pay unit. No metric units appear, so no rows were converted and none were flagged. The conversion rules (D-028) are in place for older data. Normalized values are in the `bid_normalized` view; the original values are never changed.
+**Units:** every in-scope row already uses its code's 2026 pay unit. No metric units appear, so no rows were converted and none were flagged. The conversion rules are in place for older data. Normalized values are in the `bid_normalized` view; the original values are never changed.
 
 ## Unmapped rows
 
 | Item code | Description | Bid rows | Contracts | First bid | Last bid | Handling |
 | --- | --- | --- | --- | --- | --- | --- |
-| 872130 | MODIFYING EXISTING ELECTRICAL SYSTEM | 366 | 89 | 2018-01-10 | 2020-01-09 | Retired in 2020 and split into 872131 to 872138; kept as its own item (D-029) |
+| 872130 | MODIFYING EXISTING ELECTRICAL SYSTEM | 366 | 89 | 2018-01-10 | 2020-01-09 | Retired in 2020 and split into 872131 to 872138; kept as its own item |
 
 ## Item families (top 100 items)
 
@@ -43,4 +43,4 @@ The target was at least 95%.
 | Walls and Ground Support | 3 | 21 | 133 | 26.3 |
 | Landscape and Erosion Control | 2 | 377 | 3,315 | 23.5 |
 
-18 of the 19 families appear in the top 100 (Environmental and Existing Facilities has none). The thinnest are Walls and Ground Support (21 contracts) and Piling (66 contracts). Their test sets in step 2.1 may be small; D-030 says to merge a family there if needed.
+18 of the 19 families appear in the top 100 (Environmental and Existing Facilities has none). The thinnest are Walls and Ground Support (21 contracts) and Piling (66 contracts). Their test sets in step 2.1 may be small; a family that is too small there is merged with a neighbour.

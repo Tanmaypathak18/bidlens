@@ -1,4 +1,4 @@
-"""Market: how many bidders to expect and where the low bid should land (step 4.1, D-066)."""
+"""Market: how many bidders to expect and where the low bid should land (step 4.1)."""
 
 from __future__ import annotations
 

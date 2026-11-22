@@ -1,4 +1,4 @@
-"""Step 2.5: refreshed predictions, one model library per process (decision D-045).
+"""Step 2.5: refreshed predictions, one model library per process.
 
 Usage:
     uv run python -m bidlens.pricing.refresh --model xgboost
@@ -8,7 +8,7 @@ Usage:
 For each test quarter, the model sees every cleaned bid opened before the quarter starts
 (Kumo: as context; XGBoost and LightGBM: refit with their step 2.3 settings). It also
 writes 2023 validation predictions from a model that saw only bids before 2023, which
-step 2.5 uses to choose the production model (D-046). Results go to
+step 2.5 uses to choose the production model. Results go to
 data/interim/refresh_<model>.parquet. PyTorch and the GBM libraries never share a
 process (see features.py).
 """
@@ -76,7 +76,7 @@ def run(model: str) -> pd.DataFrame:
     clean = ~rows["low_bidder_disagrees"] & ~rows["is_outlier"] & (rows["unit_price"] > 0)
     out = []
 
-    # 2023 validation, model frozen before 2023 (D-046).
+    # 2023 validation, model frozen before 2023.
     val = train_mask & (d >= VALIDATION_START)
     fit = train_mask & (d < VALIDATION_START)
     p = predict(X[fit], y[fit], X[val])
@@ -91,7 +91,7 @@ def run(model: str) -> pd.DataFrame:
         )
     )
 
-    # Test, refreshed each quarter (D-045).
+    # Test, refreshed each quarter.
     quarters = pd.period_range(pd.Timestamp(CUTOFF), pd.Timestamp(TEST_END), freq="Q")
     t_q = test["bid_open_date"].dt.to_period("Q")
     l_q = sel["bid_open_date"].dt.to_period("Q")

@@ -1,4 +1,4 @@
-"""Step 3.3: extract scope, risks and requirements with page citations (decision D-052).
+"""Step 3.3: extract scope, risks and requirements with page citations.
 
 Usage (local is the default; documents never leave this machine, no paid service):
     uv run python -m bidlens.documents.extract 04-0W0504                  # qwen3:8b
@@ -6,7 +6,7 @@ Usage (local is the default; documents never leave this machine, no paid service
     uv run python -m bidlens.documents.extract 04-0W0504 --mode combined  # both + patterns
     uv run python -m bidlens.documents.extract 04-0W0504 --mode patterns  # rules only
 
-The default is the second round (D-060 to D-063): rebuilt closure charts, a question
+The default is the second round: rebuilt closure charts, a question
 checklist per topic, and the closure tables; `--round1` reproduces step 3.5's settings.
 
 Optional, for users with their own Anthropic API key (sends the document passages to the
@@ -37,15 +37,15 @@ import pandas as pd
 ROOT = Path(".")
 CACHE = ROOT / "data" / "interim" / "docs"
 TOP_K = 25
-NUM_CTX = 32768  # D-054
-NUM_PREDICT = 4096  # D-056: stop a looping model
+NUM_CTX = 32768
+NUM_PREDICT = 4096  # stop a looping model
 RETRIES, RETRY_WAIT = 6, 30
 MAX_QUOTE = 400
-MAX_ITEMS = 25  # D-058
+MAX_ITEMS = 25  # schema limit, enforced while the model writes
 
 HOSTED_MODEL = os.environ.get("BIDLENS_HOSTED_MODEL", "claude-opus-5-5")
 LOCAL_MODEL = os.environ.get("BIDLENS_LOCAL_MODEL", "qwen3:8b")
-# The run the app shows (D-067), then fallbacks if it has not been run.
+# The run the app shows, then fallbacks if it has not been run.
 DEFAULT_RUN = "combined"
 RUN_FALLBACKS = ("combined", "local_qwen3-8b_v2", "local_qwen3-8b", "patterns")
 
@@ -134,7 +134,7 @@ CATEGORIES = [
     ),
 ]
 
-# D-061: specific questions an estimator asks on each topic, written for any Caltrans
+# specific questions an estimator asks on each topic, written for any Caltrans
 # contract (not for the sample one).
 CHECKLIST: dict[str, list[str]] = {
     "scope": [
@@ -239,7 +239,7 @@ SCHEMA = {
     "properties": {
         "items": {
             "type": "array",
-            "maxItems": MAX_ITEMS,  # D-058
+            "maxItems": MAX_ITEMS,
             "items": {
                 "type": "object",
                 "properties": {
@@ -341,7 +341,7 @@ RAW_GRID = re.compile(r"Hour 00 01 02 03")
 def retrieve(
     chunks: pd.DataFrame, cat: Category, k: int = TOP_K, charts: pd.DataFrame | None = None
 ) -> pd.DataFrame:
-    """The top-k chunks for a category, plus every addendum chunk. With `charts` (D-060),
+    """The top-k chunks for a category, plus every addendum chunk. With `charts`,
     the traffic topic gets one rebuilt line per closure chart in place of the raw grids."""
     pool = chunks if cat.handout else chunks[chunks["kind"] != "information_handout"]
     pool = pool.reset_index(drop=True)
@@ -375,7 +375,7 @@ class HostedBackend:
     """Optional, off by default: Claude API with structured JSON output.
 
     Only for users who bring their own ANTHROPIC_API_KEY; it sends the retrieved passages
-    to Anthropic and is billed per token (D-053). BidLens itself never needs it.
+    to Anthropic and is billed per token. BidLens itself never needs it.
     """
 
     name = "hosted"
@@ -431,9 +431,9 @@ class LocalBackend:
 
         payload = {
             "model": self.model,
-            "stream": True,  # D-057: keep what was written if the reply is aborted
+            "stream": True,  # keep what was written if the reply is aborted
             "format": schema,
-            "think": False,  # D-054: qwen3's reasoning mode off, same as llama3.1
+            "think": False,  # qwen3's reasoning mode off, same as llama3.1
             "options": {"temperature": 0, "num_ctx": NUM_CTX, "num_predict": NUM_PREDICT},
             "messages": [
                 {"role": "system", "content": system},
@@ -461,7 +461,7 @@ class LocalBackend:
         return salvage(text)
 
     def _stream(self, payload: dict) -> tuple[str, dict]:
-        """Read a streamed reply. A repeat-limit abort ends it like a cut-off (D-057)."""
+        """Read a streamed reply. A repeat-limit abort ends it like a cut-off."""
         parts: list[str] = []
         with self.http.stream("POST", "/api/chat", json=payload) as r:
             for line in r.iter_lines():
@@ -481,7 +481,7 @@ class LocalBackend:
         raise OllamaError("stream ended without a final message")
 
     def close(self) -> None:
-        """Unload the model so only one is in memory at a time (D-054)."""
+        """Unload the model so only one is in memory at a time."""
         import httpx
 
         # If the server is already gone, nothing is loaded.
@@ -490,11 +490,11 @@ class LocalBackend:
 
 
 class OllamaError(RuntimeError):
-    """An error message from the Ollama server (retried, D-054)."""
+    """An error message from the Ollama server (retried)."""
 
 
 def salvage(text: str) -> dict:
-    """Parse the model's JSON; if it was cut off (D-056), keep the complete items."""
+    """Parse the model's JSON; if it was cut off, keep the complete items."""
     try:
         return json.loads(text)
     except json.JSONDecodeError:
@@ -521,7 +521,7 @@ def norm(text: str) -> str:
 
 
 def words(text: str) -> str:
-    """Letters and digits only, space separated, with spaces at both ends (D-056)."""
+    """Letters and digits only, space separated, with spaces at both ends."""
     return " " + " ".join(re.findall(r"[a-z0-9]+", text.lower())) + " "
 
 
@@ -616,7 +616,7 @@ def run(
 ) -> dict:
     """Extract every category. With `partial`, finished categories are saved after each
     call and skipped on a rerun, so an interrupted run resumes where it stopped. `v2`
-    is the second round: rebuilt closure charts (D-060) and the checklist (D-061)."""
+    is the second round: rebuilt closure charts and the checklist."""
     from bidlens.documents.charts import chart_chunks
 
     chunks = pd.read_parquet(CACHE / contract / "chunks.parquet")
@@ -659,7 +659,7 @@ def run(
 
 
 def tables(contract: str) -> list[dict]:
-    """Closure hours (D-060) and late closure damages (D-062), read by code."""
+    """Closure hours and late closure damages, read by code."""
     from bidlens.documents import patterns as pt
 
     out = []
@@ -697,7 +697,7 @@ def _cat(key: str) -> Category:
 
 
 def pattern_run(contract: str) -> dict:
-    """The pattern rules alone (D-062), checked and cited like model findings."""
+    """The pattern rules alone, checked and cited like model findings."""
     from bidlens.documents import patterns as pt
 
     chunks = pd.read_parquet(CACHE / contract / "chunks.parquet")
@@ -729,7 +729,7 @@ def pattern_run(contract: str) -> dict:
 
 
 def _overlap(a: dict, b: dict) -> bool:
-    """D-063: the same fact twice, by quote containment in one chunk or statement words."""
+    """The same fact twice, by quote containment in one chunk or statement words."""
     if a["category"] != b["category"]:
         return False
     if a["chunk_id"] == b["chunk_id"]:
@@ -785,7 +785,7 @@ def model_run(contract: str, mode: str, model: str, v2: bool) -> dict:
     return result
 
 
-COMBINED_MODELS = ("qwen3:8b", "llama3.1:8b")  # priority order (D-063)
+COMBINED_MODELS = ("qwen3:8b", "llama3.1:8b")  # priority order
 
 
 def main(argv: list[str] | None = None) -> int:

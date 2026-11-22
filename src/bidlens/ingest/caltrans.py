@@ -1,7 +1,7 @@
 """Collect Caltrans item bids from the Contract Cost Data site (sv08data.dot.ca.gov).
 
-Decisions: D-012 (method), D-013 (rate), D-015 (contract list), D-017 (cache),
-D-018 (retries). Never point this at ppmoe.dot.ca.gov (robots.txt disallows it).
+Plain GET requests, one at a time, at least 2 s apart, every response cached, with
+long back-off on errors. Never point this at ppmoe.dot.ca.gov (robots.txt disallows it).
 
 Usage:
     uv run python -m bidlens.ingest.caltrans all --scope config/scope.yaml
@@ -38,7 +38,7 @@ log = logging.getLogger("bidlens.ingest")
 BASE_URL = "https://sv08data.dot.ca.gov/"
 USER_AGENT = "BidLens-research/0.1 (public-data study)"
 FORBIDDEN_HOSTS = ("ppmoe.dot.ca.gov",)
-RETRY_WAITS = (60.0, 120.0, 240.0)  # D-018: 4 attempts in total
+RETRY_WAITS = (60.0, 120.0, 240.0)  # 4 attempts in total
 
 
 # --------------------------------------------------------------------------- scope
@@ -101,7 +101,7 @@ class Fetcher:
             follow_redirects=True,
         )
         if any(h in str(self.client.base_url) for h in FORBIDDEN_HOSTS):
-            raise ValueError("automated requests to this host are not allowed (D-013)")
+            raise ValueError("automated requests to this host are not allowed")
         self.sleep = sleep
         self.clock = clock
         self.retry_errors = retry_errors
@@ -132,7 +132,7 @@ class Fetcher:
             except httpx.RemoteProtocolError as exc:
                 last_error, status = f"{type(exc).__name__}: {exc}", None
                 if not quick_retry_used:
-                    # D-020: a dropped keep-alive connection; reconnect after the normal gap.
+                    # a dropped keep-alive connection; reconnect after the normal gap.
                     quick_retry_used = True
                     log.info("connection dropped for %s; reconnecting", endpoint)
                     continue

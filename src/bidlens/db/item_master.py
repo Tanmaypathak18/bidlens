@@ -1,6 +1,7 @@
 """Item master, unit normalization and item families (step 1.4).
 
-Decisions: D-027 (source list), D-028 (units), D-029 (retired codes), D-030 (families).
+Source: the Caltrans 2026 Bid Items list. Units follow each code's pay unit; retired codes are
+kept and flagged; families follow the 2026 Standard Specifications sections.
 """
 
 from __future__ import annotations
@@ -13,7 +14,7 @@ import openpyxl
 
 DEFAULT_ITEM_LIST = Path("data/raw/item_list/bid_items_10-19-2026_numerically.xlsx")
 
-# D-030: 2026 Standard Specifications section -> item family.
+# 2026 Standard Specifications section -> item family.
 _FAMILY_SECTIONS: dict[str, tuple[int, ...]] = {
     "General and Overhead": (*range(5, 12), 99),
     "Traffic Control": (12,),
@@ -37,7 +38,7 @@ _FAMILY_SECTIONS: dict[str, tuple[int, ...]] = {
 }
 SECTION_FAMILY = {s: fam for fam, secs in _FAMILY_SECTIONS.items() for s in secs}
 
-# D-028: metric unit -> (US customary unit, quantity factor). Price divides by the factor.
+# metric unit -> (US customary unit, quantity factor). Price divides by the factor.
 UNIT_FACTORS: dict[str, tuple[str, float]] = {
     "M": ("LF", 3.28084),
     "M2": ("SQFT", 10.7639),
@@ -49,7 +50,7 @@ UNIT_FACTORS: dict[str, tuple[str, float]] = {
     "KM": ("MI", 0.621371),
 }
 
-# D-029: retired codes split by Caltrans into several successors.
+# retired codes split by Caltrans into several successors.
 RETIRED: dict[str, dict] = {
     "872130": {
         "family_section": 87,
@@ -115,7 +116,7 @@ def build_item_master(con: duckdb.DuckDBPyConnection, item_list: Path) -> dict:
             for i in items
         ],
     )
-    # Retired or unknown codes seen in the data (D-029).
+    # Retired or unknown codes seen in the data.
     missing = con.execute("""
         SELECT item_code, any_value(item_description), mode(unit)
         FROM bid_item WHERE item_code NOT IN (SELECT item_code FROM item_master)

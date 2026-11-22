@@ -23,9 +23,9 @@ BidLens prices the bid items of a Caltrans heavy civil contract from past low bi
 | Market context | Low bid vs the engineer's estimate, and number of bidders, with 80% ranges | Kumo Tabular, recalibrated each quarter | as above |
 | Document reading | Findings on 10 topics, each quoting its page | qwen3:8b and llama3.1:8b through Ollama, plus plain pattern rules; closure charts rebuilt by code | Apache-2.0 (qwen3); Llama 3.1 Community License (llama3.1) |
 
-**Refreshed every quarter.** Before pricing a quarter, the pricing and market models see every bid opened before that quarter, and never one from the quarter being priced (decision D-045). This walk-forward setup was adopted after models frozen at the end of 2023 drifted high in the test years, because the statewide cost index rose much faster than these low bids ([notebook 04](../notebooks/04_kumo_tabular.ipynb)).
+**Refreshed every quarter.** Before pricing a quarter, the pricing and market models see every bid opened before that quarter, and never one from the quarter being priced. This walk-forward setup was adopted after models frozen at the end of 2023 drifted high in the test years, because the statewide cost index rose much faster than these low bids ([notebook 04](../notebooks/04_kumo_tabular.ipynb)).
 
-**Compared and not chosen:** XGBoost and LightGBM (gradient-boosted trees) and the historical median. The choice of Kumo was made on 2023 bids before the test years were looked at (decision D-046).
+**Compared and not chosen:** XGBoost and LightGBM (gradient-boosted trees) and the historical median. The choice of Kumo was made on 2023 bids before the test years were looked at.
 
 ## Data
 
@@ -90,4 +90,4 @@ BidLens prices the bid items of a Caltrans heavy civil contract from past low bi
 
 ## Versions
 
-Kumo Tabular `structured-data-models` 0.2.1 with weights `nvidia/Kumo-Tabular` v1.0.1 (small); qwen3:8b and llama3.1:8b through Ollama; XGBoost and LightGBM as pinned in `uv.lock`. Decisions behind every choice: the Decision log in `the project notes` (D-034 to D-070).
+Kumo Tabular `structured-data-models` 0.2.1 with weights `nvidia/Kumo-Tabular` v1.0.1 (small); qwen3:8b and llama3.1:8b through Ollama; XGBoost and LightGBM as pinned in `uv.lock`. How each stage was built and checked: the README in each `outputs/` folder and the notebooks in `notebooks/`.

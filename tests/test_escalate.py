@@ -1,4 +1,4 @@
-"""Step 2.2 tests: the recovered cost index and escalation (D-039, D-040)."""
+"""Step 2.2 tests: the recovered cost index and escalation."""
 
 from __future__ import annotations
 

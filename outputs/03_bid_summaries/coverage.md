@@ -1,12 +1,12 @@
 # Bid summary coverage
 
-Status of the bid summary PDFs for the D-007 slice, checked 2026-11-19 by `bidlens.ingest.check_bid_summaries` (decision D-026, which supersedes D-022). The list holds contract numbers and dates only. The PDFs themselves stay git-ignored.
+Status of the bid summary PDFs for the BidLens slice (Districts 4 and 5, 2018 to 2026), checked 2026-11-19 by `bidlens.ingest.check_bid_summaries`. The list holds contract numbers and dates only. The PDFs themselves stay git-ignored.
 
 ## Summary
 
 | | Bid openings |
 | --- | --- |
-| In the download checklist (D-015) | 827 |
+| In the download checklist | 827 |
 | Usable bid summary | **665** |
 | Not on the Caltrans site | 151 |
 | No usable summary exists (Caltrans errors, listed below) | 11 |
@@ -15,7 +15,7 @@ Seven more files hold earlier openings of in-scope contracts. These are real bid
 
 **How usable files were checked:**
 - **631 files with a text layer.** The item rows match the stated number of items, and the low bidder's items sum exactly to the low bid.
-- **41 files read by OCR (D-025).** Caltrans serves these with broken fonts (confirmed by the maintainer: the site has no other copy). 37 pass the same exact-sum check. In the other 4, a few item lines were misread, so their item lines are left out. Their contract-level fields are still confirmed by the header check below.
+- **41 files read by OCR.** Caltrans serves these with broken fonts (confirmed by the maintainer: the site has no other copy). 37 pass the same exact-sum check. In the other 4, a few item lines were misread, so their item lines are left out. Their contract-level fields are still confirmed by the header check below.
 - **Header check, all 672 files:** the engineer's estimate × (1 + printed % over/under) reproduces the low bid, within rounding.
 
 In 43 contracts, one or more listed bids carry no rank. These are most likely irregular bids. The ranked count is used as the bidder count. In 16 OCR files, the printed bidder count was not readable, so the count of listed bids is used.

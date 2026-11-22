@@ -1,4 +1,4 @@
-"""Raw response cache with a JSONL manifest (decision D-017).
+"""Raw response cache with a JSONL manifest.
 
 Layout under the cache root:
     <endpoint>/<sha1 of sorted query>.html.gz   raw response body

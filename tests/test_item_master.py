@@ -76,7 +76,7 @@ def test_build_item_master_maps_converts_and_flags(tmp_path: Path) -> None:
         "SELECT unit, quantity, unit_price, unit_mismatch FROM bid_normalized "
         "WHERE item_code = '390132'"
     ).fetchone()
-    assert hma[0] == "TON"  # metric tonne converted (D-028)
+    assert hma[0] == "TON"  # metric tonne converted
     assert float(hma[1]) == pytest.approx(110.231)
     assert float(hma[2]) == pytest.approx(100.0, rel=1e-4)
     assert hma[3] is False

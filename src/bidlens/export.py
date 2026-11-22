@@ -1,4 +1,4 @@
-"""Step 4.2: the draft estimate workbook (decision D-065).
+"""Step 4.2: the draft estimate workbook.
 
 Usage:
     uv run python -m bidlens.export 04-0W0504   # outputs/21_app/draft_estimate_<contract>.xlsx
@@ -213,7 +213,7 @@ def workbook(contract: str, root: Path = Path(".")) -> bytes:
     if len(f):
         from bidlens.documents.review import tidy
 
-        f = tidy(mask(f))  # same check as the app (D-071)
+        f = tidy(mask(f))  # same check as the app
     for i, r in enumerate(f.itertuples(), start=2):
         vals = [
             r.category_name,

@@ -1,4 +1,4 @@
-"""Step 2.6: price ranges and comparable bids (decisions D-047, D-048).
+"""Step 2.6: price ranges and comparable bids.
 
 Usage:
     uv run python -m bidlens.pricing.ranges   # writes outputs/14_price_ranges
@@ -50,7 +50,7 @@ def cqr_adjustment(scores, coverage: float = COVERAGE) -> float:
 
 def calibrate(df: pd.DataFrame) -> pd.DataFrame:
     """Add CQR low/high to test rows, recalibrated each quarter on all earlier rows
-    (validation and earlier test quarters), separately for lump sums (D-047)."""
+    (validation and earlier test quarters), separately for lump sums."""
     df = df.copy()
     df["score"] = conformity(df["q10"], df["q90"], df["unit_price"])
     df["low"], df["high"], df["adjustment"] = np.nan, np.nan, np.nan
@@ -127,7 +127,7 @@ def main(argv: list[str] | None = None) -> int:
             )
     groups = pd.DataFrame(groups)
 
-    # Comparable bids (D-048) for every test price, from cleaned earlier low bids.
+    # Comparable bids for every test price, from cleaned earlier low bids.
     clean = rows[~rows["low_bidder_disagrees"] & ~rows["is_outlier"] & (rows["unit_price"] > 0)]
     finder = ComparableFinder(clean)
     comps, comp_check = [], []
@@ -259,7 +259,7 @@ built so that the winning bidder's unit price falls between low and high on abou
 {_pct(COVERAGE)} of items, below low on about 10% and above high on about 10%. Likely is
 the model's middle estimate (stage 13).
 
-## How it is built (decision D-047)
+## How it is built
 
 Kumo Tabular gives a full spread of possible prices, not just one number. Its own
 10th-to-90th percentile range is the starting point. Each quarter, BidLens checks how
@@ -282,7 +282,7 @@ how noisy single low-bid prices are (stage 12).
 
 {chr(10).join(_table("family", "Item family"))}
 
-## Comparable bids (decision D-048)
+## Comparable bids
 
 Every price comes with the 10 most similar earlier low bids for the same item: closest in
 quantity first, then recent, same district and similar contract size. Each links to its

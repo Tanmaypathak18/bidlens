@@ -1,4 +1,4 @@
-"""Step 2.3: XGBoost and LightGBM baselines (decision D-041).
+"""Step 2.3: XGBoost and LightGBM baselines.
 
 Usage:
     uv run python -m bidlens.pricing.baseline    # writes outputs/10_baselines, data/models/
@@ -42,7 +42,7 @@ TRIALS = 30
 SEED = 2026
 MAX_TREES = 3000
 EARLY_STOP = 100
-N_SEEDS = 3  # D-042
+N_SEEDS = 3  # average three seeds: one fit's score moves by about two points
 
 
 # ------------------------------------------------------------------ models
@@ -165,7 +165,7 @@ def run(con) -> dict:
         t0 = time.perf_counter()
         params, trees, log = tune(kind, X[inner_fit], y[inner_fit], X[inner_val], y[inner_val])
         tune_s = time.perf_counter() - t0
-        # Seed check (D-041) and the three-seed average (D-042), on the inner split.
+        # Seed check and the three-seed average, on the inner split.
         seed_mdape, seed_logs = [], []
         for s in range(SEED, SEED + 6):
             m = fit(kind, make_model(kind, params, trees, s, False), X[inner_fit], y[inner_fit])
@@ -228,7 +228,7 @@ def run(con) -> dict:
 
 
 def load_saved(kind: str) -> list:
-    """The three fitted models of a library (D-042), as saved by `run`."""
+    """The three fitted models of a library, as saved by `run`."""
     if kind == "xgboost":
         models = []
         for i in range(N_SEEDS):
@@ -351,7 +351,7 @@ def write_outputs(out: Path, res: dict) -> dict:
         f"| Same setting, six single seeds | "
         f"{_pct(min(xi['val_mdape_single_seeds']))} to {_pct(max(xi['val_mdape_single_seeds']))} | "
         f"{_pct(min(li['val_mdape_single_seeds']))} to {_pct(max(li['val_mdape_single_seeds']))} |",
-        f"| Three-seed average, two seed sets (used, D-042) | "
+        f"| Three-seed average, two seed sets (used) | "
         f"{', '.join(_pct(v) for v in xi['val_mdape_averaged'])} | "
         f"{', '.join(_pct(v) for v in li['val_mdape_averaged'])} |",
         f"| Trees | {xi['trees']:,} | {li['trees']:,} |",
@@ -371,8 +371,8 @@ Two machine-learning models that price bid items, scored on the step 2.1 test (s
 
 Both models (XGBoost and LightGBM, two widely used decision-tree methods) learn the low
 bidder's unit price from bids opened before {CUTOFF:%d %B %Y}, then price every test item
-from {CUTOFF:%B %Y} on. They see only what an estimator knows before bids open (decision
-D-041): the item and its family, the quantity (and how it compares with the item's usual
+from {CUTOFF:%B %Y} on. They see only what an estimator knows before bids open:
+the item and its family, the quantity (and how it compares with the item's usual
 quantity), district and county, the time of year and the date, the contract's size
 (engineer's estimate, working days, number of items), the type of work from the contract
 description, and the item's recent median price. Prices are in constant dollars (stage
@@ -380,7 +380,7 @@ description, and the item's recent median price. Prices are in constant dollars 
 
 Settings were chosen on the training years only: fit on bids before 2023 and pick the
 best of 30 random settings on 2023 bids. Each final model averages three fits with
-different random seeds (decision D-042), because a single fit's score moved by about two
+different random seeds, because a single fit's score moved by about two
 points from seed to seed.
 
 ## Results

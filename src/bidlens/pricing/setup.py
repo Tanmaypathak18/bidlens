@@ -1,6 +1,6 @@
-"""Step 2.1: target, time split and metrics (decision D-034).
+"""Step 2.1: target, time split and metrics.
 
-- Target: log of the escalated low-bid (rank 1) unit price (escalation: D-040, step 2.2).
+- Target: log of the escalated low-bid (rank 1) unit price (escalation: step 2.2).
   Models predict the log; the metrics below are computed on prices.
 - Split: train on bids opened before CUTOFF, test on CUTOFF to TEST_END.
 - The test set drops contracts flagged `low_bidder_disagrees` and prices that are zero or
@@ -40,7 +40,7 @@ def use_cost_index(index) -> None:
 
 
 def escalate(prices, from_dates, to_date) -> np.ndarray:
-    """Bring prices from their bid dates to `to_date` dollars (decision D-040).
+    """Bring prices from their bid dates to `to_date` dollars.
 
     Every price that crosses dates goes through here. Raises if no index was set, so
     unescalated prices can't slip through by accident.

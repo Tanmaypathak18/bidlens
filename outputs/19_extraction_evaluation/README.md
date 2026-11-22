@@ -1,12 +1,12 @@
 # 19 Extraction evaluation
 
-How well each local model reads the bid documents for contract 04-0W0504 (step 3.5,
-decision D-055). Both models ran on this machine through Ollama with the same prompts
-and settings (D-054); no document left the machine and no paid service was used.
+How well each local model reads the bid documents for contract 04-0W0504 (step 3.5).
+Both models ran on this machine through Ollama with the same prompts
+and settings; no document left the machine and no paid service was used.
 
 ## Result
 
-**Default model: qwen3:8b** (highest F1; rule in D-055).
+**Default model: qwen3:8b** (highest F1, the rule set before judging).
 
 | Model | Items | Precision | Gold facts found | Recall | F1 | Citation accuracy | Quotes rejected | Minutes |
 | --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
@@ -16,7 +16,7 @@ and settings (D-054); no document left the machine and no paid service was used.
 - **Precision:** share of the model's findings that are true and on topic.
 - **Recall:** share of the 89 gold facts found by at least one correct finding.
 - **Citation accuracy:** share of findings whose cited page actually supports them. Every
-  kept finding already quotes text that exists on its page (D-052); this checks that
+  kept finding already quotes text that exists on its page; this checks that
   the quote backs up the statement.
 - **Quotes rejected:** answers dropped automatically because the quoted text was not on
   the cited page.
@@ -48,7 +48,7 @@ judging is still open (listed for final review).
 Judging rules, applied to every finding the same way:
 
 - A finding is **correct** if its statement is true according to its cited page and it
-  belongs to its topic. Quotes are capped at 300 characters (D-058), so a quote can stop
+  belongs to its topic. Quotes are capped at 300 characters, so a quote can stop
   before the words that back the statement; the page decides.
 - A true finding filed under the wrong topic is correct if it states a gold fact of
   another topic (the fact was found), and wrong otherwise (off-topic noise, such as rows

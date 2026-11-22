@@ -152,7 +152,7 @@ _INDEX_RE = re.compile(r"CURRENT 12-MO INDEX \(([^)]*\)?)\):\s*([\d.]+)")
 
 @dataclass(frozen=True)
 class AdjustedPrices:
-    """The cost index line and the original vs adjusted price of every row (D-039)."""
+    """The cost index line and the original vs adjusted price of every row."""
 
     index_name: str  # e.g. "CHCCI (2020 Base)"
     current_index: float  # I(c), the current 12-month index

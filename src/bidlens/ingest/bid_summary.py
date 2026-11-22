@@ -1,4 +1,4 @@
-"""Read Caltrans Bid Summary PDFs (decision D-021).
+"""Read Caltrans Bid Summary PDFs.
 
 Layout notes are in docs/results/source_review.md (Source 3). Only market-level fields
 are kept: no bidder names, addresses, phone numbers or IDs are stored.
@@ -513,7 +513,7 @@ def _past_low_bidder_items(pages: list[str]) -> bool:
 
 
 def read_bid_summary(path: Path, ocr_cache: Path | None = None) -> BidSummary:
-    """Read one bid summary PDF. With `ocr_cache`, fall back to OCR (D-025)."""
+    """Read one bid summary PDF. With `ocr_cache`, fall back to OCR."""
     path = Path(path)
     try:
         with pdfplumber.open(path) as pdf:

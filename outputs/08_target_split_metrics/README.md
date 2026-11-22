@@ -7,7 +7,7 @@ How BidLens will be tested, and how well two simple yardsticks do on that test (
 Before building pricing models, we fix the rules of the test so every later model is
 judged the same way, and we score two yardsticks that any model has to beat.
 
-## The test (decision D-034)
+## The test
 
 - **What is predicted:** the low bidder's unit price for each bid item (models work on its
   logarithm, because prices span several orders of magnitude).
@@ -32,7 +32,7 @@ judged the same way, and we score two yardsticks that any model has to beat.
 | Test contracts with an engineer's estimate and item lines |  | 201 |
 | Headline contracts (90%+ lines with item-level history) |  | 178 |
 
-## Headline: whole-contract totals (decisions D-037, D-038)
+## Headline: whole-contract totals
 
 The estimator's real question: would BidLens's total have been closer to the winning bid
 than Caltrans' own engineer's estimate? Until the pricing model exists, BidLens's total here
@@ -43,7 +43,7 @@ contract being priced is used except its item list and quantities.
 The headline uses the 178 test contracts where at least 90% of lines have
 price history for that exact item (all 201 contracts are shown below too).
 Contracts need a bid summary with its item lines: three test-period summaries were read
-by OCR with their header only (decision D-026), so they have no lines to price.
+by OCR with their header only, so they have no lines to price.
 
 **The historical-median total landed closer to the low bid than the engineer's estimate on
 31.5% of headline contracts.**

@@ -1,4 +1,4 @@
-"""BidLens home: the headline numbers and what to watch (step 4.1, D-064, D-066)."""
+"""BidLens home: the headline numbers and what to watch (step 4.1)."""
 
 from __future__ import annotations
 
