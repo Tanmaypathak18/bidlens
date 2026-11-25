@@ -264,6 +264,124 @@ def workbook(contract: str, root: Path = Path(".")) -> bytes:
     return buf.getvalue()
 
 
+def evaluation_workbook(job, est: pd.DataFrame, market: dict) -> bytes:
+    """Workbook for a live evaluation (the Evaluate page): Estimate and About sheets.
+
+    Same Estimate layout as `workbook`; when the evaluation checked a bid (the estimator's
+    upload or the actual low bid), those unit prices fill the estimator column and a
+    check column says whether each is below, inside or above the range.
+    """
+    wb = Workbook()
+    ws = wb.active
+    ws.title = "Estimate"
+    info = [
+        ("Job", job.label),
+        ("Bid date", job.bid_date.date().isoformat()),
+        ("District / county", f"{job.district or ''} / {job.county or ''}"),
+        ("Engineer's estimate", job.engineers_estimate),
+        ("Priced by", est.attrs.get("model_label", "")),
+    ]
+    if market.get("bidders"):
+        b = market["bidders"]
+        info.append(
+            ("Expected bidders", f"{b['likely']:.0f} (likely {b['low']:.0f} to {b['high']:.0f})")
+        )
+    if market.get("low_bid"):
+        lb = market["low_bid"]
+        info.append(
+            (
+                "Expected low bid",
+                f"${lb['likely']:,.0f} (likely ${lb['low']:,.0f} to ${lb['high']:,.0f})",
+            )
+        )
+    for i, (k, v) in enumerate(info, start=1):
+        ws.cell(row=i, column=1, value=k).font = Font(bold=True)
+        c = ws.cell(row=i, column=2, value=v)
+        if k == "Engineer's estimate":
+            c.number_format = WHOLE
+    top = len(info) + 2
+    checked = "check" in est
+    label = job.check_label if checked else "Estimator unit price"
+    cols = [
+        "Item",
+        "Code",
+        "Description",
+        "Unit",
+        "Quantity",
+        "Low unit price",
+        "Likely unit price",
+        "High unit price",
+        "Low amount",
+        "Likely amount",
+        "High amount",
+        "Priced from",
+        "Range",
+        label,
+        "Estimator amount",
+        "Check",
+    ]
+    _header(ws, top, cols, [7, 9, 44, 7, 11, 14, 14, 14, 15, 15, 15, 34, 10, 14, 15, 10])
+    first = top + 1
+    for i, r in enumerate(est.itertuples(), start=first):
+        mine = getattr(r, "check_price", None) if checked else None
+        vals = [
+            r.item_no,
+            r.item_code,
+            r.description,
+            r.unit,
+            float(r.quantity),
+            None if pd.isna(r.low) else float(r.low),
+            float(r.pred_unit_price),
+            None if pd.isna(r.high) else float(r.high),
+            f'=IF(F{i}="","",E{i}*F{i})',
+            f"=E{i}*G{i}",
+            f'=IF(H{i}="","",E{i}*H{i})',
+            r.source,
+            r.range_kind or "none",
+            None if mine is None or pd.isna(mine) else float(mine),
+            f'=IF(N{i}="",J{i},E{i}*N{i})',
+            r.check if checked else None,
+        ]
+        for j, v in enumerate(vals, start=1):
+            c = ws.cell(row=i, column=j, value=v)
+            if j in (6, 7, 8, 14):
+                c.number_format = MONEY
+            elif j in (9, 10, 11, 15):
+                c.number_format = WHOLE
+    last = first + len(est) - 1
+    t = last + 1
+    ws.cell(row=t, column=3, value="Total (likely prices)").font = Font(bold=True)
+    for j, col in ((10, "J"), (15, "O")):
+        c = ws.cell(row=t, column=j, value=f"=SUM({col}{first}:{col}{last})")
+        c.number_format, c.font = WHOLE, Font(bold=True)
+    ws.cell(
+        row=t + 1,
+        column=3,
+        value="Low and high bracket 8 in 10 past low bids; they are "
+        "not totalled, since item lows and highs don't add up to a total range.",
+    )
+    ws.freeze_panes = ws.cell(row=first, column=4)
+    ws.auto_filter.ref = f"A{top}:P{last}"
+
+    wa = wb.create_sheet("About")
+    notes = [
+        "BidLens draft estimate from the Evaluate page. A starting point, not a bid.",
+        "Unit prices are in bid-date dollars, from public Caltrans bid history (Districts 4 "
+        "and 5), using only bids opened before this job.",
+        f"Top-100 items: {est.attrs.get('model_label', '')}. Other items: earlier low bids "
+        "for the same item (see 'Priced from').",
+        "Range 'model': 80% range from the model's past errors. 'history': 10th to 90th "
+        "percentile of at least 5 earlier low bids for the item. 'none': no range.",
+        "No bidder names are included.",
+    ]
+    wa.column_dimensions["A"].width = 120
+    for i, n in enumerate(notes, start=1):
+        wa.cell(row=i, column=1, value=n).alignment = Alignment(wrap_text=True)
+    buf = io.BytesIO()
+    wb.save(buf)
+    return buf.getvalue()  # fmt: skip
+
+
 def main(argv: list[str] | None = None) -> int:
     ap = argparse.ArgumentParser(description=__doc__)
     ap.add_argument("contract")

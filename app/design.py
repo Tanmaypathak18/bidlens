@@ -332,6 +332,7 @@ def chart(c: alt.Chart, height: int = 260) -> alt.Chart:
             labelFontSize=12,
             titleFontSize=12,
         )
+        .configure_axisY(labelOverlap=False)
         .configure_view(strokeWidth=0)
         .configure_legend(labelColor=SLATE, titleColor=SLATE)
     )

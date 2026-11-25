@@ -1,5 +1,18 @@
 # Changelog
 
+## Unreleased: live evaluation
+
+BidLens now works as a live tool, not only a report on one sample job.
+
+- **Evaluate a bid** (the new first page). Pick any of about 200 Caltrans jobs bid in 2024 to 2026 (search by contract number, district, county or work type), or upload your own bid item list as CSV or Excel. Press Evaluate and watch five steps run for real: load the items, price each item, build the price ranges, the market view and the risk summary, each showing its numbers and a chart as it finishes.
+- **A dashboard on every result:** the draft total, the engineer's estimate, the actual low bid when the job has been bid, the expected number of bidders, the items with the widest ranges, the top 10 items by dollars, and the number of risks when the bid documents are available.
+- **Check my bid.** If the uploaded list has unit prices, each one is marked inside, above or below the BidLens range, with a chart, and the items that move the total most are ranked. For past jobs, the same check runs on the actual low bid.
+- **Look at one item:** its price history, its range and its 10 most comparable earlier bids, each linked to its Caltrans page.
+- **Track record page:** all 178 test jobs on one chart (BidLens and the engineer's estimate against the actual low bid), plus the typical gap between the second-lowest and the lowest bid (6.4%) as a yardstick.
+- **Which model prices it.** On a laptop, the live run uses Kumo Tabular, the production model (about 15 to 30 seconds). The free hosted demo can't hold PyTorch, so it fits LightGBM live in a few seconds and says so on screen; on the same 178 jobs LightGBM was closer than the engineer's estimate on 52% of them, against 58% for Kumo (`outputs/22_live_evaluation/`).
+- The live engine runs on a compact bundle of public Caltrans low bids committed in `data/sample/engine/` (about 1 MB, no bidder names), so a fresh clone and the hosted demo run the same computation.
+- The sample job's pages (Overview, Package, Prices, Market, Export) are unchanged, under "Sample job with bid documents".
+
 ## v1.0.0 (21 November 2026)
 
 The first release of BidLens: an AI estimating copilot for heavy civil bids, built on public Caltrans bid data. It takes an estimator from a new bid package to a draft estimate they can review.

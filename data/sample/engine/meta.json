@@ -1,0 +1,22 @@
+{
+  "built": "2026-11-25",
+  "bids_through": "2026-11-03",
+  "cost_index_series": "CHCCI_2020_KNOWN",
+  "lightgbm": {
+    "params": {
+      "num_leaves": 124,
+      "learning_rate": 0.06225013801560157,
+      "min_child_samples": 30,
+      "subsample": 0.8320113812082225,
+      "subsample_freq": 1,
+      "colsample_bytree": 0.5944531823772292,
+      "reg_lambda": 2.9005564145095892
+    },
+    "trees": 212
+  },
+  "rows": {
+    "bids": 14859,
+    "lines": 44334,
+    "contracts": 848
+  }
+}

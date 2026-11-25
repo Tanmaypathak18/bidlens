@@ -53,3 +53,8 @@ addopts = "-ra"
 [tool.ruff.lint.per-file-ignores]
 # README templates hold long Markdown lines and table rows
 "src/bidlens/outputs.py" = ["E501"]
+"src/bidlens/live/backtest.py" = ["E501"]
+# Chart specs and on-screen prose in the live pages
+"app/views/evaluate.py" = ["E501"]
+"app/views/track_record.py" = ["E501"]
+"scripts/deploy_space.py" = ["E501"]

@@ -27,10 +27,11 @@ Document findings in the app and the workbook come from the `combined` extractio
 
 ## Screenshots
 
-`screenshots/`: every page of the app on this package (desktop width) and the home page at
-phone width, taken with `uv run python scripts/screenshots.py` (headless Chromium).
+`screenshots/`: every page of the app at desktop width (the Evaluate page after a live run
+on this package) and the Evaluate page at phone width, taken with
+`uv run python scripts/screenshots.py` (headless Chromium).
 
-![Home](screenshots/01_overview.png)
+![Evaluate](screenshots/01_evaluate.png)
 
 ## Files
 

@@ -127,7 +127,8 @@ def as_categories(f: pd.DataFrame, categories: dict[str, list[str]]) -> pd.DataF
     """Categorical columns with the training categories (unseen values become missing)."""
     f = f.copy()
     for c in CATEGORICAL:
-        f[c] = pd.Categorical(f[c], categories=categories[c])
+        known = f[c].isin(categories[c])
+        f[c] = pd.Categorical(f[c].where(known), categories=categories[c])
     return f
 
 

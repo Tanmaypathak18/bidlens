@@ -107,6 +107,8 @@ def short_money(x: float | None) -> str:
     """$950, $12.5k, $1.2M: for tight table columns."""
     if x is None or pd.isna(x):
         return "—"
+    if x < 0:
+        return "−" + short_money(-x)
     if x >= 1e6:
         return f"${x / 1e6:,.1f}M"
     if x >= 1e4:
@@ -129,20 +131,25 @@ def cite(r) -> str:
 REPO_URL = "https://github.com/Tanmaypathak18/bidlens"
 
 
+def sidebar_links() -> None:
+    from design import hosted
+
+    st.sidebar.caption(
+        "Hosted demo on public Caltrans data. No paid service is used; uploads are read in "
+        "memory and never saved."
+        if hosted()
+        else "No paid service is used. Bid documents and uploads stay on this computer."
+    )
+    st.sidebar.markdown(f"[Source code and method on GitHub]({REPO_URL})")
+
+
 def header(title: str) -> str | None:
     """Page setup, the package picker and the shared page header."""
     from design import page_header, setup
 
     setup(title)
     contract = pick_package()
-    from design import hosted
-
-    st.sidebar.caption(
-        "Demo: the committed sample package only. No paid service is used."
-        if hosted()
-        else "No paid service is used. Bid documents stay on this computer."
-    )
-    st.sidebar.markdown(f"[Source code and method on GitHub]({REPO_URL})")
+    sidebar_links()
     if contract:
         page_header(summary(contract), title)
     return contract
@@ -161,3 +168,29 @@ def track_record() -> dict:
     if not p.exists():
         return {}
     return json.loads(p.read_text())["contract_level"]["production"]["headline"]
+
+
+# ----------------------------------------------------------------- live evaluation
+
+
+@st.cache_resource(show_spinner="Loading Caltrans bid history…")
+def engine():
+    """The live pricing engine on the committed data bundle (loaded once per server)."""
+    from bidlens.live.bundle import load
+    from bidlens.live.engine import Engine
+
+    return Engine(load())
+
+
+@st.cache_data
+def test_contracts() -> pd.DataFrame:
+    return engine().test_contracts()
+
+
+@st.cache_data
+def stage(name: str, file: str):
+    """A file from a stage folder in outputs/ (JSON as a dict, CSV as a table)."""
+    p = ROOT / "outputs" / name / file
+    if not p.exists():
+        return None
+    return json.loads(p.read_text()) if p.suffix == ".json" else pd.read_csv(p)

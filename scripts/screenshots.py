@@ -4,7 +4,8 @@ Usage:
     uv run python scripts/screenshots.py            # starts the app on port 8599
     uv run python scripts/screenshots.py --out DIR  # default outputs/21_app/screenshots
 
-Saves one full-page PNG per page, plus a phone-width Home page.
+Saves one full-page PNG per page, plus phone-width views. The Evaluate page is shot after
+pressing Evaluate on the sample job, so it shows a finished live run.
 """
 
 from __future__ import annotations
@@ -18,8 +19,9 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 PORT = 8599
-PAGES = [("01_overview", ""), ("02_package", "Package"), ("03_prices", "Prices"),
-         ("04_market", "Market"), ("05_export", "Export")]  # fmt: skip
+PAGES = [("01_evaluate", ""), ("02_track_record", "track-record"), ("03_overview", "overview"),
+         ("04_package", "package"), ("05_prices", "prices"), ("06_market", "market"),
+         ("07_export", "export")]  # fmt: skip
 
 
 def wait_up(url: str, seconds: int = 60) -> None:
@@ -42,6 +44,13 @@ def settle(page) -> None:
             break
         page.wait_for_timeout(500)
     page.wait_for_timeout(2500)
+
+
+def evaluate(page) -> None:
+    """Press Evaluate and wait for the live run to finish (Kumo takes about 30 s)."""
+    page.get_by_role("button", name="Evaluate", exact=True).click()
+    page.get_by_text("Take it with you").wait_for(timeout=180000)
+    settle(page)
 
 
 def shoot(page, path: Path, width: int) -> None:
@@ -78,13 +87,16 @@ def main(argv: list[str] | None = None) -> int:
                 page.set_viewport_size({"width": 1400, "height": 900})
                 page.goto(f"{url}/{path}")
                 settle(page)
+                if name == "01_evaluate":
+                    evaluate(page)
                 shoot(page, out / f"{name}.png", 1400)
                 print(out / f"{name}.png")
             phone = browser.new_page(viewport={"width": 390, "height": 844}, device_scale_factor=2)
             phone.goto(url)
             settle(phone)
-            shoot(phone, out / "06_overview_phone.png", 390)
-            print(out / "06_overview_phone.png")
+            evaluate(phone)
+            shoot(phone, out / "08_evaluate_phone.png", 390)
+            print(out / "08_evaluate_phone.png")
             browser.close()
     finally:
         app.terminate()

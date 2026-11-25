@@ -4,7 +4,7 @@
 
 BidLens helps an estimator move from "here is a new bid package" to "here is a defensible draft estimate" faster. It reads the bid documents, prices every bid item from years of real public bid results, shows what the market is likely to do, and exports a draft estimate the estimator can review and adjust.
 
-> **Status: v1.0.0 is released** ([what's in it](CHANGELOG.md)). [Try the live demo](https://huggingface.co/spaces/tanmaypathak4/bidlens) on a real Caltrans bid package (no sign-in needed). Built and tested on public Caltrans data (Districts 4 and 5). Sections marked *Roadmap* are planned for after v1.
+> **Status: v1.0.0 is released, and the next version makes BidLens a live tool** ([what's new](CHANGELOG.md)): pick any Caltrans job bid in 2024 to 2026, or upload your own bid item list, and watch it priced step by step. [Try the live demo](https://huggingface.co/spaces/tanmaypathak4/bidlens) (no sign-in needed). Built and tested on public Caltrans data (Districts 4 and 5). Sections marked *Roadmap* are planned for after v1.
 >
 > **Headline:** on 178 Caltrans contracts bid in 2024 to 2026, which BidLens never saw while learning, its contract total landed closer to the winning bid than Caltrans' own engineer's estimate on **57.9%** of contracts (typical miss 18.4% against 21.2%). [Details below](#results).
 
@@ -33,32 +33,44 @@ BidLens puts that history, and the documents, to work for the estimator.
 
 BidLens does not replace the estimator. It does the reading and the lookup work, shows its evidence, and leaves the judgment to people who know how the work gets built.
 
-![The BidLens home page for a sample Caltrans bid package: the draft estimate, the engineer's estimate and the actual low bid side by side, BidLens's track record, and the top 5 things to watch, each linked to its page](outputs/21_app/screenshots/01_overview.png)
+**Try it: Evaluate a bid.** Pick a past Caltrans job or upload your own bid item list (CSV or Excel: item code, description, unit, quantity, and your unit prices if you have them). Press Evaluate and BidLens runs five steps for real, each showing its numbers and a chart as it finishes: load the items, price each item from every earlier Caltrans low bid, build the price ranges, the market view, and the risk summary from the bid documents. If your list has unit prices, **Check my bid** marks each one inside, above or below the BidLens range and ranks the items that move your total most.
 
-*The home page for the sample job, Caltrans contract 04-0W0504. It has already been bid, so BidLens can be checked against the real result: priced only from earlier bids, the draft landed 3% above the actual low bid; the engineer's estimate was 61% above it.*
+![The Evaluate page after a live run on Caltrans contract 04-0W0504: a dashboard with the draft, the engineer's estimate, the actual low bid, expected bidders and risks; the ten largest items and the widest ranges; the five steps with their charts; the check of the actual low bid against the ranges; and one item's price history and comparable bids](outputs/21_app/screenshots/01_evaluate.png)
+
+*A live run on Caltrans contract 04-0W0504, which has already been bid. Priced only from bids opened before its quarter, the draft landed 4% above the actual low bid; the engineer's estimate was 61% above it. Because the job has been bid, the check runs on the actual low bidder's unit prices: 71 of them fell inside the BidLens range.*
 
 <details>
-<summary><b>The other pages</b>: documents, prices, market, export, and the home page on a phone</summary>
+<summary><b>The other pages</b>: track record, the sample job's documents, prices, market and export, and Evaluate on a phone</summary>
 
-**Package:** scope, risks and requirements from the bid documents, each with its page. A summary that doesn't match its quote closely is replaced by the document's own words.
+**Track record:** all 178 test jobs on one chart, BidLens and the engineer's estimate against the actual low bid, with the typical gap between the two lowest bids as a yardstick.
 
-![The Package page: key dates, risk cards by topic with page links, a requirements checklist and the lane closure hours](outputs/21_app/screenshots/02_package.png)
+![The Track record page: a scatter of estimates against actual low bids for 178 jobs, and how far off each was](outputs/21_app/screenshots/02_track_record.png)
 
-**Prices:** every bid item with its low / likely / high price, its price history and the comparable past bids behind it.
+**Sample job with bid documents.** One job, 04-0W0504, also has its bid documents read, so these pages go deeper.
 
-![The Prices page: items by dollar impact, the price range and history of the selected item, and its comparable bids](outputs/21_app/screenshots/03_prices.png)
+*Overview:* the draft, the engineer's estimate and the actual low bid side by side, and the top 5 things to watch, each linked to its page.
 
-**Market:** a second, whole-job view of the low bid, from the engineer's estimate and how low bids landed on similar jobs, side by side with the item-by-item draft, plus the expected number of bidders.
+![The Overview page for the sample job](outputs/21_app/screenshots/03_overview.png)
 
-![The Market page: two ways to estimate the low bid, where the low bid is likely to land against the engineer's estimate, and the expected number of bidders](outputs/21_app/screenshots/04_market.png)
+*Package:* scope, risks and requirements from the bid documents, each with its page. A summary that doesn't match its quote closely is replaced by the document's own words.
 
-**Export:** a preview of the Excel workbook, then the download.
+![The Package page: key dates, risk cards by topic with page links, a requirements checklist and the lane closure hours](outputs/21_app/screenshots/04_package.png)
 
-![The Export page: the draft total, a preview of each workbook sheet and the download button](outputs/21_app/screenshots/05_export.png)
+*Prices:* every bid item with its low / likely / high price, its price history and the comparable past bids behind it.
+
+![The Prices page: items by dollar impact, the price range and history of the selected item, and its comparable bids](outputs/21_app/screenshots/05_prices.png)
+
+*Market:* a second, whole-job view of the low bid, side by side with the item-by-item draft, plus the expected number of bidders.
+
+![The Market page: two ways to estimate the low bid and the expected number of bidders](outputs/21_app/screenshots/06_market.png)
+
+*Export:* a preview of the Excel workbook, then the download.
+
+![The Export page: the draft total, a preview of each workbook sheet and the download button](outputs/21_app/screenshots/07_export.png)
 
 **On a phone:**
 
-<img src="outputs/21_app/screenshots/06_overview_phone.png" alt="The home page at phone width" width="320">
+<img src="outputs/21_app/screenshots/08_evaluate_phone.png" alt="The Evaluate page at phone width after a live run" width="320">
 
 </details>
 
@@ -118,7 +130,7 @@ flowchart TB
     end
 
     subgraph APP["Estimator app"]
-        A1["Home, Package, Prices,<br/>Market, Export pages"]
+        A1["Evaluate (live) and Track record;<br/>sample job: Overview, Package,<br/>Prices, Market, Export"]
         A2["Excel estimate export"]
     end
 
@@ -151,7 +163,7 @@ flowchart TB
 - **Refreshed every quarter.** The pricing models are refit each quarter on all earlier bids (a walk-forward setup), so they always learn from the latest market and never see the bids they are pricing. This was adopted after a check showed that models frozen at the end of 2023 drifted high in the test years (up to 24% over the low bid in 2026 for Kumo, 45% for XGBoost), because the statewide cost index rose much faster than these low bids.
 - **Market context.** Learns from past bid openings how many bidders a project like this attracts, and how the winning bid usually compares with the engineer's estimate.
 - **Document analyst.** Turns bid documents into structured, cited findings using an open-weight language model that runs on your own computer through [Ollama](https://ollama.com). Bid documents never leave the machine, and nothing is sent to a paid service. Every finding must quote the page it came from, and BidLens checks that the quote is really there.
-- **Estimator app.** A simple web app that follows the estimator's own order of work and ends in an Excel export.
+- **Estimator app.** A simple web app that follows the estimator's own order of work and ends in an Excel export. Its Evaluate page prices any past Caltrans job or an uploaded bid item list live, from a compact bundle of public Caltrans low bids (about 1 MB, committed in `data/sample/engine/`). On a laptop the live run uses Kumo Tabular, in a separate process (about 15 to 30 seconds). The free hosted demo can't hold PyTorch, so it fits LightGBM live in a few seconds instead and says so on screen.
 
 ---
 
@@ -217,9 +229,13 @@ On a real Caltrans bid package (contract 04-0W0504, 6 PDFs), scored against 89 f
 
 The bid item list read from the documents matched Caltrans' bid summary exactly (118 items). The gold facts and the judging were done with an AI assistant, not a human estimator; a human review is still open.
 
+### The live engine
+
+The Evaluate page was checked the way it runs, on all 201 jobs bid in 2024 to 2026 with a full item list ([`outputs/22_live_evaluation`](outputs/22_live_evaluation/README.md)). With Kumo Tabular (on a laptop) it reproduces the contract totals above. With LightGBM, the light model on the free hosted demo, it was closer to the low bid than the engineer's estimate on 52% of the 178 headline jobs (typical miss 22%). Its 80% item ranges held the low bidder's price on 78% of model-priced items and 68% of items priced from earlier bids alone. For scale, the second-lowest bid was a median 6.4% above the low bid on these jobs.
+
 ### End to end on the sample package
 
-For contract 04-0W0504 (trash capture, guardrail, erosion control and lighting; bid 17 September 2026), the BidLens draft total was **$14.54M**, **3% above** the actual low bid of $14.09M. The engineer's estimate, $22.72M, was 61% above it. The actual bids were used only for this check, never in the draft.
+For contract 04-0W0504 (trash capture, guardrail, erosion control and lighting; bid 17 September 2026), the BidLens draft total was **$14.54M**, **3% above** the actual low bid of $14.09M. The engineer's estimate, $22.72M, was 61% above it. The actual bids were used only for this check, never in the draft. The Evaluate page prices the job's item list from Caltrans' bid results summary (120 lines) rather than the package's own list (118 after the addenda), and refits the model live, so its draft is slightly different: $14.71M, 4% above the low bid.
 
 ---
 
@@ -233,7 +249,7 @@ For contract 04-0W0504 (trash capture, guardrail, erosion control and lighting; 
 | Caltrans Construction Cost Index | Price trend for major items | Adjusting history to today's dollars |
 | Caltrans advertised projects | Real bid packages and addenda | Document analyst |
 
-All data is public. The collection code follows each source's conditions of use and waits between requests. Bulk raw data is not committed to this repository; only a small sample is included for the demo and tests.
+All data is public. The collection code follows each source's conditions of use and waits between requests. Bulk raw data is not committed to this repository. Included for the app, the demo and the tests: one prepared sample package and a compact bundle of every low bid and low bidder's item list (about 1 MB, public facts only, no bidder names).
 
 v1 covers Caltrans Districts 4 and 5, bid years 2018 to 2026, and the 100 highest-value bid items.
 
@@ -243,7 +259,7 @@ v1 covers Caltrans Districts 4 and 5, bid years 2018 to 2026, and the 100 highes
 
 Requirements: Python 3.11 or newer and [uv](https://docs.astral.sh/uv/). Everything is free and runs on your machine.
 
-**Try the app in three commands.** It opens on the included sample package (Caltrans contract 04-0W0504) with its draft estimate, document findings, market context and Excel export:
+**Try the app in three commands.** It opens on Evaluate: pick any Caltrans job bid in 2024 to 2026, or upload your own bid item list (an example file is on the page), and press Evaluate. The included sample package (Caltrans contract 04-0W0504) also has its document findings, under "Sample job with bid documents":
 
 ```bash
 git clone <repo-url> && cd bidlens
@@ -307,13 +323,14 @@ src/bidlens/
   market/      bidder count and bid spread models
   documents/   document parsing, closure charts, extraction, evaluation
   analysis/    tables and charts for the notebooks
+  live/        the live engine behind the Evaluate page, its data bundle and its check
   estimate.py  the draft estimate for one bid package
   export.py    Excel estimate export
   sample.py    the small sample package the app ships with
 app/           Streamlit estimator app
 notebooks/     the analysis, step by step
 outputs/       every stage's results, numbered, each with a README
-data/sample/   the committed sample (all other data is rebuilt, not committed)
+data/sample/   the committed sample package and the live engine's bundle (all other data is rebuilt, not committed)
 docs/          data dictionary, model card
 tests/
 ```
@@ -335,7 +352,9 @@ tests/
 - Historical prices reflect past market conditions. Escalation adjusts for broad trends, not for local shocks such as material shortages.
 - Single item prices miss the low bid by a median of 38%, and ranges are wide. Contract totals are much closer, because over- and under-priced lines partly cancel. Lump sums and unusual quantities are the least reliable.
 - The comparison with the engineer's estimate covers 2024 to 2026, when low bids in these districts ran well under Caltrans' estimates. In a different market the margin may shrink.
-- Items that are not among the 100 modeled items are priced from the median of earlier low bids for the same item, with no range.
+- Items that are not among the 100 modeled items are priced from the median of earlier low bids for the same item. They get a range only when there are at least 5 earlier bids (the 10th to 90th percentile), and those ranges held the low bid less often than the model's (68% against 78%).
+- For an uploaded list, give the engineer's estimate if you have it: lump-sum items such as mobilization depend on the size of the job, and without it BidLens can only guess the size from the list.
+- The free hosted demo prices with LightGBM, not Kumo Tabular, and is less accurate (see Results).
 - Document extraction is an aid to review, not a substitute for reading the contract.
 - On a test package, the document reader (two local models plus plain pattern rules) finds about three quarters of the facts an estimator needs, and about 1 in 4 of its findings needs correcting. Read the cited page before relying on a finding. Lane closure hour charts are read by plain code from the page layout, not by the model.
 - BidLens supports estimating judgment. It does not replace it.

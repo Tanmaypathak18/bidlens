@@ -22,8 +22,9 @@ Every stage of BidLens writes its results to a numbered folder here, so anyone c
 | 16 | [`16_bid_package/`](16_bid_package/README.md) | The sample bid package BidLens reads in Phase 3: Caltrans contract 04-0W0504 (step 3.1). |
 | 17 | [`17_document_parsing/`](17_document_parsing/README.md) | The bid package turned into text BidLens can search and cite (step 3.2). |
 | 18 | [`18_extraction/`](18_extraction/README.md) | What BidLens reads out of the bid documents for contract 04-0W0504, with the page each |
-| 19 | [`19_extraction_evaluation/`](19_extraction_evaluation/README.md) | How well each local model reads the bid documents for contract 04-0W0504 (step 3.5, |
+| 19 | [`19_extraction_evaluation/`](19_extraction_evaluation/README.md) | How well each local model reads the bid documents for contract 04-0W0504 (step 3.5). |
 | 20 | [`20_extraction_round2/`](20_extraction_round2/README.md) | A second round of document extraction for contract 04-0W0504, scored against the same |
 | 21 | [`21_app/`](21_app/README.md) | The draft estimate the BidLens app shows for the sample bid package 04-0W0504 |
+| 22 | [`22_live_evaluation/`](22_live_evaluation/README.md) | How the light live model behind the hosted demo's Evaluate page does on the |
 
-Regenerate stages 01 to 06 with `uv run python -m bidlens.outputs`. Last generated 2026-11-20.
+Regenerate stages 01 to 06 with `uv run python -m bidlens.outputs`. Last generated 2026-11-25.

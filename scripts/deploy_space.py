@@ -4,7 +4,9 @@ Usage:
     uv run python scripts/deploy_space.py --dry-run   # build build/space/ only
     uv run python scripts/deploy_space.py             # build and upload (private Space)
 
-The Space ships the committed sample only: no database, no bid PDFs, no models. It uses
+The Space ships the committed sample and the compact data bundle the live engine runs on
+(no database, no bid PDFs, no saved models: LightGBM is fit live; Kumo Tabular is too
+heavy for the free hardware). It uses
 the Hugging Face account this computer is signed in to (`uv run hf auth whoami`).
 """
 
@@ -17,11 +19,16 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 BUILD = ROOT / "build" / "space"
-PACKAGES = ("streamlit", "pandas", "pyarrow", "openpyxl", "altair", "numpy")
+PACKAGES = ("streamlit", "pandas", "pyarrow", "openpyxl", "altair", "numpy", "lightgbm", "duckdb",
+            "beautifulsoup4")  # fmt: skip
 COPY = {
     "app": "app",
     "src/bidlens": "src/bidlens",
     "data/sample/app": "data/sample/app",
+    "data/sample/engine": "data/sample/engine",
+    "data/sample/example_bid_items.csv": "data/sample/example_bid_items.csv",
+    "outputs/13_model_comparison/contract_totals_refreshed.csv": "outputs/13_model_comparison/contract_totals_refreshed.csv",
+    "outputs/22_live_evaluation/results.json": "outputs/22_live_evaluation/results.json",
     ".streamlit/config.toml": ".streamlit/config.toml",
     "outputs/13_model_comparison/results.json": "outputs/13_model_comparison/results.json",
     "outputs/15_market_context/results.json": "outputs/15_market_context/results.json",
@@ -30,6 +37,8 @@ COPY = {
 IGNORE = shutil.ignore_patterns("__pycache__", "*.pyc", ".DS_Store")
 
 DOCKERFILE = """FROM python:3.12-slim
+RUN apt-get update && apt-get install -y --no-install-recommends libgomp1 \\
+    && rm -rf /var/lib/apt/lists/*
 RUN useradd -m -u 1000 user
 USER user
 ENV HOME=/home/user PATH=/home/user/.local/bin:$PATH PYTHONPATH=/home/user/app/src
@@ -56,14 +65,16 @@ short_description: Estimating copilot demo on a public Caltrans bid package
 # BidLens demo
 
 BidLens is an estimating copilot for heavy civil bids, built on public Caltrans bid data.
-This demo runs on one sample package, Caltrans contract 04-0W0504, which has already been
-bid, so the draft can be checked against the real result.
-
-- Prices, ranges and market context were computed from Caltrans bids opened before this
-  job and saved with the sample.
-- Document findings were pre-computed on a laptop with local models (qwen3:8b and
-  llama3.1:8b through Ollama, plus plain pattern rules). This Space shows the saved
-  results; it does not run a model, and no bid documents are uploaded.
+- **Evaluate** any of about 200 Caltrans jobs bid in 2024 to 2026, or upload your own bid
+  item list (CSV or Excel). Prices, ranges and the market view are computed live from
+  every earlier Caltrans low bid. If your list has unit prices, BidLens checks each one
+  against its range.
+- On this free hardware the pricing model is LightGBM, fit live. BidLens's production
+  model, NVIDIA Kumo Tabular, needs more memory and runs on a laptop; the Track record
+  page shows how both do on 178 past jobs.
+- Uploads are read in memory and never saved.
+- Document findings for the sample job 04-0W0504 were pre-computed on a laptop with local
+  models (qwen3:8b and llama3.1:8b through Ollama, plus plain pattern rules).
 - No bidder is named anywhere: bids are identified by rank only.
 
 Source code, method and results: https://github.com/Tanmaypathak18/bidlens

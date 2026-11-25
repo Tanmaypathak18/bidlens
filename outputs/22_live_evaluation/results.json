@@ -1,0 +1,34 @@
+{
+  "model": "LightGBM",
+  "contracts": 201,
+  "headline": {
+    "contracts": 178,
+    "live_closer_than_ee": 0.5168539325842697,
+    "kumo_closer_than_ee": 0.5786516853932584,
+    "live_median_abs_error": 0.22430895297100573,
+    "kumo_median_abs_error": 0.18442638438480524,
+    "ee_median_abs_error": 0.21238682952515908,
+    "live_within_15": 0.34831460674157305,
+    "live_median_error": 0.08641883440368159
+  },
+  "item_range_coverage": {
+    "history": 0.6767032967032967,
+    "model": 0.781385834824853
+  },
+  "item_range_coverage_all": 0.7081700099915457,
+  "items_checked": {
+    "history": 9100,
+    "model": 3911
+  },
+  "market": {
+    "spread_mae": 0.17971744101156056,
+    "spread_range_coverage": 0.7810945273631841,
+    "bidders_mae": 1.5024875621890548,
+    "bidders_within_1": 0.5870646766169154,
+    "bidders_range_coverage": 0.8208955223880597
+  },
+  "second_bid_gap_median": 0.06441273465895114,
+  "second_bid_gap_contracts": 174,
+  "seconds_total": 76.62927991594188,
+  "seconds_per_contract": 0.3812401985867755
+}
