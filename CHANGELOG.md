@@ -1,6 +1,6 @@
 # Changelog
 
-## Unreleased: live evaluation
+## v1.1.0 (25 November 2026): live evaluation
 
 BidLens now works as a live tool, not only a report on one sample job.
 
