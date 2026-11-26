@@ -12,6 +12,10 @@ The bundle holds only public Caltrans facts, with no bidder names:
 - contracts.parquet: one row per bid opening (engineer's estimate, low and second bid,
   bidders, plan holders, work and location).
 - item_master.parquet, cost_index.parquet, scope.parquet, meta.json.
+- kumo_lines.parquet and kumo_quarters.parquet: the track record's own Kumo Tabular run
+  (refreshed each quarter) for the top-100 lines of every test contract, and the range
+  widening used for each quarter, so a listed contract shows exactly the published numbers
+  without running Kumo (`--kumo` rewrites only these two files).
 
 `load()` reads it with pandas only, so the hosted demo needs no database.
 """
@@ -32,6 +36,8 @@ DB = ROOT / "data" / "bidlens.duckdb"
 ITEMS = ROOT / "data" / "interim" / "bid_summary_items.parquet"
 SUMMARIES = ROOT / "data" / "interim" / "bid_summaries.parquet"
 BASELINES = ROOT / "outputs" / "10_baselines" / "results.json"
+REFRESH = ROOT / "data" / "interim" / "refresh_kumo.parquet"
+RANGES = ROOT / "outputs" / "14_price_ranges" / "test_ranges.csv"
 
 LINE_COLS = ["contract_number", "bid_open_date", "item_no", "item_code", "description", "unit",
              "quantity", "unit_price", "amount"]  # fmt: skip
@@ -99,7 +105,34 @@ def build(out: Path = BUNDLE) -> dict:
         "rows": {"bids": len(bids), "lines": len(lines), "contracts": len(contracts)},
     }
     (out / "meta.json").write_text(json.dumps(meta, indent=2) + "\n")
+    save_kumo(out)
     return meta
+
+
+def save_kumo(out: Path = BUNDLE) -> tuple[int, int]:
+    """The track record's Kumo prices for test-contract lines, and each quarter's range
+    widening (step 2.6: calibrated on all earlier priced bids)."""
+    r = pd.read_parquet(REFRESH)
+    r = r[r["kind"] == "line"]
+    key = r["key"].str.split("|", expand=True)
+    lines = pd.DataFrame({
+        "contract_number": key[0],
+        "bid_open_date": pd.to_datetime(key[1]),
+        "item_no": key[2],
+        "q50": r["pred_unit_price"].to_numpy(),
+        "q10": r["pred_q10"].to_numpy(),
+        "q90": r["pred_q90"].to_numpy(),
+    }).sort_values(["contract_number", "bid_open_date", "item_no"])  # fmt: skip
+    rg = pd.read_csv(RANGES, parse_dates=["bid_open_date"])
+    rg["quarter"] = rg["bid_open_date"].dt.to_period("Q").astype(str)
+    rg["kind"] = np.where(rg["unit"] == "LS", "LS", "unit")
+    adj = rg.groupby(["quarter", "kind"])["adjustment"].agg(["min", "max"])
+    if (adj["max"] - adj["min"]).abs().max() > 1e-9:
+        raise SystemExit("range widening differs within a quarter")
+    quarters = adj["min"].unstack("kind").reset_index()
+    lines.to_parquet(out / "kumo_lines.parquet", index=False, compression="zstd")
+    quarters.to_parquet(out / "kumo_quarters.parquet", index=False)
+    return len(lines), len(quarters)
 
 
 @dataclass
@@ -111,6 +144,8 @@ class Bundle:
     cost_index: pd.DataFrame
     scope: set[tuple[str, str]]
     meta: dict
+    kumo_lines: pd.DataFrame | None = None  # saved track-record Kumo prices
+    kumo_quarters: dict | None = None  # quarter -> {"LS": widening, "unit": widening}
 
 
 def load(path: Path = BUNDLE) -> Bundle:
@@ -120,6 +155,12 @@ def load(path: Path = BUNDLE) -> Bundle:
     for df in (bids, lines, contracts):
         df["bid_open_date"] = pd.to_datetime(df["bid_open_date"])
     scope = pd.read_parquet(path / "scope.parquet")
+    kl, kq = None, None
+    if (path / "kumo_lines.parquet").exists():
+        kl = pd.read_parquet(path / "kumo_lines.parquet")
+        kl["bid_open_date"] = pd.to_datetime(kl["bid_open_date"])
+        q = pd.read_parquet(path / "kumo_quarters.parquet")
+        kq = {r.quarter: {"LS": float(r.LS), "unit": float(r.unit)} for r in q.itertuples()}
     return Bundle(
         bids=bids,
         lines=lines,
@@ -128,13 +169,21 @@ def load(path: Path = BUNDLE) -> Bundle:
         cost_index=pd.read_parquet(path / "cost_index.parquet"),
         scope=set(zip(scope["item_code"], scope["unit"], strict=True)),
         meta=json.loads((path / "meta.json").read_text()),
+        kumo_lines=kl,
+        kumo_quarters=kq,
     )
 
 
 def main() -> None:
-    meta = build()
+    import sys
+
+    if "--kumo" in sys.argv:
+        n, q = save_kumo()
+        print(f"{n} saved Kumo line prices, {q} quarters")
+    else:
+        print(json.dumps(build()["rows"]))
     size = sum(p.stat().st_size for p in BUNDLE.iterdir())
-    print(json.dumps(meta["rows"]), f"{size / 1e6:.2f} MB in {BUNDLE.relative_to(ROOT)}")
+    print(f"{size / 1e6:.2f} MB in {BUNDLE.relative_to(ROOT)}")
 
 
 if __name__ == "__main__":

@@ -25,7 +25,25 @@ import numpy as np
 import pandas as pd
 
 
+def cpu_quota() -> int | None:
+    """CPUs this container may use (Linux cgroup quota), when it is below the CPU count.
+    A hosted container can report 16 CPUs while allowed 2; PyTorch's default of one thread
+    per reported CPU then spends its time throttled."""
+    try:
+        quota, period = Path("/sys/fs/cgroup/cpu.max").read_text().split()
+    except (OSError, ValueError):
+        return None
+    if quota == "max":
+        return None
+    return max(1, round(int(quota) / int(period)))
+
+
 def main(folder: str) -> int:
+    import torch
+
+    if (n := cpu_quota()) is not None:
+        torch.set_num_threads(n)
+
     from bidlens.live.bundle import load
     from bidlens.pricing import features as F
     from bidlens.pricing.escalate import CostIndex

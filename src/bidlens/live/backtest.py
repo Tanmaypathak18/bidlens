@@ -33,7 +33,7 @@ def second_bid_gap(contracts: pd.DataFrame, keys: pd.DataFrame) -> pd.Series:
 
 
 def run() -> tuple[pd.DataFrame, pd.DataFrame, dict]:
-    eng = Engine(load(), model="lightgbm")  # the hosted demo's model; Kumo is stage 13
+    eng = Engine(load(), model="lightgbm", use_saved=False)  # Kumo is stage 13
     tc = eng.test_contracts()
     rows, items = [], []
     t0 = time.perf_counter()
@@ -124,10 +124,10 @@ def write(df: pd.DataFrame, res: dict) -> None:
     (OUT / "README.md").write_text(
         f"""# 22 Live evaluation
 
-How the light live model behind the hosted demo's Evaluate page does on the
+How LightGBM, the lighter fallback model of the Evaluate page, does on the
 {res["contracts"]} test contracts bid in 2024 to 2026, priced exactly as the page prices them.
-On a computer with Kumo Tabular installed, the Evaluate page runs Kumo instead, which
-reproduces the production totals of stage 13.
+Wherever Kumo Tabular is installed (a laptop and the hosted demo), the Evaluate page uses
+Kumo instead: the listed jobs show stage 13's own Kumo prices, and uploads run Kumo live.
 
 ## Method
 
@@ -137,9 +137,9 @@ the other items come from earlier bids for the same item. Ranges are 80%: model 
 the 10th to 90th percentile of the errors a model fit one year earlier made on that last
 year's bids (lump sum and unit-priced items separately); other items with at least 5
 earlier prices take the 10th to 90th percentile of those prices. The market view is a
-linear model on earlier contracts. The actual results are used only to score. Kumo Tabular
-(PyTorch plus its weights) is too heavy for the free hosted demo, so the demo uses this
-light model; Kumo's stage 13 results are shown for comparison.
+linear model on earlier contracts. The actual results are used only to score. LightGBM is
+used only where Kumo Tabular can't be installed; Kumo's stage 13 results are shown for
+comparison.
 
 ## Results
 
@@ -147,7 +147,7 @@ On the {h["contracts"]} headline contracts (the same ones as stage 13):
 
 | | Closer to the low bid than the engineer's estimate | Typical miss |
 | --- | ---: | ---: |
-| Light live model ({res["model"]}, hosted demo) | {p(h["live_closer_than_ee"])} | {p(h["live_median_abs_error"])} |
+| Light live model ({res["model"]}, fallback) | {p(h["live_closer_than_ee"])} | {p(h["live_median_abs_error"])} |
 | Kumo Tabular (production, stage 13; live on a laptop) | {p(h["kumo_closer_than_ee"])} | {p(h["kumo_median_abs_error"])} |
 | Engineer's estimate | | {p(h["ee_median_abs_error"])} |
 

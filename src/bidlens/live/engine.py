@@ -3,8 +3,9 @@
 Every step is real computation on bids opened before the job:
 
 1. `load_items`: read the item list, attach item families, mark the top-100 items.
-2. `price_items`: fit LightGBM on every cleaned earlier low bid and price the top-100
-   items; price the rest from earlier bids for the same item (history tiers).
+2. `price_items`: price the top-100 items with Kumo Tabular (in a worker process) or, where
+   Kumo is not installed, LightGBM fit on every cleaned earlier low bid; price the rest
+   from earlier bids for the same item (history tiers).
 3. `build_ranges`: an 80% low to high range. Model items: from the errors of a model fit
    one year earlier on that last year's bids (split conformal, by time). Other items with
    at least 5 earlier prices: the 10th to 90th percentile of those prices.
@@ -14,6 +15,11 @@ Every step is real computation on bids opened before the job:
 The app runs the steps one at a time so the screen fills in as each finishes. A test
 contract is priced from bids before its quarter (as in the track record); an uploaded
 list from bids before its bid date.
+
+Listed test contracts read their Kumo prices from the track record's own run, saved in the
+bundle (`kumo_lines`), so their totals equal the published ones to the cent; everything
+else (history tiers, ranges, market view) is still computed when the job is evaluated.
+Uploaded lists run Kumo Tabular live in a worker process.
 """
 
 from __future__ import annotations
@@ -35,8 +41,9 @@ from bidlens.pricing.setup import CUTOFF, TEST_END, escalate, use_cost_index
 
 MODELS = {
     "kumo": "Kumo Tabular (NVIDIA), run live on this computer",
-    "lightgbm": "LightGBM, fit live (the light model used on the hosted demo)",
+    "lightgbm": "LightGBM, fit live (the lighter online model)",
 }
+SAVED_LABEL = "Kumo Tabular (NVIDIA), from the track record's run (computed ahead on a laptop)"
 MODEL_NAME = "LightGBM"
 COVERAGE = (0.10, 0.90)
 CAL_DAYS = 365
@@ -97,15 +104,15 @@ class Job:
 
 
 def default_model() -> str:
-    """Kumo where it is installed and allowed; LightGBM otherwise (the free hosted demo).
-    `BIDLENS_MODEL=lightgbm` forces the light model."""
+    """Kumo Tabular wherever it is installed; LightGBM otherwise.
+    `BIDLENS_MODEL=lightgbm` forces the lighter model."""
     import importlib.util
     import os
 
     want = os.environ.get("BIDLENS_MODEL", "").lower()
     if want in MODELS:
         return want
-    if os.environ.get("SPACE_ID") or importlib.util.find_spec("sdm") is None:
+    if importlib.util.find_spec("sdm") is None:
         return "lightgbm"
     return "kumo"
 
@@ -113,9 +120,10 @@ def default_model() -> str:
 class Engine:
     """Holds the bundle and the fitted models (cached by cutoff date)."""
 
-    def __init__(self, bundle: Bundle, model: str | None = None) -> None:
+    def __init__(self, bundle: Bundle, model: str | None = None, use_saved: bool = True) -> None:
         self.b = bundle
         self.model_kind = model or default_model()
+        self.use_saved = use_saved and bundle.kumo_lines is not None
         use_cost_index(CostIndex(bundle.cost_index))
         bids = bundle.bids
         self.clean = bids[
@@ -209,6 +217,17 @@ class Engine:
 
     # --------------------------------------------------------------- step 2
 
+    def saved_kumo(self, job: Job) -> pd.DataFrame | None:
+        """The track record's Kumo prices for this listed contract (by item_no), if saved."""
+        if not (self.use_saved and job.contract_number):
+            return None
+        k = self.b.kumo_lines
+        k = k[(k["contract_number"] == job.contract_number) & (k["bid_open_date"] == job.bid_date)]
+        quarter = str(job.bid_date.to_period("Q"))
+        if k.empty or quarter not in (self.b.kumo_quarters or {}):
+            return None
+        return k.set_index("item_no")[["q50", "q10", "q90"]]
+
     def _fit(self, before: pd.Timestamp, after: pd.Timestamp | None = None):
         """LightGBM on cleaned bids opened before `before` (and on or after `after`)."""
         import lightgbm as lgb
@@ -268,6 +287,13 @@ class Engine:
         import tempfile
 
         cached = self._models.get(("kumo", job.cutoff))
+        quarter = str(job.bid_date.to_period("Q"))
+        if cached is None and quarter in (self.b.kumo_quarters or {}):
+            # The track record's widening for this quarter (calibrated on every earlier
+            # priced bid), so uploads get the published range method without a second run.
+            cached = {"adjustment": self.b.kumo_quarters[quarter], "cal_rows": 0,
+                      "cal_seconds": 0.0, "saved_widening": True}  # fmt: skip
+            self._models[("kumo", job.cutoff)] = cached
         with tempfile.TemporaryDirectory() as d:
             X.to_parquet(Path(d) / "query.parquet")
             (Path(d) / "request.json").write_text(json.dumps({
@@ -301,8 +327,20 @@ class Engine:
             sel["n_items"] = float(len(items))
             sel["working_days"] = job.working_days if job.working_days else np.nan
             sel["engineers_estimate"] = job.engineers_estimate if job.engineers_estimate else np.nan
-            X = F.build(sel, self.b.bids)
-            if self.model_kind == "kumo":
+            saved = self.saved_kumo(job)
+            if saved is not None and not sel["item_no"].isin(saved.index).all():
+                saved = None
+            X = None if saved is not None else F.build(sel, self.b.bids)
+            if saved is not None:
+                q = saved.loc[sel["item_no"]]
+                priced.loc[sel.index, "pred_unit_price"] = q["q50"].to_numpy()
+                priced.loc[sel.index, "kumo_q10"] = q["q10"].to_numpy()
+                priced.loc[sel.index, "kumo_q90"] = q["q90"].to_numpy()
+                quarter = str(job.bid_date.to_period("Q"))
+                m = {"rows": int((self.clean["bid_open_date"] < job.cutoff).sum()),
+                     "fit_seconds": 0.0, "reused": False, "saved": True,
+                     "adjustment": self.b.kumo_quarters[quarter]}  # fmt: skip
+            elif self.model_kind == "kumo":
                 pred, m = self._kumo(job, X)
                 when = sel["bid_open_date"]
                 priced.loc[sel.index, "pred_unit_price"] = F.from_ref(np.exp(pred[:, 0]), when)
@@ -320,10 +358,14 @@ class Engine:
             m = {"rows": int((self.clean["bid_open_date"] < job.cutoff).sum()),
                  "fit_seconds": 0.0, "reused": True}  # fmt: skip
         priced["pred_amount"] = priced["pred_unit_price"] * priced["quantity"]
+        saved = bool(m.get("saved"))
+        kind = "kumo" if saved else self.model_kind
         priced.attrs = {
             **items.attrs,
-            "model": self.model_kind,
-            "model_label": MODELS[self.model_kind],
+            "model": kind,
+            "saved": saved,
+            "model_label": SAVED_LABEL if saved else MODELS[kind],
+            "kumo_adjustment": m.get("adjustment") if kind == "kumo" else None,
             "model_rows": m["rows"],
             "fit_seconds": m["fit_seconds"],
             "reused": m["reused"],
@@ -357,8 +399,9 @@ class Engine:
         out = priced.copy()
         out["low"], out["high"], out["range_kind"] = np.nan, np.nan, ""
         model = out["tier"] == 0
-        if self.model_kind == "kumo":
-            spread = self._models.get(("kumo", job.cutoff), {}).get("adjustment", {})
+        kumo = priced.attrs.get("model") == "kumo"
+        if kumo:
+            spread = priced.attrs.get("kumo_adjustment") or {}
             for ls in (True, False):
                 sel = model & ((out["unit"] == "LS") == ls)
                 a = spread.get("LS" if ls else "unit")
@@ -368,7 +411,7 @@ class Engine:
                     out.loc[sel, "range_kind"] = "model"
         else:
             spread = self.model(job.cutoff)["spread"] if model.any() else {}
-        for ls in (True, False) if self.model_kind != "kumo" else ():
+        for ls in (True, False) if not kumo else ():
             sel = model & ((out["unit"] == "LS") == ls)
             if ls in spread and sel.any():
                 lo, hi = spread[ls]

@@ -41,7 +41,7 @@ from design import (
     top_watch,
 )
 
-from bidlens.live.engine import MODELS, WORK_LABELS, UploadError, read_upload, upload_job
+from bidlens.live.engine import WORK_LABELS, UploadError, read_upload, upload_job
 
 setup("Evaluate")
 sidebar_links()
@@ -86,8 +86,8 @@ def label(row) -> str:
     return f"{row.item_no} {str(row.description)[:40]}"
 
 
-def short_model() -> str:
-    return "Kumo Tabular" if eng.model_kind == "kumo" else "LightGBM"
+def short_model(kind: str | None = None) -> str:
+    return "Kumo Tabular" if (kind or eng.model_kind) == "kumo" else "LightGBM"
 
 
 # ----------------------------------------------------------------- what to evaluate
@@ -213,6 +213,20 @@ else:
             )
         except UploadError as err:
             st.error(str(err))
+    if eng.model_kind == "kumo":
+        st.caption(
+            "Your list is priced live by Kumo Tabular, the model behind the track record"
+            + (
+                ": on this free hosted CPU that takes about 1 to 3 minutes."
+                if hosted()
+                else " (about 15 seconds on this computer)."
+            )
+        )
+    else:
+        st.caption(
+            "Your list is priced by LightGBM, the lighter online model (Kumo Tabular is not "
+            "installed here), in a few seconds."
+        )
 
 go = st.button("Evaluate", type="primary", disabled=spec is None)
 dash = st.container()
@@ -281,12 +295,13 @@ def show_prices(res: dict) -> None:
         f"{share:.0%} of the total",
         f"{int((est['tier'] == 0).sum())} items",
     )
-    how = (
-        "reused this session's run for the same quarter"
-        if at["reused"]
-        else f"ran in {at['fit_seconds']:.1f} s"
-    )
-    tile(c, short_model(), f"{at['model_rows']:,} earlier bids", how)
+    if at.get("saved"):
+        how = "prices from the track record's run"
+    elif at["reused"]:
+        how = "reused this session's run for the same quarter"
+    else:
+        how = f"ran in {at['fit_seconds']:.1f} s"
+    tile(c, short_model(at["model"]), f"{at['model_rows']:,} earlier bids", how)
     top_items_chart(est)
     how_to_read(
         "the ten items with the most dollars at stake. Dark bars are priced by the model; "
@@ -529,9 +544,19 @@ def run_live(job) -> dict:
         res["risks"] = risks_for(job)
 
     step(1, STEPS[0][0], f"Loading {len(job.lines)} bid items…", items)
-    run_text = f"Running {short_model()} on every earlier Caltrans low bid" + (
-        " (in its own process; about 15 to 30 s)…" if eng.model_kind == "kumo" else "…"
-    )
+    if eng.saved_kumo(job) is not None:
+        run_text = (
+            "Reading Kumo Tabular's prices for this job from the track record's run, and "
+            "pricing the other items from earlier bids…"
+        )
+    elif eng.model_kind == "kumo":
+        run_text = "Running Kumo Tabular on every earlier Caltrans low bid " + (
+            "(on this free hosted CPU it takes about 1 to 3 minutes)…"
+            if hosted()
+            else "(in its own process; about 15 to 30 s)…"
+        )
+    else:
+        run_text = "Fitting LightGBM, the lighter online model, on every earlier Caltrans low bid…"
     step(2, STEPS[1][0], run_text, price)
     step(3, STEPS[2][0], "Building low to high ranges…", ranges)
     step(4, STEPS[3][0], "Fitting the market model on earlier jobs…", market)
@@ -559,7 +584,7 @@ def dashboard(res: dict) -> None:
     st.markdown(f"### {html.escape(job.label)}")
     st.caption(
         f"{where} · District {job.district} · Bid {when} · {len(est)} items · "
-        f"priced by {MODELS[eng.model_kind]} · {res['total_seconds']:.0f} s"
+        f"priced by {est.attrs['model_label']} · {res['total_seconds']:.0f} s"
     )
     if not job.engineers_estimate:
         st.warning(
@@ -936,10 +961,11 @@ def results(res: dict) -> None:
     downloads(res)
     bt = stage("22_live_evaluation", "results.json")
     tr = stage("13_model_comparison", "results.json")
-    if eng.model_kind == "lightgbm" and bt:
+    at = res["est"].attrs
+    if at["model"] == "lightgbm" and bt:
         h = bt["headline"]
         st.caption(
-            f"Priced by LightGBM, the light model this hosted demo can run. On {h['contracts']} past "
+            f"Priced by LightGBM, the lighter online model. On {h['contracts']} past "
             f"jobs it was closer to the low bid than the engineer's estimate {h['live_closer_than_ee']:.0%} "
             f"of the time (typical miss {h['live_median_abs_error']:.0%}). BidLens's production model, "
             f"Kumo Tabular, does better ({h['kumo_closer_than_ee']:.0%}, {h['kumo_median_abs_error']:.0%}) "
@@ -947,8 +973,14 @@ def results(res: dict) -> None:
         )
     elif tr:
         h = tr["contract_level"]["production"]["headline"]
+        how = (
+            "Kumo Tabular's prices for this job are the ones in the track record, computed ahead "
+            "on a laptop; the other steps ran just now. "
+            if at.get("saved")
+            else "Priced by Kumo Tabular, run just now. "
+        )
         st.caption(
-            f"Priced by Kumo Tabular. On {h['contracts']} past jobs it was closer to the low bid than "
+            how + f"On {h['contracts']} past jobs it was closer to the low bid than "
             f"the engineer's estimate {h['bidlens_closer_share']:.0%} of the time. See Track record. "
             "A starting point for the estimator, not a bid."
         )

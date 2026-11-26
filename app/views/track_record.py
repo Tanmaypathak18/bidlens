@@ -166,14 +166,15 @@ st.markdown(
 bid on **{within(bl):.0%}** of jobs, against **{within(ee):.0%}** for the engineer's estimate. The
 median BidLens draft was {100 * bl.median():+.1f}% from the low bid; the median engineer's
 estimate was {100 * ee.median():+.1f}%, consistently high. Drafts were priced by Kumo Tabular,
-refreshed each quarter on every earlier bid."""
+refreshed each quarter on every earlier bid. Evaluate shows these same prices for each of
+these jobs, so its draft totals match this page to the dollar."""
 )
 bt = stage("22_live_evaluation", "results.json")
 if bt:
     hh, cov = bt["headline"], bt["item_range_coverage"]
     st.markdown(
-        f"""**The light model on the hosted demo.** The free hosted demo cannot run Kumo, so it
-prices with LightGBM, fit live. Run the same way on the same {hh["contracts"]} jobs, it was
+        f"""**A lighter model, for comparison.** LightGBM, fit live in a few seconds, is the
+fallback where Kumo can't run. Run the same way on the same {hh["contracts"]} jobs, it was
 closer than the engineer's estimate on {hh["live_closer_than_ee"]:.0%} of jobs (typical miss
 {hh["live_median_abs_error"]:.0%}). Its 80% item ranges held the low bidder's price on
 {cov.get("model", float("nan")):.0%} of model-priced items and {cov.get("history", float("nan")):.0%}

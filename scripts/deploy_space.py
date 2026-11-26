@@ -3,16 +3,19 @@
 Usage:
     uv run python scripts/deploy_space.py --dry-run   # build build/space/ only
     uv run python scripts/deploy_space.py             # build and upload (private Space)
+    uv run python scripts/deploy_space.py --check     # also run the Kumo check at startup
 
 The Space ships the committed sample and the compact data bundle the live engine runs on
-(no database, no bid PDFs, no saved models: LightGBM is fit live; Kumo Tabular is too
-heavy for the free hardware). It uses
+(no database, no bid PDFs). Listed jobs read the track record's saved Kumo prices from the
+bundle; uploaded lists run Kumo Tabular small live on the Space's CPU (PyTorch CPU build,
+weights fetched from Hugging Face when the image is built). It uses
 the Hugging Face account this computer is signed in to (`uv run hf auth whoami`).
 """
 
 from __future__ import annotations
 
 import argparse
+import json
 import shutil
 import tomllib
 from pathlib import Path
@@ -20,7 +23,9 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 BUILD = ROOT / "build" / "space"
 PACKAGES = ("streamlit", "pandas", "pyarrow", "openpyxl", "altair", "numpy", "lightgbm", "duckdb",
-            "beautifulsoup4")  # fmt: skip
+            "beautifulsoup4", "structured-data-models", "huggingface-hub")  # fmt: skip
+TORCH_INDEX = "https://download.pytorch.org/whl/cpu"  # CPU-only build: no CUDA libraries
+KUMO_FILES = ("config.json", "small/regressor.pt")
 COPY = {
     "app": "app",
     "src/bidlens": "src/bidlens",
@@ -41,14 +46,19 @@ RUN apt-get update && apt-get install -y --no-install-recommends libgomp1 \\
     && rm -rf /var/lib/apt/lists/*
 RUN useradd -m -u 1000 user
 USER user
-ENV HOME=/home/user PATH=/home/user/.local/bin:$PATH PYTHONPATH=/home/user/app/src
+ENV HOME=/home/user PATH=/home/user/.local/bin:$PATH PYTHONPATH=/home/user/app/src \\
+    HF_HOME=/home/user/.cache/huggingface
 WORKDIR /home/user/app
+RUN pip install --no-cache-dir --user torch=={torch} --index-url {index}
 COPY --chown=user requirements.txt .
 RUN pip install --no-cache-dir --user -r requirements.txt
+RUN python -c "from huggingface_hub import hf_hub_download as get; \\
+[get('nvidia/Kumo-Tabular', f, revision='v1.0.1') for f in {files}]"
 COPY --chown=user . .
 EXPOSE 7860
-CMD ["streamlit", "run", "app/Home.py", "--server.port", "7860", "--server.address", "0.0.0.0"]
+CMD {cmd}
 """
+STREAMLIT = "streamlit run app/Home.py --server.port 7860 --server.address 0.0.0.0"
 
 README = """---
 title: BidLens
@@ -66,12 +76,12 @@ short_description: Estimating copilot demo on a public Caltrans bid package
 
 BidLens is an estimating copilot for heavy civil bids, built on public Caltrans bid data.
 - **Evaluate** any of about 200 Caltrans jobs bid in 2024 to 2026, or upload your own bid
-  item list (CSV or Excel). Prices, ranges and the market view are computed live from
-  every earlier Caltrans low bid. If your list has unit prices, BidLens checks each one
-  against its range.
-- On this free hardware the pricing model is LightGBM, fit live. BidLens's production
-  model, NVIDIA Kumo Tabular, needs more memory and runs on a laptop; the Track record
-  page shows how both do on 178 past jobs.
+  item list (CSV or Excel). If your list has unit prices, BidLens checks each one against
+  its range.
+- Listed jobs open instantly: their prices are the ones in the track record, computed ahead
+  of time with NVIDIA Kumo Tabular on a laptop, so every total matches the published
+  results. An uploaded list is priced live by Kumo Tabular on this free CPU, which takes
+  about 1 to 3 minutes.
 - Uploads are read in memory and never saved.
 - Document findings for the sample job 04-0W0504 were pre-computed on a laptop with local
   models (qwen3:8b and llama3.1:8b through Ollama, plus plain pattern rules).
@@ -79,6 +89,20 @@ BidLens is an estimating copilot for heavy civil bids, built on public Caltrans 
 
 Source code, method and results: https://github.com/Tanmaypathak18/bidlens
 """
+
+
+def locked(name: str) -> str:
+    lock = tomllib.loads((ROOT / "uv.lock").read_text())
+    return next(p["version"] for p in lock["package"] if p["name"] == name)
+
+
+def dockerfile(check: bool) -> str:
+    cmd = (
+        f'["sh", "-c", "python -m bidlens.live.space_check & exec {STREAMLIT}"]'
+        if check
+        else json.dumps(STREAMLIT.split())
+    )
+    return DOCKERFILE.format(torch=locked("torch"), index=TORCH_INDEX, files=KUMO_FILES, cmd=cmd)
 
 
 def requirements() -> str:
@@ -97,7 +121,7 @@ def requirements() -> str:
     return "".join(f"{n}=={versions[n]}\n" for n in PACKAGES)
 
 
-def build() -> Path:
+def build(check: bool = False) -> Path:
     if BUILD.exists():
         shutil.rmtree(BUILD)
     for src, dst in COPY.items():
@@ -107,7 +131,7 @@ def build() -> Path:
             shutil.copytree(s, d, ignore=IGNORE)
         else:
             shutil.copy2(s, d)
-    (BUILD / "Dockerfile").write_text(DOCKERFILE)
+    (BUILD / "Dockerfile").write_text(dockerfile(check))
     (BUILD / "requirements.txt").write_text(requirements())
     (BUILD / "README.md").write_text(README)
     return BUILD
@@ -133,8 +157,9 @@ def main() -> None:
     ap = argparse.ArgumentParser(description=__doc__.splitlines()[0])
     ap.add_argument("--dry-run", action="store_true", help="build the bundle only")
     ap.add_argument("--name", default="bidlens", help="Space name under your account")
+    ap.add_argument("--check", action="store_true", help="run the Kumo check at startup")
     args = ap.parse_args()
-    folder = build()
+    folder = build(args.check)
     size = sum(p.stat().st_size for p in folder.rglob("*") if p.is_file())
     print(f"Built {folder.relative_to(ROOT)} ({size / 1e6:.1f} MB)")
     if not args.dry_run:

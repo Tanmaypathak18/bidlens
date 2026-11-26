@@ -16,7 +16,7 @@ pytestmark = pytest.mark.skipif(not (BUNDLE / "meta.json").exists(), reason="no 
 
 @pytest.fixture(scope="module")
 def eng():
-    return Engine(load(), model="lightgbm")
+    return Engine(load(), model="lightgbm", use_saved=False)
 
 
 def test_bundle_is_small_and_has_no_bidder_names():
@@ -113,3 +113,23 @@ def test_job_cutoff():
     assert j.cutoff == pd.Timestamp("2025-04-01")
     j.contract_number = None
     assert j.cutoff == pd.Timestamp("2025-05-20")
+
+
+def test_listed_jobs_match_the_track_record_exactly():
+    """Listed jobs read the track record's saved Kumo prices: every draft total equals the
+    published production total."""
+    from bidlens.live.bundle import ROOT
+
+    path = ROOT / "outputs" / "13_model_comparison" / "contract_totals_refreshed.csv"
+    totals = pd.read_csv(path, parse_dates=["bid_open_date"])
+    saved = Engine(load(), model="lightgbm")  # model only used for uploads here
+    tc = saved.test_contracts()
+    assert len(tc) == len(totals)
+    for r in totals.itertuples():
+        job = saved.contract_job(r.contract_number, r.bid_open_date)
+        est = saved.build_ranges(job, saved.price_items(job, saved.load_items(job)))
+        assert est.attrs["saved"] and est.attrs["model"] == "kumo"
+        assert est["pred_amount"].sum() == pytest.approx(r.production_total, rel=1e-9)
+        model = est[est["tier"] == 0]
+        assert (model["range_kind"] == "model").all()
+        assert (model["low"] <= model["pred_unit_price"]).all()
