@@ -33,7 +33,7 @@ BidLens puts that history, and the documents, to work for the estimator.
 
 BidLens does not replace the estimator. It does the reading and the lookup work, shows its evidence, and leaves the judgment to people who know how the work gets built.
 
-**Try it: Evaluate a bid.** Pick a past Caltrans job or upload your own bid item list (CSV or Excel: item code, description, unit, quantity, and your unit prices if you have them). Press Evaluate and BidLens runs five steps for real, each showing its numbers and a chart as it finishes: load the items, price each item from every earlier Caltrans low bid, build the price ranges, the market view, and the risk summary from the bid documents. If your list has unit prices, **Check my bid** marks each one inside, above or below the BidLens range and ranks the items that move your total most.
+**Try it: Evaluate a bid.** Pick a past Caltrans job (no contract number needed: ten example jobs, from a $0.5M landscaping job to a $22.7M multi-scope job, are one click away) or upload your own bid item list (CSV or Excel: item code, description, unit, quantity, and your unit prices if you have them). Press Evaluate and BidLens runs five steps for real, each showing its numbers and a chart as it finishes: load the items, price each item from every earlier Caltrans low bid, build the price ranges, the market view, and the risk summary from the bid documents. If your list has unit prices, **Check my bid** marks each one inside, above or below the BidLens range and ranks the items that move your total most.
 
 ![The Evaluate page after a live run on Caltrans contract 04-0W0504: a dashboard with the draft, the engineer's estimate, the actual low bid, expected bidders and risks; the ten largest items and the widest ranges; the five steps with their charts; the check of the actual low bid against the ranges; and one item's price history and comparable bids](outputs/21_app/screenshots/01_evaluate.png)
 
@@ -259,7 +259,7 @@ v1 covers Caltrans Districts 4 and 5, bid years 2018 to 2026, and the 100 highes
 
 Requirements: Python 3.11 or newer and [uv](https://docs.astral.sh/uv/). Everything is free and runs on your machine.
 
-**Try the app in three commands.** It opens on Evaluate: pick any Caltrans job bid in 2024 to 2026, or upload your own bid item list (an example file is on the page), and press Evaluate. The included sample package (Caltrans contract 04-0W0504) also has its document findings, under "Sample job with bid documents":
+**Try the app in three commands.** It opens on Evaluate: pick any Caltrans job bid in 2024 to 2026 (or one of the ten example jobs), or upload your own bid item list (an example file is on the page), and press Evaluate. The included sample package (Caltrans contract 04-0W0504) also has its document findings, under "Sample job with bid documents":
 
 ```bash
 git clone <repo-url> && cd bidlens

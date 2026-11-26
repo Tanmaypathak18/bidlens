@@ -50,6 +50,21 @@ STATUS_COLOR = {"below": "#2563EB", "inside": GREEN, "above": RED}
 STATUS_TEXT = {"below": "Below the range", "inside": "Inside the range", "above": "Above the range"}
 SAMPLE_JOB = "04-0W0504"
 EXAMPLE = ROOT / "data" / "sample" / "example_bid_items.csv"
+# Ten jobs to try without knowing a contract number: one or two per kind of work, both
+# districts, $0.5M to $23M. Picked for variety, not for good results: on two of them the
+# engineer's estimate lands closer to the low bid than BidLens does.
+EXAMPLES = {
+    "04-0W0504": "Trash capture, guardrail, lighting · Alameda and Contra Costa · $22.7M",
+    "04-1W7104": "Pavement repair and drainage · Alameda · $3.6M",
+    "05-1Q1604": "Bridge repair · Monterey · $14.7M",
+    "05-1J8904": "Culverts and pump plants · Monterey · $18.5M",
+    "05-1H6104": "Shoulders, rumble strips, guardrail · Santa Barbara · $19.2M",
+    "04-2K3604": "Slope repair and soil nail wall · Sonoma · $6.6M",
+    "04-4AC404": "Warning signs · Sonoma · $2.2M",
+    "04-2Y5604": "Concrete slab replacement · San Mateo · $1.0M",
+    "05-1R4404": "Sidewalk, curb ramps, signals · San Luis Obispo · $1.4M",
+    "04-3G9014": "Planting upkeep and erosion control · Sonoma · $0.5M",
+}
 
 badge = (
     "Hosted demo · public Caltrans data"
@@ -86,12 +101,28 @@ source = st.radio(
 spec = None
 if source.startswith("A past"):
     tc = test_contracts()
+    examples = [c for c in EXAMPLES if c in set(tc["contract_number"])]
+
+    def use_example() -> None:
+        code = st.session_state.get("example")
+        if code:
+            st.session_state.update(job_q=code, job_district="All", job_county=[], job_work=[])
+
+    st.pills(
+        "Don't know a contract number? Try one of these jobs (amounts are the engineer's estimate)",
+        examples,
+        format_func=lambda c: f"{c} · {EXAMPLES[c]}",
+        key="example",
+        on_change=use_example,
+    )
     c1, c2, c3, c4 = st.columns([2, 1, 2, 2])
-    q = c1.text_input("Contract number", placeholder="for example 04-0W0504")
-    dist = c2.selectbox("District", ["All", "04", "05"])
+    q = c1.text_input("Contract number", placeholder="for example 04-0W0504", key="job_q")
+    dist = c2.selectbox("District", ["All", "04", "05"], key="job_district")
     names = sorted({c for v in tc["county"].dropna() for c in v.split(",")})
-    cty = c3.multiselect("County", names, format_func=lambda c: COUNTIES.get(c, c))
-    wt = c4.multiselect("Work type", list(WORK_LABELS.values()))
+    cty = c3.multiselect(
+        "County", names, format_func=lambda c: COUNTIES.get(c, c), key="job_county"
+    )
+    wt = c4.multiselect("Work type", list(WORK_LABELS.values()), key="job_work")
     f = tc
     if q.strip():
         f = f[f["contract_number"].str.contains(q.strip().upper(), regex=False)]
@@ -117,7 +148,12 @@ if source.startswith("A past"):
                 f"{r['county']}{ee} · {r['items']} items{work}"
             )
 
-        pick = st.selectbox(f"{len(f)} jobs match", opts, index=default, format_func=fmt)
+        pick = st.selectbox(
+            "1 job matches" if len(f) == 1 else f"{len(f)} jobs match",
+            opts,
+            index=default,
+            format_func=fmt,
+        )
         r = f.iloc[pick]
         spec = ("contract", r["contract_number"], r["bid_open_date"])
         st.caption(
