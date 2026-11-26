@@ -84,7 +84,7 @@ def main() -> int:
             model=est.attrs["model"],
             kumo_load_s=round(run.get("load_seconds", 0), 1),
             kumo_price_s=round(run.get("fit_seconds", 0), 1),
-            calibration_s=round(run.get("cal_seconds", 0), 1) if not run.get("reused") else 0,
+            calibration_s=round(run.get("cal_seconds", 0), 1) if not run.get("cal_reused") else 0,
             context_rows=run.get("rows"),
             draft_total=round(float(est["pred_amount"].sum())),
             worker_peak_mb=round(_peak_mb(resource.RUSAGE_CHILDREN)),

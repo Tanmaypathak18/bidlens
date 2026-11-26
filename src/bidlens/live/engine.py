@@ -40,7 +40,7 @@ from bidlens.pricing.escalate import CostIndex
 from bidlens.pricing.setup import CUTOFF, TEST_END, escalate, use_cost_index
 
 MODELS = {
-    "kumo": "Kumo Tabular (NVIDIA), run live on this computer",
+    "kumo": "Kumo Tabular (NVIDIA), run live",
     "lightgbm": "LightGBM, fit live (the lighter online model)",
 }
 SAVED_LABEL = "Kumo Tabular (NVIDIA), from the track record's run (computed ahead on a laptop)"
@@ -310,9 +310,10 @@ class Engine:
             cached = {"adjustment": info["adjustment"], "cal_rows": info["cal_rows"],
                       "cal_seconds": info["cal_seconds"]}  # fmt: skip
             self._models[("kumo", job.cutoff)] = cached
-            info["reused"] = False
+            info["cal_reused"] = False
         else:
-            info["reused"] = True
+            info["cal_reused"] = not cached.get("saved_widening", False)
+        info["reused"] = False  # Kumo itself ran for this job; only calibration is reused
         return pred, {**info, **cached}
 
     def price_items(self, job: Job, items: pd.DataFrame) -> pd.DataFrame:
